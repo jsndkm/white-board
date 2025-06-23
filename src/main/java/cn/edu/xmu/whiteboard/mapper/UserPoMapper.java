@@ -6,4 +6,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserPoMapper extends JpaRepository<UserPO, Long> {
+
+    /**
+     * 根据用户名查找用户
+     * @param username 用户名
+     * @return 如果找到用户，返回 true；否则返回 false
+     */
+    boolean existsByUsername(String username);
 }
