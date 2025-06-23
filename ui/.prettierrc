@@ -1,0 +1,7 @@
+{
+  "semi": true,
+  "singleQuote": false,
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports"
+  ]
+}
