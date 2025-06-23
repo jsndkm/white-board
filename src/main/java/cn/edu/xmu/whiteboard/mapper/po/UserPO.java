@@ -1,13 +1,10 @@
 package cn.edu.xmu.whiteboard.mapper.po;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import jakarta.persistence.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "user")
