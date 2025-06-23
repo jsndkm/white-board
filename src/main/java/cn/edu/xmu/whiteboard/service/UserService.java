@@ -38,7 +38,7 @@ public class UserService {
         user.setPassword(encryptedPassword);
         user.setEmail(userDTO.getEmail());
         user.setPhone(userDTO.getPhone());
-
+        user.setSalt(salt);
 
         // 保存用户到数据库
         userDao.save(user);
