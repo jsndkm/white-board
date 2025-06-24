@@ -3,18 +3,11 @@ package cn.edu.xmu.whiteboard.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
-import lombok.val;
-
-import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class JWTUtil {
-    //private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private static final String SECRET_KEY = "jsndnkmhzs123456789jsndkmjsndkmjsndkmjsndkm";
     private static final long EXPIRATION_TIME = 86400000; // 24 hours
 
