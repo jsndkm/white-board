@@ -29,7 +29,7 @@ CREATE TABLE `project` (
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for record
+-- Table structure for idea
 -- ----------------------------
 DROP TABLE IF EXISTS `idea`;
 CREATE TABLE `idea` (
@@ -40,7 +40,19 @@ CREATE TABLE `idea` (
   PRIMARY KEY (`id`),
   KEY `fk_user_id` (`user_id`),
   KEY `fk_project_id` (`project_id`),
-  CONSTRAINT `fk_record_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_record_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_idea_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_idea_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for project_member
+-- ----------------------------
+DROP TABLE IF EXISTS `project_member`;
+CREATE TABLE `project_member` (
+  `project_id` INT NOT NULL,
+  `member_id` INT NOT NULL,
+  PRIMARY KEY (project_id, member_id),
+  CONSTRAINT `fk_project` FOREIGN KEY (project_id) REFERENCES `project` (id) ON DELETE CASCADE,
+  CONSTRAINT `fk_member` FOREIGN KEY (member_id) REFERENCES `user` (id) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
 
