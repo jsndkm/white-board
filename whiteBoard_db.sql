@@ -22,10 +22,10 @@ CREATE TABLE `project` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `description` text,
-  `user_id` int(10) NOT NULL,
+  `username` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `fk_user_id` (`user_id`),
-  CONSTRAINT `fk_project_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `fk_user` (`username`),
+  CONSTRAINT `fk_project_user` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -35,12 +35,12 @@ DROP TABLE IF EXISTS `idea`;
 CREATE TABLE `idea` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content` text,
-  `user_id` int(10) NOT NULL,
+  `username` varchar(255) NOT NULL,
   `project_id` int(10) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `fk_user_id` (`user_id`),
-  KEY `fk_project_id` (`project_id`),
-  CONSTRAINT `fk_idea_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  KEY `fk_user` (`username`),
+  KEY `fk_project` (`project_id`),
+  CONSTRAINT `fk_idea_user` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_idea_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
 
