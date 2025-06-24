@@ -22,10 +22,10 @@ CREATE TABLE `project` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `description` text,
-  `user_id` int(10) NOT NULL,
+  `username` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `fk_user_id` (`user_id`),
-  CONSTRAINT `fk_project_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `fk_user` (`username`),
+  CONSTRAINT `fk_project_user` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -35,24 +35,25 @@ DROP TABLE IF EXISTS `idea`;
 CREATE TABLE `idea` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content` text,
-  `user_id` int(10) NOT NULL,
+  `username` varchar(255) NOT NULL,
   `project_id` int(10) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `fk_user_id` (`user_id`),
-  KEY `fk_project_id` (`project_id`),
-  CONSTRAINT `fk_idea_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  KEY `fk_user` (`username`),
+  KEY `fk_project` (`project_id`),
+  CONSTRAINT `fk_idea_user` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_idea_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for project_member
 -- ----------------------------
-DROP TABLE IF EXISTS `project_member`;
-CREATE TABLE `project_member` (
+DROP TABLE IF EXISTS `project_user`;
+CREATE TABLE `project_user` (
   `project_id` INT NOT NULL,
-  `member_name` varchar(255) NOT NULL,
-  PRIMARY KEY (project_id, member_name),
+  `username` varchar(255) NOT NULL,
+  `is_admin` BOOLEAN NOT NULL,
+  PRIMARY KEY (project_id, username),
   CONSTRAINT `fk_project` FOREIGN KEY (project_id) REFERENCES `project` (id) ON DELETE CASCADE,
-  CONSTRAINT `fk_member` FOREIGN KEY (member_name) REFERENCES `user` (username) ON DELETE CASCADE
+  CONSTRAINT `fk_user` FOREIGN KEY (username) REFERENCES `user` (username) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
 
