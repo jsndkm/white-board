@@ -2,6 +2,7 @@
   "semi": true,
   "singleQuote": false,
   "plugins": [
-    "@trivago/prettier-plugin-sort-imports"
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
   ]
 }

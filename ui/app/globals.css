@@ -123,57 +123,61 @@
 }
 
 
-.custom-styles .excalidraw {
-    --button-destructive-bg-color: var(--destructive);
-    --input-bg-color: var(--input);
-    --input-border-color: var(--border);
-    --default-bg-color: var(--background);
-    --popup-text-color: var(--foreground);
-    --popup-text-inverted-color: var(--background);
+/*.custom-styles .excalidraw {*/
+/*    --button-destructive-bg-color: var(--destructive);*/
+/*    --input-bg-color: var(--input);*/
+/*    --input-border-color: var(--border);*/
+/*    --default-bg-color: var(--background);*/
+/*    --popup-text-color: var(--foreground);*/
+/*    --popup-text-inverted-color: var(--background);*/
 
-    --default-border-color: var(--border);
+/*    --default-border-color: var(--border);*/
 
-    --color-slider-thumb: var(--muted);
+/*    --color-slider-thumb: var(--muted);*/
 
-    --avatar-border-color: var(--border);
+/*    --avatar-border-color: var(--border);*/
 
-    --text-primary-color: var(--foreground);
-    --color-primary: var(--primary);
+/*    --text-primary-color: var(--foreground);*/
+/*    --color-primary: var(--primary);*/
 
-    --color-disabled: var(--muted);
-    --color-warning: var(--destructive);
+/*    --color-disabled: var(--muted);*/
+/*    --color-warning: var(--destructive);*/
 
-    --color-muted: var(--muted);
-    --color-promo: var(--primary);
+/*    --color-muted: var(--muted);*/
+/*    --color-promo: var(--primary);*/
 
-    --color-logo-icon: var(--primary);
-    --border-radius-md: var(--radius-sm);
-    --border-radius-lg: var(--radius-md);
+/*    --color-logo-icon: var(--primary);*/
+/*    --border-radius-md: var(--radius-sm);*/
+/*    --border-radius-lg: var(--radius-md);*/
 
-    --color-on-surface: var(--foreground);
-}
+/*    --color-on-surface: var(--foreground);*/
+/*}*/
 
-.custom-styles .excalidraw.theme--dark {
-    --default-bg-color: var(--background);
-    --input-bg-color: var(--input);
-    --input-border-color: var(--border);
-    --input-hover-bg-color: var(--muted);
-    --island-bg-color: var(--card);
+/*.custom-styles .excalidraw.theme--dark {*/
+/*    --default-bg-color: var(--background);*/
+/*    --input-bg-color: var(--input);*/
+/*    --input-border-color: var(--border);*/
+/*    --input-hover-bg-color: var(--muted);*/
+/*    --island-bg-color: var(--card);*/
 
-    --scrollbar-thumb: var(--muted);
-    --scrollbar-thumb-hover: var(--muted-foreground);
+/*    --scrollbar-thumb: var(--muted);*/
+/*    --scrollbar-thumb-hover: var(--muted-foreground);*/
 
-    --color-selection: var(--primary);
+/*    --color-selection: var(--primary);*/
 
-    --color-warning-color: var(--muted);
-    --color-warning-icon-color: var(--muted);
+/*    --color-warning-color: var(--muted);*/
+/*    --color-warning-icon-color: var(--muted);*/
 
-    --color-muted: var(--muted);
-    --color-muted-darker: var(--muted-foreground);
-    --color-muted-background: var(--muted);
+/*    --color-muted: var(--muted);*/
+/*    --color-muted-darker: var(--muted-foreground);*/
+/*    --color-muted-background: var(--muted);*/
 
-    --color-on-surface: var(--foreground);
-    --color-on-primary-container: var(--foreground);
-    --color-border-outline: var(--border);
-    --color-border-outline-variant: var(--border);
+/*    --color-on-surface: var(--foreground);*/
+/*    --color-on-primary-container: var(--foreground);*/
+/*    --color-border-outline: var(--border);*/
+/*    --color-border-outline-variant: var(--border);*/
+/*}*/
+
+.excalidraw .sidebar-trigger {
+    display: none !important;
 }

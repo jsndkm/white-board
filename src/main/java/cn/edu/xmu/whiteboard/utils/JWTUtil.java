@@ -1,19 +1,20 @@
 package cn.edu.xmu.whiteboard.utils;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.security.Key;
 import java.util.Date;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.security.Keys;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JWTUtil {
-    private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);;
+    private static final String SECRET_KEY = "jsndnkmhzs123456789jsndkmjsndkmjsndkmjsndkm";
     private static final long EXPIRATION_TIME = 86400000; // 24 hours
 
     public static String generateToken(String username) {
-        return Jwts.builder()
-                .setSubject(username) // 设置主题
+        Map<String, String> claims = new HashMap<>();
+        claims.put("username", username);
+        return Jwts.builder().setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // 设置过期时间
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY) // 使用HS256算法和密钥签名
                 .compact(); // 生成令牌
@@ -21,13 +22,15 @@ public class JWTUtil {
 
     public static String parseToken(String token) {
         try {
-            Claims claims = Jwts.parser()
+            Claims claims = Jwts.parserBuilder()
                     .setSigningKey(SECRET_KEY) // 设置用于验证签名的密钥
+                    .build()
                     .parseClaimsJws(token) // 解析令牌
                     .getBody(); // 获取声明部分
 
-            return claims.getSubject(); // 返回用户标识
+            return claims.get("username", String.class); // 返回用户标识
         } catch (Exception e) {
+            e.printStackTrace();
             // 处理异常，比如令牌过期、签名无效等
             return null;
         }
