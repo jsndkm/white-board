@@ -1,7 +1,9 @@
 package cn.edu.xmu.whiteboard.service;
 
 import cn.edu.xmu.whiteboard.controller.dto.UserDto;
+import cn.edu.xmu.whiteboard.controller.vo.UserVO;
 import cn.edu.xmu.whiteboard.dao.UserDao;
+import cn.edu.xmu.whiteboard.dao.bo.User;
 import cn.edu.xmu.whiteboard.mapper.po.UserPO;
 import cn.edu.xmu.whiteboard.redis.UserKey;
 import cn.edu.xmu.whiteboard.utils.UUIDUtil;
@@ -42,5 +44,20 @@ public class UserService {
         cookie.setMaxAge(UserKey.token.expireSeconds());
         cookie.setPath("/");
         response.addCookie(cookie);
+    }
+
+    public UserDto login(UserDto UserDto) {
+        // 验证用户凭证
+        User user = userDao.validateUser(UserDto.getUsername(), UserDto.getPassword());
+
+        if (user != null) {
+            // 转换为VO对象
+            UserDto userDto = new UserDto();
+            userDto.setId(user.getId());
+            userDto.setUsername(user.getUsername());
+            // 这里可以添加更多用户信息
+            return userDto;
+        }
+        return null;
     }
 }

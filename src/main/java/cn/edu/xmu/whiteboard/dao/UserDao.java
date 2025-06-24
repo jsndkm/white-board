@@ -1,11 +1,14 @@
 package cn.edu.xmu.whiteboard.dao;
 
 import cn.edu.xmu.whiteboard.controller.dto.UserDto;
+import cn.edu.xmu.whiteboard.dao.bo.User;
 import cn.edu.xmu.whiteboard.mapper.UserPoMapper;
 import cn.edu.xmu.whiteboard.mapper.po.UserPO;
 import cn.edu.xmu.whiteboard.utils.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public class UserDao {
@@ -42,5 +45,21 @@ public class UserDao {
         this.userPoMapper.save(user);
 
         return user;
+    }
+
+    public User validateUser(String username, String password) {
+        Optional<UserPO> userPOOptional = userPoMapper.findByUsername(username);
+
+        if (userPOOptional.isPresent()) {
+            UserPO userPO = userPOOptional.get();
+            if (userPO.getPassword().equals(password)) {
+                // 验证成功，转换为BO对象
+                User user = new User();
+                user.setId(userPO.getId());
+                user.setUsername(userPO.getUsername());
+                return user;
+            }
+        }
+        return null;
     }
 }
