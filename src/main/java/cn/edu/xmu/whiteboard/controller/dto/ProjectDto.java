@@ -1,6 +1,6 @@
 package cn.edu.xmu.whiteboard.controller.dto;
 
-public class NewProjectDto {
+public class ProjectDto {
     private String name;
     private String description;
 
