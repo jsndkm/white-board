@@ -4,7 +4,7 @@ import cn.edu.xmu.whiteboard.controller.dto.UserDto;
 import cn.edu.xmu.whiteboard.dao.UserDao;
 import cn.edu.xmu.whiteboard.mapper.po.UserPO;
 import cn.edu.xmu.whiteboard.redis.UserKey;
-import cn.edu.xmu.whiteboard.utils.UUIDUtil;
+import cn.edu.xmu.whiteboard.utils.JWTUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class UserService {
         UserPO user=userDao.register(userDTO);
 
         // 生成 cookie
-        String token = UUIDUtil.uuid();
+        String token = JWTUtil.generateToken(user.getUsername());
         addCookie(response, token, user);
         return token;
     }

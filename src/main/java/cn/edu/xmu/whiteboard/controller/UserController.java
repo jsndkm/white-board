@@ -1,5 +1,6 @@
 package cn.edu.xmu.whiteboard.controller;
 
+import cn.edu.xmu.whiteboard.controller.dto.RegisterReturnData;
 import cn.edu.xmu.whiteboard.controller.dto.UserDto;
 import cn.edu.xmu.whiteboard.result.CodeMsg;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
@@ -22,7 +23,7 @@ public class UserController {
      */
     @PostMapping("/register")
     @ResponseBody
-    public ResultUtil<String> registerUser(HttpServletResponse response, @RequestBody UserDto userDTO) {
+    public ResultUtil<Object> registerUser(HttpServletResponse response, @RequestBody UserDto userDTO) {
         try {
             // 检查用户名和密码是否为空
             if (!StringUtils.hasText(userDTO.getUsername())) {
@@ -47,8 +48,9 @@ public class UserController {
 
             // 调用 UserService 注册用户
             String token = userService.registerUser(response,userDTO);
+            RegisterReturnData data=new RegisterReturnData(token);
 
-            return ResultUtil.success(token);
+            return ResultUtil.success(data);
         } catch (Exception e) {
             // 处理异常情况
             e.printStackTrace();
