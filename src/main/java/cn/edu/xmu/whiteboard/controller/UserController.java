@@ -2,8 +2,7 @@ package cn.edu.xmu.whiteboard.controller;
 
 import cn.edu.xmu.whiteboard.controller.dto.RegisterReturnData;
 import cn.edu.xmu.whiteboard.controller.dto.UserDto;
-import cn.edu.xmu.whiteboard.result.CodeMsg;
-import cn.edu.xmu.whiteboard.result.ResultUtil;
+import cn.edu.xmu.whiteboard.result.*;
 import cn.edu.xmu.whiteboard.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +56,19 @@ public class UserController {
             if(e.getMessage().equals("Username already exists"))
                 return ResultUtil.error(CodeMsg.USERNAME_ALREADY_EXIST);
             return ResultUtil.error(CodeMsg.SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/login")
+    public Object login(@RequestBody UserDto UserDto) {
+        UserDto userDto = userService.login(UserDto);
+
+        if (userDto != null) {
+            // 登录成功
+            return Common.getRetObject(new ReturnObject<>(userDto));
+        } else {
+            // 登录失败
+            return Common.getRetObject(new ReturnObject<>(ReturnNo.AUTH_INVALID_ACCOUNT));
         }
     }
 }
