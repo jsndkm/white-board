@@ -10,7 +10,7 @@ const Excalidraw = dynamic(
 
 export default function ExcalidrawClient() {
   return (
-    <div style={{ height: "100vh" }}>
+    <div className="h-screen custom-styles">
       <Excalidraw langCode="zh-CN" />
     </div>
   );
