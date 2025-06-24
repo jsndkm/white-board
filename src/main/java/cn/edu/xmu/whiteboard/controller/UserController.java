@@ -1,16 +1,19 @@
 package cn.edu.xmu.whiteboard.controller;
 
-import cn.edu.xmu.whiteboard.Exception.GlobalException;
+import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
 import cn.edu.xmu.whiteboard.controller.dto.LoginDto;
 import cn.edu.xmu.whiteboard.controller.dto.LoginReturnData;
 import cn.edu.xmu.whiteboard.controller.dto.RegisterReturnData;
 import cn.edu.xmu.whiteboard.controller.dto.UserDto;
 import cn.edu.xmu.whiteboard.result.*;
 import cn.edu.xmu.whiteboard.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController /*Restful的Controller对象*/
 @RequestMapping(value = "/api", produces = "application/json;charset=UTF-8")
@@ -54,11 +57,8 @@ public class UserController {
 
             return ResultUtil.success(data);
         } catch (Exception e) {
-            // 处理异常情况
-            e.printStackTrace();
-            if(e.getMessage().equals("username already exists"))
-                return ResultUtil.error(CodeMsg.USERNAME_ALREADY_EXIST);
-            return ResultUtil.error(CodeMsg.SERVER_ERROR);
+            GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
+            return exceptionHandle.exceptionHandle(e);
         }
     }
 
@@ -76,12 +76,19 @@ public class UserController {
             LoginReturnData data = userService.login(response,loginDTO);
             return ResultUtil.success(data);
         }catch (Exception e){
-            e.printStackTrace();
-            if(e.getMessage().equals("username is not exists"))
-                return ResultUtil.error(CodeMsg.USERNAME_NOT_EXIST);
-            else if(e.getMessage().equals("password does not match"))
-                return ResultUtil.error(CodeMsg.PASSWORD_ERROR);
-            return ResultUtil.error(CodeMsg.SERVER_ERROR);
+            GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
+            return exceptionHandle.exceptionHandle(e);
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResultUtil<Object> logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            userService.logout(request, response);
+            return ResultUtil.success(null);
+        }catch (Exception e){
+            GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
+            return exceptionHandle.exceptionHandle(e);
         }
     }
 }

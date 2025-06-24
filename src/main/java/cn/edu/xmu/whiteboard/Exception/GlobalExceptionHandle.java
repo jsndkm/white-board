@@ -8,7 +8,6 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @ControllerAdvice
@@ -16,7 +15,7 @@ import java.util.List;
 public class GlobalExceptionHandle {
 
     @ExceptionHandler(value = Exception.class)
-    public ResultUtil<String> exceptionHandle(HttpServletRequest request, Exception e) {
+    public ResultUtil<Object> exceptionHandle(Exception e) {
         if (e instanceof GlobalException) {
             GlobalException ex = (GlobalException) e;
             return ResultUtil.error(ex.getCm());
