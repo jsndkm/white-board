@@ -1,4 +1,4 @@
-package cn.edu.xmu.whiteboard.utils;
+package cn.edu.xmu.whiteboard.result;
 
 import org.springframework.http.ResponseEntity;
 

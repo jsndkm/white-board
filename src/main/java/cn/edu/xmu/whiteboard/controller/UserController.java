@@ -1,11 +1,8 @@
 package cn.edu.xmu.whiteboard.controller;
 
 import cn.edu.xmu.whiteboard.controller.dto.UserDto;
-import cn.edu.xmu.whiteboard.controller.vo.UserVO;
-import cn.edu.xmu.whiteboard.result.CodeMsg;
-import cn.edu.xmu.whiteboard.result.ResultUtil;
+import cn.edu.xmu.whiteboard.result.*;
 import cn.edu.xmu.whiteboard.service.UserService;
-import cn.edu.xmu.whiteboard.utils.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;

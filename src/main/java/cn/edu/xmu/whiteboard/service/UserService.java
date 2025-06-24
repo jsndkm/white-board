@@ -51,7 +51,6 @@ public class UserService {
         User user = userDao.validateUser(UserDto.getUsername(), UserDto.getPassword());
 
         if (user != null) {
-            // 转换为VO对象
             UserDto userDto = new UserDto();
             userDto.setId(user.getId());
             userDto.setUsername(user.getUsername());

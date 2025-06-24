@@ -1,4 +1,4 @@
-package cn.edu.xmu.whiteboard.utils;
+package cn.edu.xmu.whiteboard.result;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,12 +14,12 @@ public class ReturnObject<T> {
     }
 
     public ReturnObject(T data) {
-        this.code = cn.edu.xmu.whiteboard.utils.ReturnNo.OK.getCode();
-        this.message = cn.edu.xmu.whiteboard.utils.ReturnNo.OK.getMessage();
+        this.code = ReturnNo.OK.getCode();
+        this.message = ReturnNo.OK.getMessage();
         this.data = data;
     }
 
-    public ReturnObject(cn.edu.xmu.whiteboard.utils.ReturnNo returnNo) {
+    public ReturnObject(ReturnNo returnNo) {
         this.code = returnNo.getCode();
         this.message = returnNo.getMessage();
     }
