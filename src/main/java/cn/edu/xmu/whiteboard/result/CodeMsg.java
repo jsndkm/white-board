@@ -22,6 +22,9 @@ public class CodeMsg {
     public static CodeMsg USERNAME_EMPTY = new CodeMsg(500212, "用户名不能为空");
     public static CodeMsg USERNAME_NOT_EXIST = new CodeMsg(500213, "用户名不存在");
     public static CodeMsg PASSWORD_ERROR = new CodeMsg(500214, "密码错误");
+    public static CodeMsg USERNAME_TOO_SHORT = new CodeMsg(500215, "用户名至少为3个字符");
+    public static CodeMsg PASSWORD_TOO_SHORT = new CodeMsg(500216, "密码至少为6个字符");
+    public static CodeMsg USERNAME_ALREADY_EXIST = new CodeMsg(500217, "用户名已存在");
 
     public int getCode() {
         return code;

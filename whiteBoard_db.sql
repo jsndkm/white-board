@@ -31,8 +31,8 @@ CREATE TABLE `project` (
 -- ----------------------------
 -- Table structure for record
 -- ----------------------------
-DROP TABLE IF EXISTS `record`;
-CREATE TABLE `record` (
+DROP TABLE IF EXISTS `idea`;
+CREATE TABLE `idea` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content` text,
   `user_id` int(10) NOT NULL,

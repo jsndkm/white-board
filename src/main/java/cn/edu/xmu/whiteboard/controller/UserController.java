@@ -38,6 +38,13 @@ public class UserController {
                 return ResultUtil.error(CodeMsg.BIND_ERROR);
             }
 
+            // 检查用户名和密码的长度
+            if (userDTO.getUsername().length() < 3) {
+                return ResultUtil.error(CodeMsg.USERNAME_TOO_SHORT);
+            } else if (userDTO.getPassword().length() < 6) {
+                return ResultUtil.error(CodeMsg.PASSWORD_TOO_SHORT);
+            }
+
             // 调用 UserService 注册用户
             String token = userService.registerUser(response,userDTO);
 
@@ -45,6 +52,8 @@ public class UserController {
         } catch (Exception e) {
             // 处理异常情况
             e.printStackTrace();
+            if(e.getMessage().equals("Username already exists"))
+                return ResultUtil.error(CodeMsg.USERNAME_ALREADY_EXIST);
             return ResultUtil.error(CodeMsg.SERVER_ERROR);
         }
     }

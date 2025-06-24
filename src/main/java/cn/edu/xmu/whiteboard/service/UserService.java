@@ -4,7 +4,6 @@ import cn.edu.xmu.whiteboard.controller.dto.UserDto;
 import cn.edu.xmu.whiteboard.dao.UserDao;
 import cn.edu.xmu.whiteboard.mapper.po.UserPO;
 import cn.edu.xmu.whiteboard.redis.UserKey;
-import cn.edu.xmu.whiteboard.utils.MD5Util;
 import cn.edu.xmu.whiteboard.utils.UUIDUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,19 +28,8 @@ public class UserService {
             throw new IllegalArgumentException("Username already exists");
         }
 
-        // 创建新的用户实体
-        UserPO user = new UserPO();
-        user.setUsername(userDTO.getUsername());
-        // 对密码进行加密
-        String salt=MD5Util.generateSalt();//生成随机salt
-        String encryptedPassword = MD5Util.inputPassToDBPass(userDTO.getPassword(), salt);//密码加密
-        user.setPassword(encryptedPassword);
-        user.setEmail(userDTO.getEmail());
-        user.setPhone(userDTO.getPhone());
-        user.setSalt(salt);
-
-        // 保存用户到数据库
-        userDao.save(user);
+        // 注册用户
+        UserPO user=userDao.register(userDTO);
 
         // 生成 cookie
         String token = UUIDUtil.uuid();
