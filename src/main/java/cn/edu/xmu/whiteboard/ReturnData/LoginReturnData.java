@@ -1,4 +1,4 @@
-package cn.edu.xmu.whiteboard.controller.dto;
+package cn.edu.xmu.whiteboard.ReturnData;
 
 public class LoginReturnData {
     private int id;

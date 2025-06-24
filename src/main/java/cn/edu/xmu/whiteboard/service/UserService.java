@@ -2,10 +2,9 @@ package cn.edu.xmu.whiteboard.service;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalException;
 import cn.edu.xmu.whiteboard.controller.dto.LoginDto;
-import cn.edu.xmu.whiteboard.controller.dto.LoginReturnData;
+import cn.edu.xmu.whiteboard.ReturnData.LoginReturnData;
 import cn.edu.xmu.whiteboard.controller.dto.UserDto;
 import cn.edu.xmu.whiteboard.dao.UserDao;
-import cn.edu.xmu.whiteboard.dao.bo.User;
 import cn.edu.xmu.whiteboard.mapper.po.UserPO;
 import cn.edu.xmu.whiteboard.redis.UserKey;
 import cn.edu.xmu.whiteboard.result.CodeMsg;
@@ -16,8 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
 
 @Service
 public class UserService {

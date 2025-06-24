@@ -2,8 +2,8 @@ package cn.edu.xmu.whiteboard.controller;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
 import cn.edu.xmu.whiteboard.controller.dto.LoginDto;
-import cn.edu.xmu.whiteboard.controller.dto.LoginReturnData;
-import cn.edu.xmu.whiteboard.controller.dto.RegisterReturnData;
+import cn.edu.xmu.whiteboard.ReturnData.LoginReturnData;
+import cn.edu.xmu.whiteboard.ReturnData.RegisterReturnData;
 import cn.edu.xmu.whiteboard.controller.dto.UserDto;
 import cn.edu.xmu.whiteboard.result.*;
 import cn.edu.xmu.whiteboard.service.UserService;
