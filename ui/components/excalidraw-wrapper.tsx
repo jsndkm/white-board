@@ -1,9 +1,13 @@
 "use client";
 
+import { Project } from "@/components/my-project";
+import { Template } from "@/components/new-project";
 import { useUserStore } from "@/stores/user";
 import { Excalidraw, MainMenu, Sidebar } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import { SiGithub } from "@icons-pack/react-simple-icons";
+import { Folder, LogOut, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -15,12 +19,6 @@ export default function ExcalidrawWrapper() {
   const router = useRouter();
   const logout = useUserStore((state) => state.logout);
 
-  const refreshScene = () => {
-    excalidrawAPI?.refresh();
-    console.log(excalidrawAPI);
-    toast.success("刷新成功");
-  };
-
   return (
     <div className="custom-styles h-screen">
       <Excalidraw
@@ -28,44 +26,67 @@ export default function ExcalidrawWrapper() {
         excalidrawAPI={(api) => setExcalidrawAPI(api)}
       >
         <MainMenu>
-          <MainMenu.DefaultItems.LoadScene />
-          <MainMenu.DefaultItems.SaveAsImage />
+          <MainMenu.Item
+            onSelect={() =>
+              excalidrawAPI?.toggleSidebar({ name: "new-project" })
+            }
+          >
+            <Plus />
+            新建项目
+          </MainMenu.Item>
+
+          <MainMenu.Item
+            onSelect={() =>
+              excalidrawAPI?.toggleSidebar({ name: "open-project" })
+            }
+          >
+            <Folder />
+            打开项目
+          </MainMenu.Item>
+
+          <MainMenu.Item onSelect={() => toast.error("功能未实现")}>
+            <X />
+            删除项目
+          </MainMenu.Item>
+
+          <MainMenu.DefaultItems.ClearCanvas />
+
           <MainMenu.Separator />
-          <MainMenu.Item onSelect={refreshScene}>刷新</MainMenu.Item>
+
+          <MainMenu.DefaultItems.ToggleTheme />
+          <MainMenu.DefaultItems.ChangeCanvasBackground />
+
           <MainMenu.ItemLink href="https://github.com/jsndkm/white-board">
+            <SiGithub />
             GitHub
           </MainMenu.ItemLink>
+
           <MainMenu.Item
             onSelect={async () => {
               await logout();
               router.replace("/login");
             }}
           >
+            <LogOut />
             退出登录
           </MainMenu.Item>
         </MainMenu>
 
-        <Sidebar name="custom" docked={false} onDock={() => {}}>
-          <Sidebar.Header />
-          <Sidebar.Tabs>
-            <Sidebar.Tab tab="one">Tab One!</Sidebar.Tab>
-            <Sidebar.Tab tab="two">Tab Two!</Sidebar.Tab>
-            <Sidebar.TabTriggers>
-              <Sidebar.TabTrigger tab="one">One</Sidebar.TabTrigger>
-              <Sidebar.TabTrigger tab="two">Two</Sidebar.TabTrigger>
-            </Sidebar.TabTriggers>
-          </Sidebar.Tabs>
+        {/* ========== New Project ========== */}
+        <Sidebar name="new-project">
+          <Sidebar.Header>
+            <span>新建项目</span>
+          </Sidebar.Header>
+          <Template name="空白模板" />
         </Sidebar>
-        {/* 自定义触发按钮 */}
-        <Sidebar.Trigger
-          name="custom"
-          tab="one"
-          title="Toggle My Sidebar"
-          icon={<span>📁</span>}
-          style={{ marginLeft: 8 }}
-        >
-          My Sidebar
-        </Sidebar.Trigger>
+
+        {/* ========== Open Project ========== */}
+        <Sidebar name="open-project" className="px-2">
+          <Sidebar.Header>
+            <span>打开项目</span>
+          </Sidebar.Header>
+          <Project name="头脑风暴" />
+        </Sidebar>
       </Excalidraw>
     </div>
   );

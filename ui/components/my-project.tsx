@@ -27,13 +27,13 @@ export function Project({ name }: TemplateProps) {
   const router = useRouter();
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="m-3 max-w-sm">
       <CardHeader>
         <CardTitle>{name}</CardTitle>
         <CardDescription>发挥你的想象力！</CardDescription>
       </CardHeader>
       <CardContent>
-        <Skeleton className="mx-auto flex h-50 w-50 flex-col gap-6" />
+        <Skeleton className="mx-auto flex h-40 w-50 flex-col gap-6" />
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Button
