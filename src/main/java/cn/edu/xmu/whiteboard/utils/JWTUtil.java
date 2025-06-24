@@ -32,4 +32,19 @@ public class JWTUtil {
             return null;
         }
     }
+
+    public static Date getTokenExpiration(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.getExpiration(); // 获取过期时间
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

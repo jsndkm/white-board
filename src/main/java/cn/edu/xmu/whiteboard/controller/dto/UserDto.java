@@ -6,14 +6,11 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
 public class UserDto {
-    private int id;
     private String username;
     private String password;
     private String email;
     private String phone;
 
-    public int getId() {return id;}
-    public void setId(int id) {this.id = id;}
     public String getUsername(){return this.username;}
     public String getPassword(){return this.password;}
     public String getEmail(){return this.email;}

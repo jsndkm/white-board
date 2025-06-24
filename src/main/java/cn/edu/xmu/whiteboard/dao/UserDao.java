@@ -47,18 +47,12 @@ public class UserDao {
         return user;
     }
 
-    public User validateUser(String username, String password) {
-        Optional<UserPO> userPOOptional = userPoMapper.findByUsername(username);
+    public UserPO validateUser(String username) {
+        Optional<UserPO> userPOOptional= userPoMapper.findByUsername(username);
 
         if (userPOOptional.isPresent()) {
             UserPO userPO = userPOOptional.get();
-            if (userPO.getPassword().equals(password)) {
-                // 验证成功，转换为BO对象
-                User user = new User();
-                user.setId(userPO.getId());
-                user.setUsername(userPO.getUsername());
-                return user;
-            }
+            return userPO;
         }
         return null;
     }

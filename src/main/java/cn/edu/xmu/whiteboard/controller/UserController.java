@@ -1,5 +1,8 @@
 package cn.edu.xmu.whiteboard.controller;
 
+import cn.edu.xmu.whiteboard.Exception.GlobalException;
+import cn.edu.xmu.whiteboard.controller.dto.LoginDto;
+import cn.edu.xmu.whiteboard.controller.dto.LoginReturnData;
 import cn.edu.xmu.whiteboard.controller.dto.RegisterReturnData;
 import cn.edu.xmu.whiteboard.controller.dto.UserDto;
 import cn.edu.xmu.whiteboard.result.*;
@@ -53,22 +56,32 @@ public class UserController {
         } catch (Exception e) {
             // 处理异常情况
             e.printStackTrace();
-            if(e.getMessage().equals("Username already exists"))
+            if(e.getMessage().equals("username already exists"))
                 return ResultUtil.error(CodeMsg.USERNAME_ALREADY_EXIST);
             return ResultUtil.error(CodeMsg.SERVER_ERROR);
         }
     }
 
     @PostMapping("/login")
-    public Object login(@RequestBody UserDto UserDto) {
-        UserDto userDto = userService.login(UserDto);
+    @ResponseBody
+    public ResultUtil<Object> login(HttpServletResponse response, @RequestBody LoginDto loginDTO) {
+        try {
+            //验证用户名和密码是否为空
+            if(!StringUtils.hasText(loginDTO.getUsername())){
+                return ResultUtil.error(CodeMsg.USERNAME_EMPTY);
+            }else if (!StringUtils.hasText(loginDTO.getPassword())) {
+                return ResultUtil.error(CodeMsg.PASSWORD_EMPTY);
+            }
 
-        if (userDto != null) {
-            // 登录成功
-            return Common.getRetObject(new ReturnObject<>(userDto));
-        } else {
-            // 登录失败
-            return Common.getRetObject(new ReturnObject<>(ReturnNo.AUTH_INVALID_ACCOUNT));
+            LoginReturnData data = userService.login(response,loginDTO);
+            return ResultUtil.success(data);
+        }catch (Exception e){
+            e.printStackTrace();
+            if(e.getMessage().equals("username is not exists"))
+                return ResultUtil.error(CodeMsg.USERNAME_NOT_EXIST);
+            else if(e.getMessage().equals("password does not match"))
+                return ResultUtil.error(CodeMsg.PASSWORD_ERROR);
+            return ResultUtil.error(CodeMsg.SERVER_ERROR);
         }
     }
 }
