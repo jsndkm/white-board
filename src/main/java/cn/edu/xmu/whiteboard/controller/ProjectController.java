@@ -22,7 +22,9 @@ public class ProjectController {
     @ResponseBody
     public ResultUtil<Object> newProject(HttpServletResponse response, @RequestBody NewProjectDto newProjectDto){
         try{
-            if(!StringUtils.hasText(newProjectDto.getName())){
+            if(!StringUtils.hasText(newProjectDto.getUsername())){
+                return ResultUtil.error(CodeMsg.USER_EMPTY);
+            } else if(!StringUtils.hasText(newProjectDto.getName())){
                 return ResultUtil.error(CodeMsg.NAME_EMPTY);
             }
             ProjectReturnData data = projectService.newProject(response, newProjectDto);
