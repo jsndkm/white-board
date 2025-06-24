@@ -1,14 +1,34 @@
 "use client";
 
 import AppHeader from "@/components/app-header";
-import { Template } from "@/components/template";
+import { MyProject } from "@/components/my-project";
+import { NewProject } from "@/components/new-project";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 
 export default function Page() {
+  useAuthRedirect();
+
   return (
-    <div className="flex flex-col min-w-0  h-screen w-screen">
+    <div className="flex h-screen w-screen min-w-0 flex-col">
       <AppHeader />
-      <main className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 p-10">
-        <Template name="空白模板" />
+      <main className="container mx-auto p-10">
+        <Tabs defaultValue="new-project" className="w-full">
+          <TabsList className="mx-auto h-15 w-70">
+            <TabsTrigger value="new-project" className="cursor-pointer">
+              新建项目
+            </TabsTrigger>
+            <TabsTrigger value="my-project" className="cursor-pointer">
+              我的项目
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="new-project">
+            <NewProject />
+          </TabsContent>
+          <TabsContent value="my-project">
+            <MyProject />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );

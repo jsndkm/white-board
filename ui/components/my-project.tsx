@@ -14,7 +14,16 @@ type TemplateProps = {
   name: string;
 };
 
-export function Template({ name }: TemplateProps) {
+export function MyProject() {
+  return (
+    <div className="container mx-auto grid grid-cols-1 gap-5 p-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <Project name="头脑风暴" />
+      <Project name="我叫项目" />
+    </div>
+  );
+}
+
+export function Project({ name }: TemplateProps) {
   const router = useRouter();
 
   return (
@@ -24,7 +33,7 @@ export function Template({ name }: TemplateProps) {
         <CardDescription>发挥你的想象力！</CardDescription>
       </CardHeader>
       <CardContent>
-        <Skeleton className="flex flex-col mx-auto gap-6 h-40 w-60" />
+        <Skeleton className="mx-auto flex h-50 w-50 flex-col gap-6" />
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Button

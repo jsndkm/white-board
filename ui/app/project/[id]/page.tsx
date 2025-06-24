@@ -1,9 +1,15 @@
 "use client";
 
-import ExcalidrawClient from "@/components/excalidraw-client";
 import { useAuthRedirect } from "@/hooks/use-auth-redirect";
+import dynamic from "next/dynamic";
 
+const ExcalidrawWrapper = dynamic(
+  () => import("@/components/excalidraw-wrapper"),
+  {
+    ssr: false,
+  },
+);
 export default function Page() {
   useAuthRedirect();
-  return <ExcalidrawClient />;
+  return <ExcalidrawWrapper />;
 }
