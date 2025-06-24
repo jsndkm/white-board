@@ -13,6 +13,6 @@ public class ProjectUserDto {
     public String getUsername() {return username;}
     public void setUsername(String username) {this.username = username;}
 
-    public boolean isIsAdmin() {return isAdmin;}
+    public boolean isAdmin() {return isAdmin;}
     public void setAdmin(boolean admin) {isAdmin = admin;}
 }

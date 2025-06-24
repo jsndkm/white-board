@@ -3,6 +3,7 @@ package cn.edu.xmu.whiteboard.service;
 import cn.edu.xmu.whiteboard.Exception.GlobalException;
 import cn.edu.xmu.whiteboard.ReturnData.ProjectReturnData;
 import cn.edu.xmu.whiteboard.ReturnData.ProjectUserData;
+import cn.edu.xmu.whiteboard.controller.dto.ProjectModifyDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectUserDto;
 import cn.edu.xmu.whiteboard.dao.ProjectDao;
@@ -49,5 +50,16 @@ public class ProjectService {
 
         List<ProjectUserDto> projectUserDtos = projectDao.getProjectUser(id);
         return new ProjectUserData(data, projectUserDtos);
+    }
+
+    public Integer modifyProject(String username, ProjectModifyDto projectModifyDto) {
+        if(projectModifyDto ==null){
+            throw new IllegalArgumentException("project id is null");
+        }
+        // 检查用户名是否存在
+        if (!userDao.existsByUsername(username)) {
+            throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
+        }
+        return projectDao.modifyProject(projectModifyDto);
     }
 }

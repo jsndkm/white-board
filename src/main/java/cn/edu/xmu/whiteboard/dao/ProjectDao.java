@@ -1,5 +1,6 @@
 package cn.edu.xmu.whiteboard.dao;
 
+import cn.edu.xmu.whiteboard.controller.dto.ProjectModifyDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectUserDto;
 import cn.edu.xmu.whiteboard.mapper.ProjectPoMapper;
@@ -53,6 +54,16 @@ public class ProjectDao {
             return projectUserPOS.stream()
                     .map(source -> new ProjectUserDto(source.getUsername(), source.isAdmin()))
                     .collect(Collectors.toList());
+        }
+        return null;
+    }
+
+    public Integer modifyProject(ProjectModifyDto projectModifyDto){
+        Optional<ProjectPO> projectPO = this.projectPoMapper.findById(projectModifyDto.getId());
+        if(!projectPO.isEmpty()){
+            projectPoMapper.updateNameById(projectModifyDto.getId(), projectModifyDto.getName());
+            projectPoMapper.updateDescriptionById(projectModifyDto.getId(), projectModifyDto.getDescription());
+            return projectModifyDto.getId();
         }
         return null;
     }

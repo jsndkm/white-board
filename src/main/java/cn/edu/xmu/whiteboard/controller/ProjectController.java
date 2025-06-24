@@ -4,11 +4,11 @@ import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
 import cn.edu.xmu.whiteboard.ReturnData.ProjectReturnData;
 import cn.edu.xmu.whiteboard.ReturnData.ProjectUserData;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
+import cn.edu.xmu.whiteboard.controller.dto.ProjectModifyDto;
 import cn.edu.xmu.whiteboard.result.CodeMsg;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
 import cn.edu.xmu.whiteboard.service.ProjectService;
 import cn.edu.xmu.whiteboard.utils.JWTUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -74,6 +74,39 @@ public class ProjectController {
         }catch (Exception e){
                 GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
                 return exceptionHandle.exceptionHandle(e);
+        }
+    }
+
+    @PutMapping("modify-project")
+    @ResponseBody
+    public ResultUtil<Object> modifyProject(@RequestHeader("Authorization") String authorization, @RequestBody ProjectModifyDto projectModifyDto){
+        try{
+            if(projectModifyDto.getId()<=0){
+                return ResultUtil.error(CodeMsg.PROJECTID_EMPTY);
+            }
+            else if(!StringUtils.hasText(projectModifyDto.getName())){
+                return ResultUtil.error(CodeMsg.PROJECTNAME_EMPTY);
+            }
+            else if(!StringUtils.hasText(projectModifyDto.getDescription())){
+                return ResultUtil.error(CodeMsg.DESCRIPTION_EMPTY);
+            }
+            // 验证 Token
+            if (!authorization.startsWith("Bearer ")) {
+                return ResultUtil.error(CodeMsg.TOKEN_ERROR);
+            }
+
+            String token = authorization.substring(7); // 去掉 "Bearer "
+
+            // 验证 Token
+            String username = JWTUtil.parseToken(token);
+            if (username == null) {
+                return ResultUtil.error(CodeMsg.TOKEN_INVALID);
+            }
+            Integer code = projectService.modifyProject(username, projectModifyDto);
+            return ResultUtil.success(code);
+        }catch (Exception e){
+            GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
+            return exceptionHandle.exceptionHandle(e);
         }
     }
 }

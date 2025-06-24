@@ -6,10 +6,8 @@ import java.util.Objects;
 import java.io.Serializable;
 
 public class ProjectUserPK implements Serializable {
-    @Id
-    private int project_id;
 
-    @Id
+    private int project_id;
     private String username;
 
     private boolean is_admin;
