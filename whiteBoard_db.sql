@@ -6,7 +6,7 @@ SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL UNIQUE,
   `password` varchar(255) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
@@ -50,9 +50,9 @@ CREATE TABLE `idea` (
 DROP TABLE IF EXISTS `project_member`;
 CREATE TABLE `project_member` (
   `project_id` INT NOT NULL,
-  `member_id` INT NOT NULL,
-  PRIMARY KEY (project_id, member_id),
+  `member_name` varchar(255) NOT NULL,
+  PRIMARY KEY (project_id, member_name),
   CONSTRAINT `fk_project` FOREIGN KEY (project_id) REFERENCES `project` (id) ON DELETE CASCADE,
-  CONSTRAINT `fk_member` FOREIGN KEY (member_id) REFERENCES `user` (id) ON DELETE CASCADE
+  CONSTRAINT `fk_member` FOREIGN KEY (member_name) REFERENCES `user` (username) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
 
