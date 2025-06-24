@@ -1,6 +1,6 @@
 package cn.edu.xmu.whiteboard.dao;
 
-import cn.edu.xmu.whiteboard.controller.dto.NewProjectDto;
+import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
 import cn.edu.xmu.whiteboard.mapper.ProjectPoMapper;
 import cn.edu.xmu.whiteboard.mapper.po.ProjectPO;
 import org.springframework.stereotype.Repository;
@@ -11,15 +11,15 @@ public class ProjectDao {
 
     public ProjectDao(ProjectPoMapper projectPoMapper) {this.projectPoMapper = projectPoMapper;}
 
-    public ProjectPO createProject(NewProjectDto newProjectDto){
-        if(newProjectDto == null){
+    public ProjectPO createProject(String username,ProjectDto projectDto){
+        if(projectDto == null){
             throw new IllegalArgumentException("projectDTO can not be null");
         }
 
         ProjectPO project = new ProjectPO();
-        project.setName(newProjectDto.getName());
-        project.setUsername(newProjectDto.getUsername());
-        project.setDescription(newProjectDto.getDescription());
+        project.setName(projectDto.getName());
+        project.setUsername(username);
+        project.setDescription(projectDto.getDescription());
         this.projectPoMapper.save(project);
 
         return project;

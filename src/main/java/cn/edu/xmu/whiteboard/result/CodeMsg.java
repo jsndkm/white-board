@@ -26,9 +26,13 @@ public class CodeMsg {
     public static CodeMsg PASSWORD_TOO_SHORT = new CodeMsg(500216, "密码至少为6个字符");
     public static CodeMsg USERNAME_ALREADY_EXIST = new CodeMsg(500217, "用户名已存在");
 
-    // 项目模块
-    public static CodeMsg USER_EMPTY = new CodeMsg(500310,"用户不能为空");
-    public static CodeMsg NAME_EMPTY = new CodeMsg(500311,"项目名不能为空");
+    //项目模块
+    public static CodeMsg PROJECTNAME_EMPTY = new CodeMsg(500310, "项目名称不能为空");
+    public static CodeMsg DESCRIPTION_EMPTY = new CodeMsg(500311, "项目说明不能为空");
+
+    //token
+    public static CodeMsg TOKEN_ERROR = new CodeMsg(500500, "token错误");
+    public static CodeMsg TOKEN_INVALID = new CodeMsg(500501, "token无效");
 
     public int getCode() {
         return code;
