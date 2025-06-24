@@ -57,10 +57,4 @@ public class JWTUtil {
             return null;
         }
     }
-
-    public static void main(String[] args) {
-        String token="eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3Q1IiwiZXhwIjoxNzUwODUxNDk4fQ.eYeRDppgtb8hL-IUTA8Q2ayna4c3kUWL_q_KpvPzPT8";
-        String username=parseToken(token);
-        System.out.println(username);
-    }
 }
