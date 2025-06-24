@@ -47,12 +47,13 @@ CREATE TABLE `idea` (
 -- ----------------------------
 -- Table structure for project_member
 -- ----------------------------
-DROP TABLE IF EXISTS `project_member`;
-CREATE TABLE `project_member` (
+DROP TABLE IF EXISTS `project_user`;
+CREATE TABLE `project_user` (
   `project_id` INT NOT NULL,
-  `member_name` varchar(255) NOT NULL,
-  PRIMARY KEY (project_id, member_name),
+  `username` varchar(255) NOT NULL,
+  `is_admin` BOOLEAN NOT NULL,
+  PRIMARY KEY (project_id, username),
   CONSTRAINT `fk_project` FOREIGN KEY (project_id) REFERENCES `project` (id) ON DELETE CASCADE,
-  CONSTRAINT `fk_member` FOREIGN KEY (member_name) REFERENCES `user` (username) ON DELETE CASCADE
+  CONSTRAINT `fk_user` FOREIGN KEY (username) REFERENCES `user` (username) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
 
