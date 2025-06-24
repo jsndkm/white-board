@@ -2,7 +2,7 @@ package cn.edu.xmu.whiteboard.controller;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
 import cn.edu.xmu.whiteboard.ReturnData.ProjectReturnData;
-import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
+import cn.edu.xmu.whiteboard.controller.dto.NewProjectDto;
 import cn.edu.xmu.whiteboard.result.CodeMsg;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
 import cn.edu.xmu.whiteboard.service.ProjectService;
@@ -20,12 +20,12 @@ public class ProjectController {
 
     @PostMapping("/new-project")
     @ResponseBody
-    public ResultUtil<Object> newProject(HttpServletResponse response, @RequestBody ProjectDto projectDto){
+    public ResultUtil<Object> newProject(HttpServletResponse response, @RequestBody NewProjectDto newProjectDto){
         try{
-            if(!StringUtils.hasText(projectDto.getUsername())){
+            if(!StringUtils.hasText(newProjectDto.getUsername())){
                 return ResultUtil.error(CodeMsg.USERNAME_EMPTY);
             }
-            ProjectReturnData data = projectService.newProject(response, projectDto);
+            ProjectReturnData data = projectService.newProject(response, newProjectDto);
             return ResultUtil.success(data);
         }catch (Exception e){
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
