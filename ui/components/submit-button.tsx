@@ -19,7 +19,7 @@ export function SubmitButton({
       type={pending ? "button" : "submit"}
       aria-disabled={pending || isSuccessful}
       disabled={pending || isSuccessful}
-      className="relative"
+      className="relative cursor-pointer"
     >
       {children}
 

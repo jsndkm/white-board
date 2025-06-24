@@ -29,7 +29,7 @@ export default function Page() {
       toast.success("注册成功");
 
       setIsSuccessful(true);
-      router.refresh();
+      router.replace("/");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
