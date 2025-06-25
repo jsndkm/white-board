@@ -18,7 +18,6 @@ export function NewProject() {
   return (
     <div className="container mx-auto flex flex-wrap justify-start gap-4 p-4">
       <Template name="空白模板" />
-      <Template name="空白模板" />
     </div>
   );
 }
