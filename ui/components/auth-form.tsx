@@ -8,12 +8,14 @@ export function AuthForm({
   action,
   children,
   defaultUsername = "",
+  isRegister,
 }: {
   action: NonNullable<
     string | ((formData: FormData) => void | Promise<void>) | undefined
   >;
   children: React.ReactNode;
   defaultUsername?: string;
+  isRegister: boolean;
 }) {
   const resetStatus = useUserStore((state) => state.resetStatus);
 
@@ -22,7 +24,7 @@ export function AuthForm({
       <div className="flex flex-col gap-2">
         <Label
           htmlFor="username"
-          className="text-zinc-600 font-normal dark:text-zinc-400"
+          className="font-normal text-zinc-600 dark:text-zinc-400"
         >
           用户名
         </Label>
@@ -44,7 +46,7 @@ export function AuthForm({
       <div className="flex flex-col gap-2">
         <Label
           htmlFor="password"
-          className="text-zinc-600 font-normal dark:text-zinc-400"
+          className="font-normal text-zinc-600 dark:text-zinc-400"
         >
           密码
         </Label>
@@ -59,6 +61,48 @@ export function AuthForm({
           onChange={resetStatus}
         />
       </div>
+
+      {isRegister && (
+        <div className="flex flex-col gap-2">
+          <Label
+            htmlFor="email"
+            className="font-normal text-zinc-600 dark:text-zinc-400"
+          >
+            邮箱
+          </Label>
+
+          <Input
+            id="email"
+            name="email"
+            className="bg-muted text-md md:text-sm"
+            type="email"
+            placeholder="请输入邮箱"
+            required
+            onChange={resetStatus}
+          />
+        </div>
+      )}
+
+      {isRegister && (
+        <div className="flex flex-col gap-2">
+          <Label
+            htmlFor="phone"
+            className="font-normal text-zinc-600 dark:text-zinc-400"
+          >
+            密码
+          </Label>
+
+          <Input
+            id="phone"
+            name="phone"
+            className="bg-muted text-md md:text-sm"
+            type="text"
+            placeholder="请输入电话"
+            required
+            onChange={resetStatus}
+          />
+        </div>
+      )}
 
       {children}
     </Form>

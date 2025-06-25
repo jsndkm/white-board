@@ -6,9 +6,16 @@ import { z } from "zod";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-const authFormSchema = z.object({
+const loginFormSchema = z.object({
   username: z.string().regex(/^[a-zA-Z0-9]{6,16}$/),
   password: z.string().min(6).max(16),
+});
+
+const registerFormSchema = z.object({
+  username: z.string().regex(/^[a-zA-Z0-9]{6,16}$/),
+  password: z.string().min(6).max(16),
+  email: z.string().email(),
+  phone: z.string().regex(/^1[0-9]{10}$/),
 });
 
 type loginStatusType =
@@ -44,9 +51,11 @@ export const useUserStore = create<UserState>()(
       resetStatus: () => set({ loginStatus: "idle", registerStatus: "idle" }),
       register: async (formData) => {
         try {
-          const validatedData = authFormSchema.parse({
+          const validatedData = registerFormSchema.parse({
             username: formData.get("username"),
             password: formData.get("password"),
+            email: formData.get("email"),
+            phone: formData.get("phone"),
           });
           set({ username: validatedData.username as string });
 
@@ -61,6 +70,7 @@ export const useUserStore = create<UserState>()(
           localStorage.setItem("token", resp.data.token);
           set({ registerStatus: "success" });
         } catch (error) {
+          console.log(error);
           if (error instanceof z.ZodError) {
             set({ registerStatus: "invalid_data" });
           } else {
@@ -70,7 +80,7 @@ export const useUserStore = create<UserState>()(
       },
       login: async (formData) => {
         try {
-          const validatedData = authFormSchema.parse({
+          const validatedData = loginFormSchema.parse({
             username: formData.get("username"),
             password: formData.get("password"),
           });
