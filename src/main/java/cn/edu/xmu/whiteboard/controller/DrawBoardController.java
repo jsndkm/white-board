@@ -27,7 +27,7 @@ public class DrawBoardController {
             //解析token
             JWTUtil.analyzeToken(authorization);
 
-            // 存储场景数据
+            // 存储画板数据
             String sceneId = drawBoardService.storeDrawBoard(sceneData);
 
             // 返回响应
@@ -47,7 +47,7 @@ public class DrawBoardController {
             //解析token
             JWTUtil.analyzeToken(authorization);
 
-            // 存储场景数据
+            // 获取画板数据
             byte[] resourceData = drawBoardService.getDrawBoard(id);
 
             // 设置响应头
