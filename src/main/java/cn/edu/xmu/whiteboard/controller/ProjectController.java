@@ -10,10 +10,8 @@ import cn.edu.xmu.whiteboard.result.CodeMsg;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
 import cn.edu.xmu.whiteboard.service.ProjectService;
 import cn.edu.xmu.whiteboard.utils.JWTUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -110,7 +108,7 @@ public class ProjectController {
     @ResponseBody
     public ResultUtil<Object> modifyProject(@RequestHeader("Authorization") String authorization, @RequestBody ProjectModifyDto projectModifyDto){
         try{
-            if(projectModifyDto.getId()<=0){
+            if(projectModifyDto.getPid()<=0){
                 return ResultUtil.error(CodeMsg.PROJECT_ID_EMPTY);
             }
             else if(!StringUtils.hasText(projectModifyDto.getName())){
@@ -126,6 +124,23 @@ public class ProjectController {
             }
             projectService.modifyProject(username, projectModifyDto);
             return ResultUtil.success(null);
+        } catch (Exception e) {
+            GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
+            return exceptionHandle.exceptionHandle(e);
+        }
+    }
+
+    @Transactional
+    @DeleteMapping("/delete-project")
+    @ResponseBody
+    public ResultUtil<Object> deleteProject(@RequestHeader("Authorization") String authorization,@RequestParam("project_id") Integer id){
+        try {
+            //解析token
+            String username=JWTUtil.analyzeToken(authorization);
+            if(projectService.deleteProject(username,id))
+                return ResultUtil.success(null);
+            else
+                return ResultUtil.error(CodeMsg.SERVER_ERROR);
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);

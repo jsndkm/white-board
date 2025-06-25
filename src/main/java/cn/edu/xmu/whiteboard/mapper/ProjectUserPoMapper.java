@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ProjectUserPoMapper extends JpaRepository<ProjectUserPO, ProjectUserPK> {
@@ -28,4 +27,5 @@ public interface ProjectUserPoMapper extends JpaRepository<ProjectUserPO, Projec
      * @return 删除的记录数
      */
     long deleteByProjectIdAndUsername(int projectId, String username);
+    long deleteByProjectId(int projectId);
 }

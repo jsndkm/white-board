@@ -73,4 +73,8 @@ public class ProjectUserDao {
         }
         return null;
     }
+
+    public Long deleteProjectUser(int pid){
+        return projectUserPoMapper.deleteByProjectId(pid);
+    }
 }

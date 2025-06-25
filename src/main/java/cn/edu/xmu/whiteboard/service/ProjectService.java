@@ -15,6 +15,7 @@ import cn.edu.xmu.whiteboard.mapper.po.ProjectUserPO;
 import cn.edu.xmu.whiteboard.result.CodeMsg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +131,7 @@ public class ProjectService {
         List<ProjectUserPO> projectUserPOList = projectUserDao.findMyProject(username);
         for(int i = 0; i < projectUserPOList.size(); i++){
             ProjectUserPO projectUserPO = projectUserPOList.get(i);
-            if(projectUserPO.getProjectId()==projectModifyDto.getId()){
+            if(projectUserPO.getProjectId()==projectModifyDto.getPid()){
                 projectDao.modifyProject(projectModifyDto);
                 break;
             }
@@ -154,5 +155,29 @@ public class ProjectService {
             }
         }
         return null;
+    }
+
+    @Transactional
+    public boolean deleteProject(String username, Integer pid){
+        if(username==null) {
+            throw new IllegalArgumentException("username is null");
+        }
+        if (!userDao.existsByUsername(username)) {
+            throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
+        }
+        ProjectPO projectPO = projectDao.findById(pid);
+        if(projectPO==null){
+            throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
+        }
+        ProjectUserPO projectUserPO=projectUserDao.findByPidAndUname(pid,username);
+        if(projectUserPO==null){
+            throw new GlobalException(CodeMsg.PROJECT_USER_NOT_EXIST);
+        }
+        Long record=projectUserDao.deleteProjectUser(pid);
+        projectDao.deleteProject(pid);
+        if(record>0)
+            return true;
+        else
+            return false;
     }
 }

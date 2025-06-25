@@ -2,15 +2,9 @@ package cn.edu.xmu.whiteboard.dao;
 
 import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectModifyDto;
-import cn.edu.xmu.whiteboard.controller.dto.ProjectUserDto;
 import cn.edu.xmu.whiteboard.mapper.ProjectPoMapper;
-import cn.edu.xmu.whiteboard.mapper.ProjectUserPoMapper;
 import cn.edu.xmu.whiteboard.mapper.po.ProjectPO;
-import cn.edu.xmu.whiteboard.mapper.po.ProjectUserPO;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 public class ProjectDao {
@@ -45,13 +39,24 @@ public class ProjectDao {
     }
 
     public void modifyProject(ProjectModifyDto projectModifyDto){
-        ProjectPO projectPO = this.projectPoMapper.findById(projectModifyDto.getId());
+        ProjectPO projectPO = this.projectPoMapper.findById(projectModifyDto.getPid());
         if(projectPO==null){
             throw new IllegalArgumentException("can't find this project");
         }
         else {
-            projectPoMapper.updateNameById(projectModifyDto.getId(), projectModifyDto.getName());
-            projectPoMapper.updateDescriptionById(projectModifyDto.getId(), projectModifyDto.getDescription());
+            projectPO.setName(projectModifyDto.getName());
+            projectPO.setDescription(projectModifyDto.getDescription());
+            projectPoMapper.save(projectPO);
+        }
+    }
+
+    public void deleteProject(Integer id){
+        ProjectPO projectPO = this.projectPoMapper.findById(id);
+        if(projectPO==null){
+            throw new IllegalArgumentException("can't find this project");
+        }
+        else {
+            projectPoMapper.delete(projectPO);
         }
     }
 }
