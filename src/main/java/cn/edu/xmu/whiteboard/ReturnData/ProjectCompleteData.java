@@ -4,11 +4,11 @@ import cn.edu.xmu.whiteboard.controller.dto.ProjectUserDto;
 
 import java.util.List;
 
-public class ProjectUserData {
+public class ProjectCompleteData {
     private ProjectReturnData projectReturnData;
     private List<ProjectUserDto> projectUserDtos;
 
-    public ProjectUserData(ProjectReturnData projectReturnData, List<ProjectUserDto> projectUserDtos) {
+    public ProjectCompleteData(ProjectReturnData projectReturnData, List<ProjectUserDto> projectUserDtos) {
         this.projectReturnData = projectReturnData;
         this.projectUserDtos = projectUserDtos;
     }

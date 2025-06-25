@@ -1,11 +1,13 @@
 package cn.edu.xmu.whiteboard.dao;
 
+import cn.edu.xmu.whiteboard.controller.dto.ProjectUserDto;
 import cn.edu.xmu.whiteboard.mapper.ProjectUserPoMapper;
 import cn.edu.xmu.whiteboard.mapper.po.ProjectPO;
 import cn.edu.xmu.whiteboard.mapper.po.ProjectUserPO;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class ProjectUserDao {
@@ -46,5 +48,15 @@ public class ProjectUserDao {
         projectUserPO.setProjectId(projectPO.getId());
         projectUserPO.setAdmin(false);
         projectUserPoMapper.save(projectUserPO);
+    }
+
+    public List<ProjectUserDto> getProjectUser(int id){
+        List<ProjectUserPO> projectUserPOS = projectUserPoMapper.findByProjectId(id);
+        if(!projectUserPOS.isEmpty()){
+            return projectUserPOS.stream()
+                    .map(source -> new ProjectUserDto(source.getUsername(), source.isAdmin()))
+                    .collect(Collectors.toList());
+        }
+        return null;
     }
 }

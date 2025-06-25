@@ -3,7 +3,10 @@ package cn.edu.xmu.whiteboard.service;
 import cn.edu.xmu.whiteboard.Exception.GlobalException;
 import cn.edu.xmu.whiteboard.ReturnData.MyProjectReturnData;
 import cn.edu.xmu.whiteboard.ReturnData.ProjectReturnData;
+import cn.edu.xmu.whiteboard.ReturnData.ProjectCompleteData;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
+import cn.edu.xmu.whiteboard.controller.dto.ProjectModifyDto;
+import cn.edu.xmu.whiteboard.controller.dto.ProjectUserDto;
 import cn.edu.xmu.whiteboard.dao.ProjectDao;
 import cn.edu.xmu.whiteboard.dao.ProjectUserDao;
 import cn.edu.xmu.whiteboard.dao.UserDao;
@@ -87,5 +90,40 @@ public class ProjectService {
             throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
         }
         projectUserDao.createProjectMember(username,projectPO);
+    }
+
+    public void modifyProject(String username, ProjectModifyDto projectModifyDto) {
+        // 检查用户名是否存在
+        if (!userDao.existsByUsername(username)) {
+            throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
+        }
+        //根据username查ProjectUser关联表
+        List<ProjectUserPO> projectUserPOList = projectUserDao.findMyProject(username);
+        for(int i = 0; i < projectUserPOList.size(); i++){
+            ProjectUserPO projectUserPO = projectUserPOList.get(i);
+            if(projectUserPO.getProjectId()==projectModifyDto.getId()){
+                projectDao.modifyProject(projectModifyDto);
+                break;
+            }
+        }
+    }
+
+    public ProjectCompleteData openProject(String username, Integer id){
+        // 检查用户名是否存在
+        if (!userDao.existsByUsername(username)) {
+            throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
+        }
+        //根据username查ProjectUser关联表
+        List<ProjectUserPO> projectUserPOList = projectUserDao.findMyProject(username);
+        for(int i = 0; i < projectUserPOList.size(); i++){
+            ProjectUserPO projectUserPO = projectUserPOList.get(i);
+            if(projectUserPO.getProjectId()==id){
+                ProjectPO projectPO = projectDao.getProject(id);
+                ProjectReturnData projectReturnData = new ProjectReturnData(projectPO.getId(),projectPO.getName(),projectPO.getDescription());
+                List<ProjectUserDto> projectUserDtos = projectUserDao.getProjectUser(id);
+                return new ProjectCompleteData(projectReturnData, projectUserDtos);
+            }
+        }
+        return null;
     }
 }
