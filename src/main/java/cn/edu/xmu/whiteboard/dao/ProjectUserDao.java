@@ -50,6 +50,13 @@ public class ProjectUserDao {
         projectUserPoMapper.save(projectUserPO);
     }
 
+    public ProjectUserPO findByPidAndUname(int pid,String uname){
+        if(uname == null){
+            throw new IllegalArgumentException("username can not be null");
+        }
+        return projectUserPoMapper.findByProjectIdAndUsername(pid,uname);
+    }
+
     public List<ProjectUserDto> getProjectUser(int id){
         List<ProjectUserPO> projectUserPOS = projectUserPoMapper.findByProjectId(id);
         if(!projectUserPOS.isEmpty()){

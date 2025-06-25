@@ -8,7 +8,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "project_user")
 @ToString
-@IdClass(ProjectUserPO.class)
+@IdClass(ProjectUserPK.class)
 public class ProjectUserPO implements Serializable {
     @Id
     @Column(name = "project_id")

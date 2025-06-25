@@ -29,8 +29,9 @@ public class CodeMsg {
     //项目模块
     public static CodeMsg PROJECTNAME_EMPTY = new CodeMsg(500310, "项目名称不能为空");
     public static CodeMsg DESCRIPTION_EMPTY = new CodeMsg(500311, "项目说明不能为空");
-    public static CodeMsg PROJECTID_EMPTY = new CodeMsg(500312, "项目ID不能为空");
+    public static CodeMsg PROJECT_ID_EMPTY = new CodeMsg(500312, "项目ID不能为空");
     public static CodeMsg PROJECT_NOT_EXIST = new CodeMsg(500313,"项目不存在");
+    public static CodeMsg PROJECT_USER_ALREADY_EXIST = new CodeMsg(500314,"不能重复加入");
 
     //token
     public static CodeMsg TOKEN_ERROR = new CodeMsg(500500, "token错误");
