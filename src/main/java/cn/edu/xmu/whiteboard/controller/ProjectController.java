@@ -91,7 +91,7 @@ public class ProjectController {
     public ResultUtil<Object> modifyProject(@RequestHeader("Authorization") String authorization, @RequestBody ProjectModifyDto projectModifyDto){
         try{
             if(projectModifyDto.getId()<=0){
-                return ResultUtil.error(CodeMsg.PROJECTID_EMPTY);
+                return ResultUtil.error(CodeMsg.PROJECT_ID_EMPTY);
             }
             else if(!StringUtils.hasText(projectModifyDto.getName())){
                 return ResultUtil.error(CodeMsg.PROJECTNAME_EMPTY);
