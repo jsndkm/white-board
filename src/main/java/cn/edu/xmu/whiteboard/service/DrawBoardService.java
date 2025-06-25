@@ -31,11 +31,11 @@ public class DrawBoardService {
         return ID_PREFIX + System.currentTimeMillis() + "_" + counter.incrementAndGet();
     }
 
-    public byte[] getScene(String id) {
+    public byte[] getDrawBoard(String id) {
         return redisService.getBinary(DrawBoardKey.getById, id);
     }
 
-    public boolean deleteScene(String id) {
+    public boolean deleteDrawBoard(String id) {
         return redisService.deleteBinary(DrawBoardKey.getById, id);
     }
 }
