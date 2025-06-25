@@ -17,6 +17,7 @@ import java.io.IOException;
 
 @RestController /*Restful的Controller对象*/
 @RequestMapping(value = "/api", produces = "application/json;charset=UTF-8")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     @Autowired
     private UserService userService;
