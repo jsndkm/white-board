@@ -60,7 +60,6 @@ public class ProjectService {
         }
 
         List<MyProjectReturnData> data = new ArrayList<>();
-        // 遍历两个列表，假设它们的长度相同
         for (int i = 0; i < projectUserPOList.size() && i < projectPOList.size(); i++) {
             ProjectUserPO projectUserPO = projectUserPOList.get(i);
             ProjectPO projectPO = projectPOList.get(i);
@@ -74,5 +73,19 @@ public class ProjectService {
             data.add(returnData);
         }
         return data;
+    }
+
+    public void joinProject(String username, int projectId){
+        if(username==null) {
+            throw new IllegalArgumentException("username is null");
+        }
+        if (!userDao.existsByUsername(username)) {
+            throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
+        }
+        ProjectPO projectPO = projectDao.findById(projectId);
+        if(projectPO==null){
+            throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
+        }
+        projectUserDao.createProjectMember(username,projectPO);
     }
 }

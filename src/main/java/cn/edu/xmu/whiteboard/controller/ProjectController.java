@@ -55,4 +55,18 @@ public class ProjectController {
             return exceptionHandle.exceptionHandle(e);
         }
     }
+
+    @PostMapping("/join-project")
+    @ResponseBody
+    public ResultUtil<Object> joinProject(@RequestHeader("Authorization") String authorization,@RequestParam("project_id") int projectId) {
+        try {
+            //解析token
+            String username=JWTUtil.analyzeToken(authorization);
+            projectService.joinProject(username,projectId);
+            return ResultUtil.success(null);
+        } catch (Exception e) {
+            GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
+            return exceptionHandle.exceptionHandle(e);
+        }
+    }
 }

@@ -33,4 +33,18 @@ public class ProjectUserDao {
         projectUserPO.setAdmin(true);
         projectUserPoMapper.save(projectUserPO);
     }
+
+    public void createProjectMember(String username,ProjectPO projectPO){
+        if(username == null){
+            throw new IllegalArgumentException("username can not be null");
+        }
+        if(projectPO == null){
+            throw new IllegalArgumentException("projectPO can not be null");
+        }
+        ProjectUserPO projectUserPO = new ProjectUserPO();
+        projectUserPO.setUsername(username);
+        projectUserPO.setProjectId(projectPO.getId());
+        projectUserPO.setAdmin(false);
+        projectUserPoMapper.save(projectUserPO);
+    }
 }
