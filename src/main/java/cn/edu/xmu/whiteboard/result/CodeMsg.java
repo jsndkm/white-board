@@ -32,6 +32,8 @@ public class CodeMsg {
     public static CodeMsg PROJECT_ID_EMPTY = new CodeMsg(500312, "项目ID不能为空");
     public static CodeMsg PROJECT_NOT_EXIST = new CodeMsg(500313,"项目不存在");
     public static CodeMsg PROJECT_USER_ALREADY_EXIST = new CodeMsg(500314,"不能重复加入");
+    public static CodeMsg PROJECT_USER_NOT_EXIST = new CodeMsg(500315,"用户不在项目中");
+    public static CodeMsg PROJECT_NOT_ALLOW_TO_EXIT = new CodeMsg(500316,"项目所有者不允许退出项目");
 
     //token
     public static CodeMsg TOKEN_ERROR = new CodeMsg(500500, "token错误");

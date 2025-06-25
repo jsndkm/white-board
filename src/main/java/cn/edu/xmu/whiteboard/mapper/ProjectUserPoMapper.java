@@ -20,4 +20,12 @@ public interface ProjectUserPoMapper extends JpaRepository<ProjectUserPO, Projec
      * @return 如果找到记录，返回Optional.of(ProjectUserPO)；否则返回Optional.empty()
      */
     ProjectUserPO findByProjectIdAndUsername(int projectId, String username);
+
+    /**
+     * 根据projectId和username删除用户项目
+     * @param projectId 项目ID
+     * @param username 用户名
+     * @return 删除的记录数
+     */
+    long deleteByProjectIdAndUsername(int projectId, String username);
 }

@@ -50,6 +50,13 @@ public class ProjectUserDao {
         projectUserPoMapper.save(projectUserPO);
     }
 
+    public Long exitProjectMember(int pid,String uname){
+        if(uname == null){
+            throw new IllegalArgumentException("username can not be null");
+        }
+        return projectUserPoMapper.deleteByProjectIdAndUsername(pid,uname);
+    }
+
     public ProjectUserPO findByPidAndUname(int pid,String uname){
         if(uname == null){
             throw new IllegalArgumentException("username can not be null");

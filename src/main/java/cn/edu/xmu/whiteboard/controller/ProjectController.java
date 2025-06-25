@@ -10,6 +10,8 @@ import cn.edu.xmu.whiteboard.result.CodeMsg;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
 import cn.edu.xmu.whiteboard.service.ProjectService;
 import cn.edu.xmu.whiteboard.utils.JWTUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.util.StringUtils;
@@ -66,6 +68,23 @@ public class ProjectController {
             String username=JWTUtil.analyzeToken(authorization);
             projectService.joinProject(username,projectId);
             return ResultUtil.success(null);
+        } catch (Exception e) {
+            GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
+            return exceptionHandle.exceptionHandle(e);
+        }
+    }
+
+    @Transactional
+    @PostMapping("/exit-project")
+    @ResponseBody
+    public ResultUtil<Object> exitProject(@RequestHeader("Authorization") String authorization,@RequestParam("project_id") int projectId) {
+        try {
+            //解析token
+            String username=JWTUtil.analyzeToken(authorization);
+            if(projectService.exitProject(username,projectId))
+                return ResultUtil.success(null);
+            else
+                return ResultUtil.error(CodeMsg.SERVER_ERROR);
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);
