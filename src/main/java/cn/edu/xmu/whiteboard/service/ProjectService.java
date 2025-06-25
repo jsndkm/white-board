@@ -173,6 +173,9 @@ public class ProjectService {
         if(projectUserPO==null){
             throw new GlobalException(CodeMsg.PROJECT_USER_NOT_EXIST);
         }
+        else if(!projectUserPO.isAdmin()){
+            throw new GlobalException(CodeMsg.PROJECT_NOT_ALLOW_TO_DELETE);
+        }
         Long record=projectUserDao.deleteProjectUser(pid);
         projectDao.deleteProject(pid);
         if(record>0)
