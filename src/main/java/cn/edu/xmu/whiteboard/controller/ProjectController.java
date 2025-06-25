@@ -91,9 +91,9 @@ public class ProjectController {
         }
     }
 
-    @GetMapping("open-project")
+    @GetMapping("/open-project")
     @ResponseBody
-    public ResultUtil<Object> openProject(@RequestHeader("Authorization") String authorization, @Param("project_id") Integer id){
+    public ResultUtil<Object> openProject(@RequestHeader("Authorization") String authorization, @RequestParam("project_id") Integer id){
         try {
             //解析token
             String username=JWTUtil.analyzeToken(authorization);
@@ -105,7 +105,7 @@ public class ProjectController {
         }
     }
 
-    @PutMapping("modify-project")
+    @PutMapping("/modify-project")
     @ResponseBody
     public ResultUtil<Object> modifyProject(@RequestHeader("Authorization") String authorization, @RequestBody ProjectModifyDto projectModifyDto){
         try{

@@ -20,12 +20,12 @@ public interface ProjectPoMapper extends JpaRepository<ProjectPO, Long>{
     // 根据id修改项目名
     @Modifying
     @Transactional
-    @Query("UPDATE ProjectPO p SET p.name = :role WHERE p.id = :id")
+    @Query("UPDATE ProjectPO p SET p.name = :name WHERE p.id = :id")
     void updateNameById(@Param("id") Integer id, @Param("name") String name);
 
     // 根据id修改项目描述
     @Modifying
     @Transactional
-    @Query("UPDATE ProjectPO p SET p.description = :Description WHERE p.id = :id")
+    @Query("UPDATE ProjectPO p SET p.description = :description WHERE p.id = :id")
     void updateDescriptionById(@Param("id") Integer id, @Param("description") String Description);
 }
