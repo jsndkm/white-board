@@ -86,6 +86,10 @@ public class ProjectService {
         if(projectPO==null){
             throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
         }
+        ProjectUserPO projectUserPO=projectUserDao.findByPidAndUname(projectId,username);
+        if(projectUserPO!=null||projectPO.getUsername().equals(username)){
+            throw new GlobalException(CodeMsg.PROJECT_USER_ALREADY_EXIST);
+        }
         projectUserDao.createProjectMember(username,projectPO);
     }
 }

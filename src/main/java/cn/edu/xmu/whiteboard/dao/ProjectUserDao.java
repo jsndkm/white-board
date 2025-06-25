@@ -47,4 +47,11 @@ public class ProjectUserDao {
         projectUserPO.setAdmin(false);
         projectUserPoMapper.save(projectUserPO);
     }
+
+    public ProjectUserPO findByPidAndUname(int pid,String uname){
+        if(uname == null){
+            throw new IllegalArgumentException("username can not be null");
+        }
+        return projectUserPoMapper.findByProjectIdAndUsername(pid,uname);
+    }
 }
