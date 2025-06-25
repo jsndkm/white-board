@@ -1,5 +1,8 @@
 package cn.edu.xmu.whiteboard.utils;
 
+import cn.edu.xmu.whiteboard.Exception.GlobalException;
+import cn.edu.xmu.whiteboard.result.CodeMsg;
+import cn.edu.xmu.whiteboard.result.ResultUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -49,5 +52,21 @@ public class JWTUtil {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static String analyzeToken(String authorization) {
+        // 验证 Token
+        if (!authorization.startsWith("Bearer ")) {
+            throw new GlobalException(CodeMsg.TOKEN_ERROR);
+        }
+
+        String token = authorization.substring(7); // 去掉 "Bearer "
+
+        // 验证 Token
+        String username = JWTUtil.parseToken(token);
+        if (username == null) {
+            throw new GlobalException(CodeMsg.TOKEN_INVALID);
+        }
+        return username;
     }
 }

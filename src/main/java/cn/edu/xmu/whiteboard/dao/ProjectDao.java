@@ -1,28 +1,17 @@
 package cn.edu.xmu.whiteboard.dao;
 
-import cn.edu.xmu.whiteboard.controller.dto.ProjectModifyDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
-import cn.edu.xmu.whiteboard.controller.dto.ProjectUserDto;
 import cn.edu.xmu.whiteboard.mapper.ProjectPoMapper;
-import cn.edu.xmu.whiteboard.mapper.ProjectUserPoMapper;
 import cn.edu.xmu.whiteboard.mapper.po.ProjectPO;
-import cn.edu.xmu.whiteboard.mapper.po.ProjectUserPO;
 import org.springframework.stereotype.Repository;
-import java.util.stream.Collectors;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public class ProjectDao {
     private final ProjectPoMapper projectPoMapper;
-    private final ProjectUserPoMapper projectUserPoMapper;
 
-    public ProjectDao(ProjectPoMapper projectPoMapper, ProjectUserPoMapper projectUserPoMapper) {
-        this.projectPoMapper = projectPoMapper;
-        this.projectUserPoMapper = projectUserPoMapper;
-    }
-
+    public ProjectDao(ProjectPoMapper projectPoMapper) {this.projectPoMapper = projectPoMapper;}
 
     public ProjectPO createProject(String username,ProjectDto projectDto){
         if(projectDto == null){
@@ -38,33 +27,10 @@ public class ProjectDao {
         return project;
     }
 
-    public ProjectPO getProject(int id){
-        Optional<ProjectPO> projectPO = projectPoMapper.findById(id);
-
-        if(projectPO.isPresent()){
-            ProjectPO po = projectPO.get();
-            return po;
+    public List<ProjectPO> findMyProject(String username){
+        if(username == null){
+            throw new IllegalArgumentException("username can not be null");
         }
-        return null;
-    }
-
-    public List<ProjectUserDto> getProjectUser(int id){
-        List<ProjectUserPO> projectUserPOS = projectUserPoMapper.findByProjectId(id);
-        if(!projectUserPOS.isEmpty()){
-            return projectUserPOS.stream()
-                    .map(source -> new ProjectUserDto(source.getUsername(), source.isAdmin()))
-                    .collect(Collectors.toList());
-        }
-        return null;
-    }
-
-    public Integer modifyProject(ProjectModifyDto projectModifyDto){
-        Optional<ProjectPO> projectPO = this.projectPoMapper.findById(projectModifyDto.getId());
-        if(!projectPO.isEmpty()){
-            projectPoMapper.updateNameById(projectModifyDto.getId(), projectModifyDto.getName());
-            projectPoMapper.updateDescriptionById(projectModifyDto.getId(), projectModifyDto.getDescription());
-            return projectModifyDto.getId();
-        }
-        return null;
+        return projectPoMapper.findByUsername(username);
     }
 }

@@ -5,6 +5,12 @@ public class ProjectReturnData {
     private String name;
     private String description;
 
+    public ProjectReturnData() {
+        id=-1;
+        name=null;
+        description=null;
+    }
+
     public ProjectReturnData(int id, String name, String description) {
         this.id = id;
         this.name = name;
