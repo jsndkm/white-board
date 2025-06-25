@@ -70,7 +70,6 @@ export const useUserStore = create<UserState>()(
           localStorage.setItem("token", resp.data.token);
           set({ registerStatus: "success" });
         } catch (error) {
-          console.log(error);
           if (error instanceof z.ZodError) {
             set({ registerStatus: "invalid_data" });
           } else {

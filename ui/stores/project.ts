@@ -2,27 +2,73 @@ import { ENDPOINT } from "@/lib/constants";
 import { ProjectInfo } from "@/lib/types/project";
 import { Resp } from "@/lib/types/types";
 import { fetcher } from "@/lib/utils";
+import { z } from "zod";
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
+const newProjectInfoSchema = z.object({
+  name: z.string().min(2).max(12),
+  description: z.string().min(5).max(30),
+});
 
 interface ProjectState {
-  id: number;
-  createProject: (name: string, description: string) => Promise<ProjectInfo>;
-  deleteProject: (id: number) => Promise<void>;
+  project: ProjectInfo | null;
+  newProjectStatus:
+    | "idle"
+    | "in_progress"
+    | "success"
+    | "failed"
+    | "invalid_data";
+  resetStatus: () => void;
+  createProject: (formData: FormData) => Promise<void>;
+  deleteProject: (id: number | undefined) => Promise<void>;
 }
 
-export const useProjectStore = create<ProjectState>(() => ({
-  id: 1,
-  createProject: async (name: string, description: string) => {
-    const resp = await fetcher<Resp<ProjectInfo>>(ENDPOINT.CreateProject, {
-      method: "POST",
-      body: JSON.stringify({ name, description }),
-    });
+export const useProjectStore = create<ProjectState>()(
+  persist(
+    (set) => ({
+      project: null,
+      newProjectStatus: "idle",
+      resetStatus: () => set({ newProjectStatus: "idle" }),
+      createProject: async (formData) => {
+        try {
+          const validatedData = newProjectInfoSchema.parse({
+            name: formData.get("name"),
+            description: formData.get("description"),
+          });
 
-    return resp.data;
-  },
-  deleteProject: async (id: number) => {
-    await fetcher<Resp<ProjectInfo>>(ENDPOINT.DeleteProject(id), {
-      method: "DELETE",
-    });
-  },
-}));
+          const resp = await fetcher<Resp<ProjectInfo>>(
+            ENDPOINT.CreateProject,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                name: validatedData.name,
+                description: validatedData.description,
+              }),
+            },
+          );
+
+          set({ newProjectStatus: "success", project: resp.data });
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            set({ newProjectStatus: "invalid_data" });
+          } else {
+            set({ newProjectStatus: "failed" });
+          }
+        }
+      },
+      deleteProject: async (id: number | undefined) => {
+        if (!id) return;
+        await fetcher<Resp<ProjectInfo>>(ENDPOINT.DeleteProject(id), {
+          method: "DELETE",
+        });
+      },
+    }),
+    {
+      name: "project-store",
+      partialize: (state) => ({
+        projectId: state.project?.id,
+      }),
+    },
+  ),
+);

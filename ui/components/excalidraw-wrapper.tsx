@@ -27,7 +27,7 @@ import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import { Folder, House, LogOut, Plus, RotateCcw, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function ExcalidrawWrapper() {
@@ -42,9 +42,13 @@ export default function ExcalidrawWrapper() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resetSceneDialogOpen, setResetSceneDialogOpen] = useState(false);
 
-  const projectId = useProjectStore((state) => state.id);
-
+  const project = useProjectStore((state) => state.project);
+  const resetStatus = useProjectStore((state) => state.resetStatus);
   const deleteProject = useProjectStore((state) => state.deleteProject);
+
+  useEffect(() => {
+    resetStatus();
+  }, [resetStatus]);
 
   return (
     <div className="custom-styles h-screen w-screen">
@@ -139,7 +143,7 @@ export default function ExcalidrawWrapper() {
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={async () => {
-                  await deleteProject(projectId);
+                  await deleteProject(project?.id);
                   toast.success("删除成功");
                   router.replace("/home");
                 }}

@@ -71,7 +71,7 @@ export function Project({ id, name, description, isAdmin }: ProjectProps) {
         <Button
           className="w-full cursor-pointer"
           onClick={async () => {
-            router.push(`project/${id}`);
+            router.replace(`/project/${id}`);
           }}
         >
           打开项目
