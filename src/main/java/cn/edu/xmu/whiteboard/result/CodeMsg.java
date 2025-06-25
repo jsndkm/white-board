@@ -35,6 +35,9 @@ public class CodeMsg {
     public static CodeMsg PROJECT_USER_NOT_EXIST = new CodeMsg(500315,"用户不在项目中");
     public static CodeMsg PROJECT_NOT_ALLOW_TO_EXIT = new CodeMsg(500316,"项目所有者不允许退出项目");
 
+    //想法模块
+    public static CodeMsg CONTENT_NOT_EXIST = new CodeMsg(500410,"想法内容不能为空");
+
     //token
     public static CodeMsg TOKEN_ERROR = new CodeMsg(500500, "token错误");
     public static CodeMsg TOKEN_INVALID = new CodeMsg(500501, "token无效");
