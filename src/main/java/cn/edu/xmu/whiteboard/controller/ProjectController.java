@@ -1,6 +1,7 @@
 package cn.edu.xmu.whiteboard.controller;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
+import cn.edu.xmu.whiteboard.ReturnData.MyProjectReturnData;
 import cn.edu.xmu.whiteboard.ReturnData.ProjectReturnData;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
 import cn.edu.xmu.whiteboard.result.CodeMsg;
@@ -41,13 +42,13 @@ public class ProjectController {
         }
     }
 
-    @GetMapping("/my-project-list")
+    @GetMapping("/project-list")
     @ResponseBody
     public ResultUtil<Object> findMyProject(@RequestHeader("Authorization") String authorization) {
         try {
             //解析token
             String username=JWTUtil.analyzeToken(authorization);
-            List<ProjectReturnData> data=projectService.findMyProject(username);
+            List<MyProjectReturnData> data=projectService.findMyProject(username);
             return ResultUtil.success(data);
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();

@@ -27,10 +27,7 @@ public class ProjectDao {
         return project;
     }
 
-    public List<ProjectPO> findMyProject(String username){
-        if(username == null){
-            throw new IllegalArgumentException("username can not be null");
-        }
-        return projectPoMapper.findByUsername(username);
+    public ProjectPO findById(int id){
+        return projectPoMapper.findById(id);
     }
 }

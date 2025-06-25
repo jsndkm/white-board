@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface ProjectUserPoMapper extends JpaRepository<ProjectUserPO, ProjectUserPK> {
     List<ProjectUserPO> findByProjectId(int id);
+    List<ProjectUserPO> findByUsername(String username);
 }

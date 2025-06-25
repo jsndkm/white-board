@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ProjectPoMapper extends JpaRepository<ProjectPO, Long>{
-    // 根据username查找Project列表
-    List<ProjectPO> findByUsername(String username);
+    // 根据id查找Project列表
+    ProjectPO findById(int id);
 }
