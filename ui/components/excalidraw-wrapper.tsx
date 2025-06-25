@@ -1,7 +1,7 @@
 "use client";
 
-import { Project } from "@/components/my-project";
-import { NewProject, Template } from "@/components/new-project";
+import { MyProject } from "@/components/my-project";
+import { NewProject } from "@/components/new-project";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,11 +10,18 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useProjectStore } from "@/stores/project";
 import { useUserStore } from "@/stores/user";
-import { Excalidraw, MainMenu, Sidebar } from "@excalidraw/excalidraw";
+import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { SiGithub } from "@icons-pack/react-simple-icons";
@@ -30,8 +37,14 @@ export default function ExcalidrawWrapper() {
   const router = useRouter();
   const logout = useUserStore((state) => state.logout);
 
-  const [resetSceneDialogOpen, setResetSceneDialogOpen] = useState(false);
   const [newProjectDialogOpen, setNewProjectDialogOpen] = useState(false);
+  const [openProjectDialogOpen, setOpenProjectDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [resetSceneDialogOpen, setResetSceneDialogOpen] = useState(false);
+
+  const projectId = useProjectStore((state) => state.id);
+
+  const deleteProject = useProjectStore((state) => state.deleteProject);
 
   return (
     <div className="custom-styles h-screen w-screen">
@@ -40,24 +53,17 @@ export default function ExcalidrawWrapper() {
         excalidrawAPI={(api) => setExcalidrawAPI(api)}
       >
         <MainMenu>
-          <MainMenu.Item
-            onSelect={
-              () => setNewProjectDialogOpen(true)
-              // excalidrawAPI?.toggleSidebar({ name: "new-project" })
-            }
-          >
+          <MainMenu.Item onSelect={() => setNewProjectDialogOpen(true)}>
             <Plus />
             新建项目
           </MainMenu.Item>
-          <MainMenu.Item
-            onSelect={() =>
-              excalidrawAPI?.toggleSidebar({ name: "open-project" })
-            }
-          >
+
+          <MainMenu.Item onSelect={() => setOpenProjectDialogOpen(true)}>
             <Folder />
             打开项目
           </MainMenu.Item>
-          <MainMenu.Item onSelect={() => toast.error("功能未实现")}>
+
+          <MainMenu.Item onSelect={() => setDeleteDialogOpen(true)}>
             <X />
             删除项目
           </MainMenu.Item>
@@ -90,21 +96,60 @@ export default function ExcalidrawWrapper() {
           </MainMenu.Item>
         </MainMenu>
 
-        {/* ========== New Project ========== */}
-        <Sidebar name="new-project">
-          <Sidebar.Header>
-            <span>新建项目</span>
-          </Sidebar.Header>
-          <Template name="空白模板" />
-        </Sidebar>
+        {/* ========== New Project Dialog ========== */}
+        <Dialog
+          open={newProjectDialogOpen}
+          onOpenChange={setNewProjectDialogOpen}
+        >
+          <DialogContent className="!max-w-fit">
+            <DialogHeader>
+              <DialogTitle>新建项目</DialogTitle>
+              <DialogDescription>选择模板</DialogDescription>
+            </DialogHeader>
+            <NewProject />
+          </DialogContent>
+        </Dialog>
 
-        {/* ========== Open Project ========== */}
-        <Sidebar name="open-project" className="px-2">
-          <Sidebar.Header>
-            <span>打开项目</span>
-          </Sidebar.Header>
-          <Project name="头脑风暴" />
-        </Sidebar>
+        {/* ========== Open Project Dialog ========== */}
+        <Dialog
+          open={openProjectDialogOpen}
+          onOpenChange={setOpenProjectDialogOpen}
+        >
+          <DialogContent className="!max-w-fit">
+            <DialogHeader>
+              <DialogTitle>打开项目</DialogTitle>
+              <DialogDescription>打开已有项目</DialogDescription>
+            </DialogHeader>
+            <MyProject />
+          </DialogContent>
+        </Dialog>
+
+        {/* ========== Delete Project Dialog ========== */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>删除项目</AlertDialogTitle>
+              <AlertDialogDescription>
+                这将会删除项目。您是否要继续?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="cursor-pointer">
+                取消
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={async () => {
+                  await deleteProject(projectId);
+                  toast.success("删除成功");
+                  router.replace("/home");
+                }}
+                className="cursor-pointer"
+              >
+                确定
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* ========== Reset Scene Dialog ========== */}
         <AlertDialog
@@ -131,20 +176,6 @@ export default function ExcalidrawWrapper() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-
-        {/* ========== New Project Dialog ========== */}
-        <Dialog
-          open={newProjectDialogOpen}
-          onOpenChange={setNewProjectDialogOpen}
-        >
-          <DialogContent className="!max-w-fit">
-            <DialogHeader>
-              <DialogTitle>新建项目</DialogTitle>
-              <DialogDescription>选择模板</DialogDescription>
-            </DialogHeader>
-            <NewProject />
-          </DialogContent>
-        </Dialog>
       </Excalidraw>
     </div>
   );
