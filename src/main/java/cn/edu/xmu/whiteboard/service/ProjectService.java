@@ -133,9 +133,10 @@ public class ProjectService {
             ProjectUserPO projectUserPO = projectUserPOList.get(i);
             if(projectUserPO.getProjectId()==projectModifyDto.getPid()){
                 projectDao.modifyProject(projectModifyDto);
-                break;
+                return;
             }
         }
+        throw new GlobalException(CodeMsg.PROJECT_USER_NOT_EXIST);
     }
 
     public ProjectCompleteData openProject(String username, Integer id){
@@ -157,7 +158,6 @@ public class ProjectService {
         return null;
     }
 
-    @Transactional
     public boolean deleteProject(String username, Integer pid){
         if(username==null) {
             throw new IllegalArgumentException("username is null");
@@ -173,7 +173,7 @@ public class ProjectService {
         if(projectUserPO==null){
             throw new GlobalException(CodeMsg.PROJECT_USER_NOT_EXIST);
         }
-        else if(!projectUserPO.isAdmin()){
+        if(!projectUserPO.isAdmin()){
             throw new GlobalException(CodeMsg.PROJECT_NOT_ALLOW_TO_DELETE);
         }
         Long record=projectUserDao.deleteProjectUser(pid);
