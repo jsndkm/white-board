@@ -3,7 +3,7 @@ package cn.edu.xmu.whiteboard.controller;
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
 import cn.edu.xmu.whiteboard.ReturnData.DrawBoardReturnData;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
-import cn.edu.xmu.whiteboard.service.RoomService;
+import cn.edu.xmu.whiteboard.service.FileService;
 import cn.edu.xmu.whiteboard.utils.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/api", produces = "application/json;charset=UTF-8")
 @CrossOrigin(origins = "http://localhost:3000")
-public class RoomController {
+public class FileController {
     @Autowired
-    private RoomService roomService;
+    private FileService fileService;
 
-    @GetMapping(value = "/rooms/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/files/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<byte[]> getRoom(
             @RequestHeader("Authorization") String authorization,
             @PathVariable("id") String id){
@@ -28,7 +28,7 @@ public class RoomController {
             JWTUtil.analyzeToken(authorization);
 
             // 获取房间数据
-            byte[] resourceData = roomService.getRoom(id);
+            byte[] resourceData = fileService.getFile(id);
 
             // 设置响应头
             HttpHeaders headers = new HttpHeaders();
@@ -43,16 +43,16 @@ public class RoomController {
         }
     }
 
-    @PutMapping(value = "/rooms/{id}", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @PutMapping(value = "/files/{id}", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResultUtil<Object> modifyRoom(
             @RequestHeader("Authorization") String authorization,
             @PathVariable("id") String id,
-            @RequestBody byte[] roomData) {
+            @RequestBody byte[] fileData) {
         try {
             //解析token
             JWTUtil.analyzeToken(authorization);
 
-            String ID = roomService.modifyRoom(roomData, id);
+            String ID = fileService.modifyFile(fileData, id);
 
             DrawBoardReturnData data=new DrawBoardReturnData(ID);
             return ResultUtil.success(data);

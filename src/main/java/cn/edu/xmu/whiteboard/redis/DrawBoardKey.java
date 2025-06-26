@@ -11,5 +11,5 @@ public class DrawBoardKey extends BasePrefix{
     }
 
     public static DrawBoardKey getById = new DrawBoardKey(0, "db");
-    public static DrawBoardKey getByHash = new DrawBoardKey("db:");
+    public static DrawBoardKey getByHash = new DrawBoardKey("db");
 }
