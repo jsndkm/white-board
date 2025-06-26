@@ -1,49 +1,29 @@
-import { fetcher } from "@/lib/api";
-import { ProjectInfo } from "@/lib/api/project";
-import { ENDPOINT } from "@/lib/constants";
+import {
+  createProject,
+  deleteProject,
+  MyProjectListItem,
+} from "@/lib/api/project";
 import { z } from "zod";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-const newProjectInfoSchema = z.object({
-  name: z.string().min(2).max(12),
-  description: z.string().min(5).max(30),
-});
-
 interface ProjectState {
-  project: ProjectInfo | null;
-  newProjectStatus:
-    | "idle"
-    | "in_progress"
-    | "success"
-    | "failed"
-    | "invalid_data";
+  project?: MyProjectListItem;
+  newProjectStatus: "idle" | "success" | "failed" | "invalid_data";
   resetStatus: () => void;
-  createProject: (formData: FormData) => Promise<void>;
-  deleteProject: (id: number | undefined) => Promise<void>;
+  createProjectAction: (formData: FormData) => Promise<void>;
+  deleteProjectAction: (id: number) => Promise<void>;
 }
 
 export const useProjectStore = create<ProjectState>()(
   persist(
     (set) => ({
-      project: null,
+      project: undefined,
       newProjectStatus: "idle",
       resetStatus: () => set({ newProjectStatus: "idle" }),
-      createProject: async (formData) => {
+      createProjectAction: async (formData) => {
         try {
-          const validatedData = newProjectInfoSchema.parse({
-            name: formData.get("name"),
-            description: formData.get("description"),
-          });
-
-          const project = await fetcher<ProjectInfo>(ENDPOINT.CreateProject, {
-            method: "POST",
-            body: JSON.stringify({
-              name: validatedData.name,
-              description: validatedData.description,
-            }),
-          });
-
+          const project = await createProject(formData);
           set({ newProjectStatus: "success", project: project });
         } catch (error) {
           if (error instanceof z.ZodError) {
@@ -53,11 +33,8 @@ export const useProjectStore = create<ProjectState>()(
           }
         }
       },
-      deleteProject: async (id: number | undefined) => {
-        if (!id) return;
-        await fetcher<ProjectInfo>(ENDPOINT.DeleteProject(id), {
-          method: "DELETE",
-        });
+      deleteProjectAction: async (id: number) => {
+        await deleteProject(id);
       },
     }),
     {

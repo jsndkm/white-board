@@ -9,9 +9,10 @@ export function useGuestRedirect() {
   const token = useUserStore((state) => state.token);
 
   useEffect(() => {
+    console.log(token);
     if (token) {
       router.replace("/");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [token]);
 }

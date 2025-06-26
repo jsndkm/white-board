@@ -10,27 +10,27 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/lib/api";
-import { ProjectInfo } from "@/lib/api/project";
-import { ENDPOINT } from "@/lib/constants";
+import { GetMyProjectListEndpoint } from "@/lib/api/endpoint";
+import { MyProjectListItem } from "@/lib/api/project";
+import { useHomeStore } from "@/stores/home";
 import { LoaderCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { Suspense } from "react";
 import useSWR from "swr";
 
-type ProjectProps = ProjectInfo;
+type ProjectProps = MyProjectListItem;
 
 export function MyProject() {
-  const { data } = useSWR<ProjectInfo[]>(
-    ENDPOINT.GetProjectList,
-    fetcher<ProjectInfo[]>,
+  const { data: myProjectList } = useSWR<MyProjectListItem[]>(
+    GetMyProjectListEndpoint,
+    fetcher<MyProjectListItem[]>,
     { suspense: true },
   );
 
   return (
     <div className="container mx-auto flex flex-wrap justify-start gap-4 p-4">
       <Suspense fallback={<LoaderCircle />}>
-        {data?.map((proj, idx) => (
-          <Project
+        {myProjectList?.map((proj, idx) => (
+          <ProjectCard
             key={idx}
             id={proj.id}
             name={proj.name}
@@ -43,8 +43,10 @@ export function MyProject() {
   );
 }
 
-export function Project({ id, name, description, isAdmin }: ProjectProps) {
-  const router = useRouter();
+export function ProjectCard({ id, name, description, isAdmin }: ProjectProps) {
+  const setProjectDetailsDialogOpen = useHomeStore(
+    (state) => state.setProjectDetailsDialogOpen,
+  );
 
   return (
     <Card className="relative h-[260px] w-[240px] shrink-0 sm:h-[300px] md:h-[340px]">
@@ -70,11 +72,12 @@ export function Project({ id, name, description, isAdmin }: ProjectProps) {
       <CardFooter className="flex-col gap-2">
         <Button
           className="w-full cursor-pointer"
-          onClick={async () => {
-            router.replace(`/project/${id}`);
+          onClick={() => {
+            useHomeStore.getState().setSelectedProjectId(id);
+            setProjectDetailsDialogOpen(true);
           }}
         >
-          打开项目
+          查看详情
         </Button>
       </CardFooter>
     </Card>

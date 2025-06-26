@@ -1,5 +1,5 @@
+import { LoginEndpoint, RegisterEndpoint } from "@/lib/api/endpoint";
 import { fetcher } from "@/lib/api/index";
-import { ENDPOINT } from "@/lib/constants";
 import { z } from "zod";
 
 // ============================== Register ==============================
@@ -19,7 +19,7 @@ export const register = async (formData: FormData) => {
       phone: formData.get("phone"),
     });
 
-    await fetcher<void>(ENDPOINT.Register, {
+    await fetcher<void>(RegisterEndpoint, {
       method: "POST",
       body: JSON.stringify({
         username: validatedData.username,
@@ -52,7 +52,7 @@ export const login = async (formData: FormData) => {
       password: formData.get("password"),
     });
 
-    const resp = await fetcher<LoginResp>(ENDPOINT.Login, {
+    const resp = await fetcher<LoginResp>(LoginEndpoint, {
       method: "POST",
       body: JSON.stringify({
         username: validatedData.username,

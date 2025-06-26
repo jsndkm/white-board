@@ -44,7 +44,7 @@ export default function ExcalidrawWrapper() {
 
   const project = useProjectStore((state) => state.project);
   const resetStatus = useProjectStore((state) => state.resetStatus);
-  const deleteProject = useProjectStore((state) => state.deleteProject);
+  const deleteProject = useProjectStore((state) => state.deleteProjectAction);
 
   useEffect(() => {
     resetStatus();
@@ -87,7 +87,7 @@ export default function ExcalidrawWrapper() {
             重置画布
           </MainMenu.Item>
 
-          <MainMenu.Item onSelect={() => router.push("/home")}>
+          <MainMenu.Item onSelect={() => router.push("/")}>
             <House />
             回到主页
           </MainMenu.Item>
@@ -153,9 +153,13 @@ export default function ExcalidrawWrapper() {
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={async () => {
-                  await deleteProject(project?.id);
+                  if (!project) {
+                    toast.error("找不到项目");
+                    return;
+                  }
+                  await deleteProject(project.id);
                   toast.success("删除成功");
-                  router.replace("/home");
+                  router.replace("/");
                 }}
                 className="cursor-pointer"
               >
