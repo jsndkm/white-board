@@ -122,7 +122,7 @@ public class ProjectService {
             return false;
     }
 
-    public void modifyProject(String username, ProjectModifyDto projectModifyDto) {
+    public void modifyProject(String username, ProjectModifyDto projectModifyDto,Integer id) {
         // 检查用户名是否存在
         if (!userDao.existsByUsername(username)) {
             throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
@@ -131,8 +131,8 @@ public class ProjectService {
         List<ProjectUserPO> projectUserPOList = projectUserDao.findMyProject(username);
         for(int i = 0; i < projectUserPOList.size(); i++){
             ProjectUserPO projectUserPO = projectUserPOList.get(i);
-            if(projectUserPO.getProjectId()==projectModifyDto.getPid()){
-                projectDao.modifyProject(projectModifyDto);
+            if(projectUserPO.getProjectId()==id){
+                projectDao.modifyProject(projectModifyDto,id);
                 return;
             }
         }

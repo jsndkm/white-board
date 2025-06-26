@@ -25,7 +25,7 @@ public class ProjectController {
     @Autowired
     private ProjectService projectService;
 
-    @PostMapping("/new-project")
+    @PostMapping("/projects")
     @ResponseBody
     public ResultUtil<Object> newProject(@RequestHeader("Authorization") String authorization, @RequestBody ProjectDto projectDto){
         try{
@@ -59,7 +59,7 @@ public class ProjectController {
         }
     }
 
-    @PostMapping("/join-project")
+    @PostMapping("/projects/join")
     @ResponseBody
     public ResultUtil<Object> joinProject(@RequestHeader("Authorization") String authorization,@RequestParam("project_id") int projectId) {
         try {
@@ -74,7 +74,7 @@ public class ProjectController {
     }
 
     @Transactional
-    @PostMapping("/exit-project")
+    @PostMapping("/projects/exit")
     @ResponseBody
     public ResultUtil<Object> exitProject(@RequestHeader("Authorization") String authorization,@RequestParam("project_id") int projectId) {
         try {
@@ -90,9 +90,9 @@ public class ProjectController {
         }
     }
 
-    @GetMapping("/open-project")
+    @GetMapping("/projects/{id}")
     @ResponseBody
-    public ResultUtil<Object> openProject(@RequestHeader("Authorization") String authorization, @RequestParam("project_id") Integer id){
+    public ResultUtil<Object> openProject(@RequestHeader("Authorization") String authorization, @PathVariable("id") Integer id){
         try {
             //解析token
             String username=JWTUtil.analyzeToken(authorization);
@@ -105,11 +105,11 @@ public class ProjectController {
         }
     }
 
-    @PutMapping("/modify-project")
+    @PutMapping("/projects/{id}")
     @ResponseBody
-    public ResultUtil<Object> modifyProject(@RequestHeader("Authorization") String authorization, @RequestBody ProjectModifyDto projectModifyDto){
+    public ResultUtil<Object> modifyProject(@RequestHeader("Authorization") String authorization, @PathVariable("id") Integer id,@RequestBody ProjectModifyDto projectModifyDto){
         try{
-            if(projectModifyDto.getPid()<=0){
+            if(id==null){
                 return ResultUtil.error(CodeMsg.PROJECT_ID_EMPTY);
             }
             else if(!StringUtils.hasText(projectModifyDto.getName())){
@@ -123,7 +123,7 @@ public class ProjectController {
             if (username == null) {
                 return ResultUtil.error(CodeMsg.TOKEN_INVALID);
             }
-            projectService.modifyProject(username, projectModifyDto);
+            projectService.modifyProject(username, projectModifyDto,id);
             return ResultUtil.success(null);
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
@@ -132,9 +132,9 @@ public class ProjectController {
     }
 
     @Transactional
-    @DeleteMapping("/delete-project")
+    @DeleteMapping("/projects/{id}")
     @ResponseBody
-    public ResultUtil<Object> deleteProject(@RequestHeader("Authorization") String authorization,@RequestParam("project_id") Integer id){
+    public ResultUtil<Object> deleteProject(@RequestHeader("Authorization") String authorization,@PathVariable("id") Integer id){
         try {
             //解析token
             String username=JWTUtil.analyzeToken(authorization);

@@ -38,8 +38,8 @@ public class ProjectDao {
         else return projectPO;
     }
 
-    public void modifyProject(ProjectModifyDto projectModifyDto){
-        ProjectPO projectPO = this.projectPoMapper.findById(projectModifyDto.getPid());
+    public void modifyProject(ProjectModifyDto projectModifyDto,Integer id){
+        ProjectPO projectPO = this.projectPoMapper.findById(id);
         if(projectPO==null){
             throw new IllegalArgumentException("can't find this project");
         }
