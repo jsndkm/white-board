@@ -1,6 +1,7 @@
 package cn.edu.xmu.whiteboard.controller;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
+import cn.edu.xmu.whiteboard.ReturnData.DrawBoardReturnData;
 import cn.edu.xmu.whiteboard.result.CodeMsg;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
 import cn.edu.xmu.whiteboard.service.RoomService;
@@ -46,16 +47,16 @@ public class RoomController {
     @PutMapping(value = "/rooms/{id}", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResultUtil<Object> modifyRoom(
             @RequestHeader("Authorization") String authorization,
-            @PathVariable("id") Integer id,
+            @PathVariable("id") String id,
             @RequestBody byte[] roomData) {
         try {
             //解析token
             JWTUtil.analyzeToken(authorization);
 
-            Integer ID = roomService.modifyRoom(roomData, id);
+            String ID = roomService.modifyRoom(roomData, id);
 
-            return ResultUtil.success(ID);
-
+            DrawBoardReturnData data=new DrawBoardReturnData(ID);
+            return ResultUtil.success(data);
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);

@@ -15,26 +15,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class RoomService {
     @Autowired
     private RedisService redisService;
-    private static final String ID_PREFIX = "room_";
-    private static final AtomicInteger counter = new AtomicInteger(0);
 
-    public Integer modifyRoom(byte[] roomData, Integer id) {
-
+    public String modifyRoom(byte[] roomData, String id) {
         // 存储到Redis
-        boolean result = redisService.setBinary(DrawBoardKey.getById, id.toString(), roomData);
+        boolean result = redisService.setBinary(RoomKey.getById, id, roomData);
         if (!result) {
-            throw new RuntimeException("Failed to store room data");
+            throw new RuntimeException("Failed to store new room data");
         }
-
         return id;
-    }
-
-    private String generateUniqueId() {
-        return ID_PREFIX + System.currentTimeMillis() + "_" + counter.incrementAndGet();
     }
 
     public byte[] getRoom(String id) {
         return redisService.getBinary(RoomKey.getById, id);
     }
-
 }
