@@ -1,7 +1,6 @@
 package cn.edu.xmu.whiteboard.controller;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
-import cn.edu.xmu.whiteboard.result.CodeMsg;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
 import cn.edu.xmu.whiteboard.service.RoomService;
 import cn.edu.xmu.whiteboard.utils.JWTUtil;
@@ -27,7 +26,7 @@ public class RoomController {
             //解析token
             JWTUtil.analyzeToken(authorization);
 
-            // 获取房间数据
+            // 获取数据
             byte[] resourceData = roomService.getRoom(id);
 
             // 设置响应头

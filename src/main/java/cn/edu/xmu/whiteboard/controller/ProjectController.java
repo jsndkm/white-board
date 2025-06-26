@@ -97,6 +97,7 @@ public class ProjectController {
             //解析token
             String username=JWTUtil.analyzeToken(authorization);
             ProjectCompleteData data=projectService.openProject(username,id);
+            if(data==null) return ResultUtil.error(CodeMsg.PROJECT_NOT_EXIST);
             return ResultUtil.success(data);
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
@@ -140,7 +141,7 @@ public class ProjectController {
             if(projectService.deleteProject(username,id))
                 return ResultUtil.success(null);
             else
-                return ResultUtil.error(CodeMsg.SERVER_ERROR);
+                return ResultUtil.error(CodeMsg.PROJECT_NOT_ALLOW_TO_DELETE);
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);
