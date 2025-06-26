@@ -28,7 +28,7 @@ public class UserService {
      * 注册用户
      * @param userDTO 用户数据传输对象
      */
-    public String registerUser(HttpServletResponse response,UserDto userDTO) {
+    public boolean registerUser(HttpServletResponse response,UserDto userDTO) {
         if(userDTO==null)
         {
             throw new IllegalArgumentException("userDTO is null");
@@ -41,10 +41,9 @@ public class UserService {
         // 注册用户
         UserPO user=userDao.register(userDTO);
 
-        // 生成 cookie
-        String token = JWTUtil.generateToken(user.getUsername());
-        addCookie(response, token, user);
-        return token;
+        if(user==null)
+            return false;
+        return true;
     }
 
     public LoginReturnData login(HttpServletResponse response, LoginDto loginDTO) {

@@ -1,9 +1,9 @@
 package cn.edu.xmu.whiteboard.controller;
 
+import cn.edu.xmu.whiteboard.Exception.GlobalException;
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
 import cn.edu.xmu.whiteboard.controller.dto.LoginDto;
 import cn.edu.xmu.whiteboard.ReturnData.LoginReturnData;
-import cn.edu.xmu.whiteboard.ReturnData.RegisterReturnData;
 import cn.edu.xmu.whiteboard.controller.dto.UserDto;
 import cn.edu.xmu.whiteboard.result.*;
 import cn.edu.xmu.whiteboard.service.UserService;
@@ -46,17 +46,17 @@ public class UserController {
             }
 
             // 检查用户名和密码的长度
-            if (userDTO.getUsername().length() < 3) {
+            if (userDTO.getUsername().length() < 6) {
                 return ResultUtil.error(CodeMsg.USERNAME_TOO_SHORT);
             } else if (userDTO.getPassword().length() < 6) {
                 return ResultUtil.error(CodeMsg.PASSWORD_TOO_SHORT);
             }
 
             // 调用 UserService 注册用户
-            String token = userService.registerUser(response,userDTO);
-            RegisterReturnData data=new RegisterReturnData(token);
+            if(!userService.registerUser(response,userDTO))
+                throw  new GlobalException(CodeMsg.SERVER_ERROR);
 
-            return ResultUtil.success(data);
+            return ResultUtil.success(null);
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);
