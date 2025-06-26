@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { uploadExcalidraw } from "@/lib/api/test";
 import { useProjectStore } from "@/stores/project";
 import { useUserStore } from "@/stores/user";
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
@@ -55,8 +56,18 @@ export default function ExcalidrawWrapper() {
       <Excalidraw
         langCode="zh-CN"
         excalidrawAPI={(api) => setExcalidrawAPI(api)}
+        initialData={() => null}
       >
         <MainMenu>
+          <MainMenu.Item
+            onSelect={async () =>
+              uploadExcalidraw(excalidrawAPI?.getSceneElements())
+            }
+          >
+            <Plus />
+            上传画板
+          </MainMenu.Item>
+
           <MainMenu.Item onSelect={() => setNewProjectDialogOpen(true)}>
             <Plus />
             新建项目
