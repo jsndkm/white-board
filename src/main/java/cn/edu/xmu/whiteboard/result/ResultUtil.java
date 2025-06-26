@@ -9,7 +9,7 @@ public class ResultUtil<T> {
     private T data;
 
     private ResultUtil(T data) {
-        this.code = 200;
+        this.code = 0;
         this.msg = "success";
         this.data = data;
     }
