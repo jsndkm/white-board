@@ -61,11 +61,11 @@ public class ProjectController {
 
     @PostMapping("/projects/join")
     @ResponseBody
-    public ResultUtil<Object> joinProject(@RequestHeader("Authorization") String authorization,@RequestParam("project_id") int projectId) {
+    public ResultUtil<Object> joinProject(@RequestHeader("Authorization") String authorization,@RequestParam("project_id") int projectId,@RequestParam("username") String username) {
         try {
             //解析token
-            String username=JWTUtil.analyzeToken(authorization);
-            projectService.joinProject(username,projectId);
+            String admin=JWTUtil.analyzeToken(authorization);
+            projectService.joinProject(username,projectId,admin);
             return ResultUtil.success(null);
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();

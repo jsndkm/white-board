@@ -79,16 +79,18 @@ public class ProjectService {
         return data;
     }
 
-    public void joinProject(String username, int projectId){
-        if(username==null) {
+    public void joinProject(String username, int projectId,String admin){
+        if(username==null||admin==null) {
             throw new IllegalArgumentException("username is null");
         }
-        if (!userDao.existsByUsername(username)) {
+        if (!userDao.existsByUsername(username)||!userDao.existsByUsername(admin)) {
             throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
         }
         ProjectPO projectPO = projectDao.findById(projectId);
         if(projectPO==null){
             throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
+        } else if (!projectPO.getUsername().equals(admin)) {
+            throw new GlobalException(CodeMsg.PROJECT_NOT_ALLOW_TO_JOIN);
         }
         ProjectUserPO projectUserPO=projectUserDao.findByPidAndUname(projectId,username);
         if(projectUserPO!=null||projectPO.getUsername().equals(username)){
