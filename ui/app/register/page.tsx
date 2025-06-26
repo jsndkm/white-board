@@ -14,8 +14,7 @@ export default function Page() {
   const router = useRouter();
 
   const status = useUserStore((state) => state.registerStatus);
-  const username = useUserStore((state) => state.username);
-  const register = useUserStore((state) => state.register);
+  const registerAction = useUserStore((state) => state.registerAction);
   const [isSuccessful, setIsSuccessful] = useState(false);
 
   useEffect(() => {
@@ -29,13 +28,13 @@ export default function Page() {
       toast.success("注册成功");
 
       setIsSuccessful(true);
-      router.replace("/");
+      router.replace("/login");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
   const handleSubmit = async (formData: FormData) => {
-    await register(formData);
+    await registerAction(formData);
   };
 
   return (
@@ -47,11 +46,7 @@ export default function Page() {
             输入用户名和密码创建用户
           </p>
         </div>
-        <AuthForm
-          action={handleSubmit}
-          defaultUsername={username}
-          isRegister={true}
-        >
+        <AuthForm action={handleSubmit} isRegister={true}>
           <SubmitButton isSuccessful={isSuccessful}>注册</SubmitButton>
           <p className="mt-4 text-center text-sm text-gray-600 dark:text-zinc-400">
             已经有账号？

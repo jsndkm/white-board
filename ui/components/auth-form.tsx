@@ -7,14 +7,12 @@ import React from "react";
 export function AuthForm({
   action,
   children,
-  defaultUsername = "",
   isRegister,
 }: {
   action: NonNullable<
     string | ((formData: FormData) => void | Promise<void>) | undefined
   >;
   children: React.ReactNode;
-  defaultUsername?: string;
   isRegister: boolean;
 }) {
   const resetStatus = useUserStore((state) => state.resetStatus);
@@ -38,7 +36,6 @@ export function AuthForm({
           autoComplete="username"
           required
           autoFocus
-          defaultValue={defaultUsername}
           onChange={resetStatus}
         />
       </div>

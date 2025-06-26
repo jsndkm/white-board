@@ -1,32 +1,11 @@
-import { ENDPOINT } from "@/lib/constants";
-import { Resp } from "@/lib/types/types";
-import { LoginResp, RegisterResp } from "@/lib/types/user";
-import { fetcher } from "@/lib/utils";
+import { login, register } from "@/lib/api/user";
 import { z } from "zod";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-const loginFormSchema = z.object({
-  username: z.string().regex(/^[a-zA-Z0-9]{6,16}$/),
-  password: z.string().min(6).max(16),
-});
-
-const registerFormSchema = z.object({
-  username: z.string().regex(/^[a-zA-Z0-9]{6,16}$/),
-  password: z.string().min(6).max(16),
-  email: z.string().email(),
-  phone: z.string().regex(/^1[0-9]{10}$/),
-});
-
-type loginStatusType =
-  | "idle"
-  | "in_progress"
-  | "success"
-  | "failed"
-  | "invalid_data";
+type loginStatusType = "idle" | "success" | "failed" | "invalid_data";
 type registerStatusType =
   | "idle"
-  | "in_progress"
   | "success"
   | "failed"
   | "user_exists"
@@ -35,11 +14,12 @@ type registerStatusType =
 interface UserState {
   loginStatus: loginStatusType;
   registerStatus: registerStatusType;
-  username: string;
+  username?: string;
+  token?: string;
   resetStatus: () => void;
-  register: (formData: FormData) => Promise<void>;
-  login: (formData: FormData) => Promise<void>;
-  logout: () => Promise<void>;
+  registerAction: (formData: FormData) => Promise<void>;
+  loginAction: (formData: FormData) => Promise<void>;
+  logoutAction: () => Promise<void>;
 }
 
 export const useUserStore = create<UserState>()(
@@ -47,27 +27,11 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       loginStatus: "idle",
       registerStatus: "idle",
-      username: "",
+      username: undefined,
       resetStatus: () => set({ loginStatus: "idle", registerStatus: "idle" }),
-      register: async (formData) => {
+      registerAction: async (formData) => {
         try {
-          const validatedData = registerFormSchema.parse({
-            username: formData.get("username"),
-            password: formData.get("password"),
-            email: formData.get("email"),
-            phone: formData.get("phone"),
-          });
-          set({ username: validatedData.username as string });
-
-          const resp = await fetcher<Resp<RegisterResp>>(ENDPOINT.Register, {
-            method: "POST",
-            body: JSON.stringify({
-              username: validatedData.username,
-              password: validatedData.password,
-            }),
-          });
-
-          localStorage.setItem("token", resp.data.token);
+          await register(formData);
           set({ registerStatus: "success" });
         } catch (error) {
           if (error instanceof z.ZodError) {
@@ -77,24 +41,10 @@ export const useUserStore = create<UserState>()(
           }
         }
       },
-      login: async (formData) => {
+      loginAction: async (formData) => {
         try {
-          const validatedData = loginFormSchema.parse({
-            username: formData.get("username"),
-            password: formData.get("password"),
-          });
-          set({ username: validatedData.username as string });
-
-          const resp = await fetcher<Resp<LoginResp>>(ENDPOINT.Login, {
-            method: "POST",
-            body: JSON.stringify({
-              username: validatedData.username,
-              password: validatedData.password,
-            }),
-          });
-
-          localStorage.setItem("token", resp.data.token);
-          set({ loginStatus: "success" });
+          const token = await login(formData);
+          set({ loginStatus: "success", token: token });
         } catch (error) {
           if (error instanceof z.ZodError) {
             set({ loginStatus: "invalid_data" });
@@ -103,21 +53,20 @@ export const useUserStore = create<UserState>()(
           }
         }
       },
-      logout: async () => {
-        try {
-          await fetcher<Resp<null>>(ENDPOINT.Logout, {
-            method: "POST",
-          });
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (error) {}
-        localStorage.removeItem("token");
-        set({ username: "", loginStatus: "idle", registerStatus: "idle" });
+      logoutAction: async () => {
+        set({
+          username: undefined,
+          token: undefined,
+          loginStatus: "idle",
+          registerStatus: "idle",
+        });
       },
     }),
     {
       name: "user-store",
       partialize: (state) => ({
         username: state.username,
+        token: state.token,
       }),
     },
   ),

@@ -8,7 +8,7 @@ import * as React from "react";
 export default function AppHeader() {
   const router = useRouter();
   const username = useUserStore((state) => state.username);
-  const logout = useUserStore((state) => state.logout);
+  const logout = useUserStore((state) => state.logoutAction);
 
   return (
     <header className="bg-background sticky top-0 flex items-center gap-2 px-2 py-1.5 md:px-2">

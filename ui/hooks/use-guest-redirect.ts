@@ -1,14 +1,14 @@
 "use client";
 
+import { useUserStore } from "@/stores/user";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export function useGuestRedirect() {
   const router = useRouter();
+  const token = useUserStore((state) => state.token);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
     if (token) {
       router.replace("/");
     }

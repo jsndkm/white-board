@@ -1,7 +1,6 @@
+import { fetcher } from "@/lib/api";
+import { ProjectInfo } from "@/lib/api/project";
 import { ENDPOINT } from "@/lib/constants";
-import { ProjectInfo } from "@/lib/types/project";
-import { Resp } from "@/lib/types/types";
-import { fetcher } from "@/lib/utils";
 import { z } from "zod";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -37,18 +36,15 @@ export const useProjectStore = create<ProjectState>()(
             description: formData.get("description"),
           });
 
-          const resp = await fetcher<Resp<ProjectInfo>>(
-            ENDPOINT.CreateProject,
-            {
-              method: "POST",
-              body: JSON.stringify({
-                name: validatedData.name,
-                description: validatedData.description,
-              }),
-            },
-          );
+          const project = await fetcher<ProjectInfo>(ENDPOINT.CreateProject, {
+            method: "POST",
+            body: JSON.stringify({
+              name: validatedData.name,
+              description: validatedData.description,
+            }),
+          });
 
-          set({ newProjectStatus: "success", project: resp.data });
+          set({ newProjectStatus: "success", project: project });
         } catch (error) {
           if (error instanceof z.ZodError) {
             set({ newProjectStatus: "invalid_data" });
@@ -59,7 +55,7 @@ export const useProjectStore = create<ProjectState>()(
       },
       deleteProject: async (id: number | undefined) => {
         if (!id) return;
-        await fetcher<Resp<ProjectInfo>>(ENDPOINT.DeleteProject(id), {
+        await fetcher<ProjectInfo>(ENDPOINT.DeleteProject(id), {
           method: "DELETE",
         });
       },

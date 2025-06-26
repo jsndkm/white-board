@@ -15,8 +15,7 @@ export default function Page() {
   const router = useRouter();
 
   const status = useUserStore((state) => state.loginStatus);
-  const username = useUserStore((state) => state.username);
-  const login = useUserStore((state) => state.login);
+  const loginAction = useUserStore((state) => state.loginAction);
   const [isSuccessful, setIsSuccessful] = useState(false);
 
   useEffect(() => {
@@ -32,7 +31,7 @@ export default function Page() {
   }, [status]);
 
   const handleSubmit = async (formData: FormData) => {
-    await login(formData);
+    await loginAction(formData);
   };
 
   return (
@@ -44,11 +43,7 @@ export default function Page() {
             使用用户名和密码登录
           </p>
         </div>
-        <AuthForm
-          action={handleSubmit}
-          defaultUsername={username}
-          isRegister={false}
-        >
+        <AuthForm action={handleSubmit} isRegister={false}>
           <SubmitButton isSuccessful={isSuccessful}>登录</SubmitButton>
           <p className="mt-4 text-center text-sm text-gray-600 dark:text-zinc-400">
             还没有账号？

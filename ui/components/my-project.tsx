@@ -9,9 +9,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetcher } from "@/lib/api";
+import { ProjectInfo } from "@/lib/api/project";
 import { ENDPOINT } from "@/lib/constants";
-import { ProjectInfo } from "@/lib/types/project";
-import { dataFetcher } from "@/lib/utils";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Suspense } from "react";
@@ -22,7 +22,7 @@ type ProjectProps = ProjectInfo;
 export function MyProject() {
   const { data } = useSWR<ProjectInfo[]>(
     ENDPOINT.GetProjectList,
-    dataFetcher<ProjectInfo[]>,
+    fetcher<ProjectInfo[]>,
     { suspense: true },
   );
 
