@@ -37,7 +37,7 @@ public class ProjectBoardController {
     }
 
     @GetMapping("/project-board/{id}")
-    public ProjectBoardReturnData getProjectBoard(
+    public ResultUtil<Object> getProjectBoard(
             @RequestHeader("Authorization") String authorization,
             @PathVariable("id") Integer id) {
         try {
@@ -47,10 +47,10 @@ public class ProjectBoardController {
             // 获取画板数据
             ProjectBoardReturnData resourceData = projectBoardService.getProjectBoard(id);
 
-            return resourceData;
+            return ResultUtil.success(resourceData);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
+            return exceptionHandle.exceptionHandle(e);
         }
     }
 }

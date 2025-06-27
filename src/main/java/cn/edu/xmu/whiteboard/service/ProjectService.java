@@ -99,6 +99,30 @@ public class ProjectService {
         projectUserDao.createProjectMember(username,projectPO);
     }
 
+    public boolean kickProject(String username, int projectId,String admin){
+        if(username==null||admin==null) {
+            throw new IllegalArgumentException("username is null");
+        }
+        if (!userDao.existsByUsername(username)||!userDao.existsByUsername(admin)) {
+            throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
+        }
+        ProjectPO projectPO = projectDao.findById(projectId);
+        if(projectPO==null){
+            throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
+        } else if (!projectPO.getUsername().equals(admin)) {
+            throw new GlobalException(CodeMsg.PROJECT_NOT_ALLOW_TO_KICK);
+        }
+        ProjectUserPO projectUserPO=projectUserDao.findByPidAndUname(projectId,username);
+        if(projectUserPO==null){
+            throw new GlobalException(CodeMsg.PROJECT_USER_NOT_EXIST);
+        }
+        Long record=projectUserDao.exitProjectMember(projectId,username);
+        if(record==1)
+            return true;
+        else
+            return false;
+    }
+
     public boolean exitProject(String username, int projectId){
         if(username==null) {
             throw new IllegalArgumentException("username is null");

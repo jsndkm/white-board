@@ -74,6 +74,23 @@ public class ProjectController {
     }
 
     @Transactional
+    @DeleteMapping("/projects/kick")
+    @ResponseBody
+    public ResultUtil<Object> kickProject(@RequestHeader("Authorization") String authorization,@RequestParam("project_id") int projectId,@RequestParam("username") String username) {
+        try {
+            //解析token
+            String admin=JWTUtil.analyzeToken(authorization);
+            if(projectService.kickProject(username,projectId,admin))
+                return ResultUtil.success(null);
+            else
+                return ResultUtil.error(CodeMsg.SERVER_ERROR);
+        } catch (Exception e) {
+            GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
+            return exceptionHandle.exceptionHandle(e);
+        }
+    }
+
+    @Transactional
     @PostMapping("/projects/exit")
     @ResponseBody
     public ResultUtil<Object> exitProject(@RequestHeader("Authorization") String authorization,@RequestParam("project_id") int projectId) {
