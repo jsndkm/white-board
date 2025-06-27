@@ -9,7 +9,6 @@ export function useGuestRedirect() {
   const token = useUserStore((state) => state.token);
 
   useEffect(() => {
-    console.log(token);
     if (token) {
       router.replace("/");
     }

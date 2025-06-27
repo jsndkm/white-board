@@ -14,12 +14,15 @@ import { GetMyProjectListEndpoint } from "@/lib/api/endpoint";
 import { MyProjectListItem } from "@/lib/api/project";
 import { useHomeStore } from "@/stores/home";
 import { LoaderCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Suspense } from "react";
 import useSWR from "swr";
 
-type ProjectProps = MyProjectListItem;
-
-export function MyProject() {
+export function MyProjectContainer({
+  showDetailButton = true,
+}: {
+  showDetailButton?: boolean;
+}) {
   const { data: myProjectList } = useSWR<MyProjectListItem[]>(
     GetMyProjectListEndpoint,
     fetcher<MyProjectListItem[]>,
@@ -27,7 +30,7 @@ export function MyProject() {
   );
 
   return (
-    <div className="container mx-auto flex flex-wrap justify-start gap-4 p-4">
+    <div className="container mx-auto flex max-h-fit flex-wrap justify-start gap-4 overflow-auto p-4">
       <Suspense fallback={<LoaderCircle />}>
         {myProjectList?.map((proj, idx) => (
           <ProjectCard
@@ -35,7 +38,8 @@ export function MyProject() {
             id={proj.id}
             name={proj.name}
             description={proj.description}
-            isAdmin={proj.isAdmin}
+            admin={proj.admin}
+            showDetailButton={showDetailButton}
           />
         ))}
       </Suspense>
@@ -43,14 +47,28 @@ export function MyProject() {
   );
 }
 
-export function ProjectCard({ id, name, description, isAdmin }: ProjectProps) {
+export function ProjectCard({
+  id,
+  name,
+  description,
+  admin,
+  showDetailButton,
+}: {
+  id: number;
+  name: string;
+  description: string;
+  admin: boolean;
+  showDetailButton?: boolean;
+}) {
+  const router = useRouter();
+
   const setProjectDetailsDialogOpen = useHomeStore(
     (state) => state.setProjectDetailsDialogOpen,
   );
 
   return (
     <Card className="relative h-[260px] w-[240px] shrink-0 sm:h-[300px] md:h-[340px]">
-      {isAdmin ? (
+      {admin ? (
         <Badge
           variant="secondary"
           className="absolute top-4 right-4 bg-blue-500 text-white dark:bg-blue-600"
@@ -72,13 +90,28 @@ export function ProjectCard({ id, name, description, isAdmin }: ProjectProps) {
       <CardFooter className="flex-col gap-2">
         <Button
           className="w-full cursor-pointer"
-          onClick={() => {
-            useHomeStore.getState().setSelectedProjectId(id);
-            setProjectDetailsDialogOpen(true);
-          }}
+          onClick={() => router.push(`/project/${id}`)}
         >
-          查看详情
+          打开项目
         </Button>
+        {showDetailButton && (
+          <Button
+            variant="secondary"
+            className="w-full cursor-pointer"
+            onClick={() => {
+              const item: MyProjectListItem = {
+                id,
+                name,
+                description,
+                admin: admin,
+              };
+              useHomeStore.getState().setSelectedProject(item);
+              setProjectDetailsDialogOpen(true);
+            }}
+          >
+            查看详情
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

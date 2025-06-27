@@ -1,3 +1,4 @@
+import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { SubmitButton } from "@/components/submit-button";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,9 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher } from "@/lib/api";
-import { GetProjectDetailEndpoint } from "@/lib/api/endpoint";
-import { inviteToProject, ProjectDetail } from "@/lib/api/project";
+import { deleteProject, inviteToProject } from "@/lib/api/project";
 import { useHomeStore } from "@/stores/home";
 import { Loader } from "lucide-react";
 import Form from "next/form";
@@ -20,7 +19,6 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 import { Suspense, useState } from "react";
 import { toast } from "sonner";
-import useSWR from "swr";
 import { z } from "zod";
 
 export function ProjectDetailDrawer() {
@@ -29,15 +27,7 @@ export function ProjectDetailDrawer() {
   const projectDetailsDialogOpen = useHomeStore(
     (state) => state.projectDetailsDialogOpen,
   );
-  const projectId = useHomeStore((state) => state.selectedProjectId);
-
-  const { data: projectDetail } = useSWR(
-    projectId ? GetProjectDetailEndpoint(projectId) : null,
-    fetcher<ProjectDetail>,
-    {
-      suspense: true,
-    },
-  );
+  const project = useHomeStore((state) => state.selectedProject);
 
   const [isSuccessful, setIsSuccessful] = useState(false);
   const handleSubmit = async (formData: FormData) => {
@@ -48,10 +38,10 @@ export function ProjectDetailDrawer() {
           username: formData.get("username"),
         });
       const username = validated.username;
-      if (!username || !projectDetail) {
+      if (!username || !project) {
         return;
       }
-      await inviteToProject(projectDetail.id, username);
+      await inviteToProject(project.id, username);
       setIsSuccessful(true);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -75,14 +65,12 @@ export function ProjectDetailDrawer() {
             <DrawerDescription>输入用户名发送邀请</DrawerDescription>
           </DrawerHeader>
           <div className="mx-48 mt-5 mb-10 flex justify-center gap-15">
-            <div className="flex flex-2 flex-col justify-between">
+            <div className="flex flex-3 flex-col justify-between">
               <div className="flex flex-col gap-2">
                 <h2 className="text-foreground text-2xl font-semibold">
-                  {projectDetail?.name}
+                  {project?.name}
                 </h2>
-                <p className="text-muted-foreground">
-                  {projectDetail?.description}
-                </p>
+                <p className="text-muted-foreground">{project?.description}</p>
               </div>
 
               <Form
@@ -112,11 +100,32 @@ export function ProjectDetailDrawer() {
               </Form>
             </div>
 
-            <div className="flex flex-1 flex-col items-center justify-center gap-5">
+            <div className="flex flex-2 flex-col items-center justify-center gap-5">
               <Skeleton className="h-50 w-50" />
-              <Button onClick={() => router.replace(`/project/${projectId}`)}>
-                打开项目
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  className="cursor-pointer"
+                  onClick={() => {
+                    router.replace(`/project/${project?.id}`);
+                    useHomeStore.getState().setProjectDetailsDialogOpen(false);
+                  }}
+                >
+                  打开项目
+                </Button>
+                {project?.admin && (
+                  <ConfirmDeleteButton
+                    onConfirmAction={async () => {
+                      if (!project?.id) return;
+                      await deleteProject(project.id);
+                      useHomeStore
+                        .getState()
+                        .setProjectDetailsDialogOpen(false);
+                      router.replace("/");
+                    }}
+                    className="cursor-pointer"
+                  />
+                )}
+              </div>
             </div>
           </div>
         </DrawerContent>

@@ -2,17 +2,26 @@
 
 import AppHeader from "@/components/app-header";
 import { ProjectDetailDrawer } from "@/components/home/project-detail-drawer";
-import { MyProject } from "@/components/my-project";
+import { MyProjectContainer } from "@/components/my-project-container";
 import { NewProject } from "@/components/new-project";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 import { useHomeStore } from "@/stores/home";
+import { Loader } from "lucide-react";
 
 export default function Page() {
   useAuthRedirect();
 
   const selectedTab = useHomeStore((state) => state.selectedTab);
   const setSelectedTab = useHomeStore((state) => state.setSelectedTab);
+  const isHydrated = useHomeStore((state) => state.isHydrated);
+
+  if (!isHydrated)
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+      </div>
+    );
 
   return (
     <div className="flex h-screen w-screen min-w-0 flex-col">
@@ -35,7 +44,7 @@ export default function Page() {
             <NewProject />
           </TabsContent>
           <TabsContent value="my-project">
-            <MyProject />
+            <MyProjectContainer showDetailButton={true} />
           </TabsContent>
         </Tabs>
         <ProjectDetailDrawer />

@@ -1,6 +1,6 @@
 "use client";
 
-import { MyProject } from "@/components/my-project";
+import { MyProjectContainer } from "@/components/my-project-container";
 import { NewProject } from "@/components/new-project";
 import {
   AlertDialog,
@@ -134,7 +134,7 @@ export default function ExcalidrawWrapper() {
               <DialogTitle>打开项目</DialogTitle>
               <DialogDescription>打开已有项目</DialogDescription>
             </DialogHeader>
-            <MyProject />
+            <MyProjectContainer showDetailButton={false} />
           </DialogContent>
         </Dialog>
 

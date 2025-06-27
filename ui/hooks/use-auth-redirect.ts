@@ -7,9 +7,11 @@ import { useEffect } from "react";
 export function useAuthRedirect() {
   const router = useRouter();
   const token = useUserStore((state) => state.token);
+  const isHydrated = useUserStore((state) => state.isHydrated);
 
   useEffect(() => {
-    console.log(token);
+    if (!isHydrated) return;
+    
     if (!token) {
       router.replace("/login");
     }

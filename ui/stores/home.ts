@@ -1,11 +1,14 @@
+import { MyProjectListItem } from "@/lib/api/project";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface HomeState {
+  isHydrated: boolean;
+  setIsHydrated: (isHydrated: boolean) => void;
   selectedTab: string;
   setSelectedTab: (name: string) => void;
-  selectedProjectId: number;
-  setSelectedProjectId: (id: number) => void;
+  selectedProject?: MyProjectListItem;
+  setSelectedProject: (item: MyProjectListItem) => void;
   newProjectDialogOpen: boolean;
   setNewProjectDialogOpen: (status: boolean) => void;
   projectDetailsDialogOpen: boolean;
@@ -15,10 +18,12 @@ interface HomeState {
 export const useHomeStore = create<HomeState>()(
   persist(
     (set) => ({
+      isHydrated: false,
+      setIsHydrated: (isHydrated: boolean) => set({ isHydrated: isHydrated }),
       selectedTab: "new-project",
       setSelectedTab: (name) => set({ selectedTab: name }),
-      selectedProjectId: 0,
-      setSelectedProjectId: (id: number) => set({ selectedProjectId: id }),
+      setSelectedProject: (iterm: MyProjectListItem) =>
+        set({ selectedProject: iterm }),
       newProjectDialogOpen: false,
       setNewProjectDialogOpen: (status: boolean) =>
         set({ newProjectDialogOpen: status }),
@@ -31,6 +36,9 @@ export const useHomeStore = create<HomeState>()(
       partialize: (state) => ({
         selectedTab: state.selectedTab,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setIsHydrated(true);
+      },
     },
   ),
 );

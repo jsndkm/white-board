@@ -12,6 +12,8 @@ type registerStatusType =
   | "invalid_data";
 
 interface UserState {
+  isHydrated: boolean;
+  setIsHydrated: (isHydrated: boolean) => void;
   loginStatus: loginStatusType;
   registerStatus: registerStatusType;
   username?: string;
@@ -25,9 +27,10 @@ interface UserState {
 export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
+      isHydrated: false,
+      setIsHydrated: (isHydrated: boolean) => set({ isHydrated: isHydrated }),
       loginStatus: "idle",
       registerStatus: "idle",
-      username: undefined,
       resetStatus: () => set({ loginStatus: "idle", registerStatus: "idle" }),
       registerAction: async (formData) => {
         try {
@@ -68,6 +71,9 @@ export const useUserStore = create<UserState>()(
         username: state.username,
         token: state.token,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setIsHydrated(true);
+      },
     },
   ),
 );

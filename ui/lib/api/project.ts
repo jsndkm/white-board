@@ -11,7 +11,7 @@ export type MyProjectListItem = {
   id: number;
   name: string;
   description: string;
-  isAdmin: boolean;
+  admin: boolean;
 };
 
 // ============================== Get Project Detail ==============================
