@@ -5,6 +5,7 @@ import { DeleteProjectDialog } from "@/components/scene/delete-project-dialog";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryClient } from "@tanstack/query-core";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { SessionProvider } from "next-auth/react";
 import React, { useState } from "react";
 import { Toaster } from "sonner";
 
@@ -25,7 +26,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <SessionProvider>{children}</SessionProvider>
             <Toaster position="top-center" richColors />
             <DeleteProjectDialog />
           </ThemeProvider>

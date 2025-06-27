@@ -1,37 +1,43 @@
 "use client";
 
+import { login, LoginActionState } from "@/app/(auth)/actions";
 import { AuthForm } from "@/components/form/auth-form";
 import { SubmitButton } from "@/components/form/submit-button";
-import { useGuestRedirect } from "@/hooks/use-guest-redirect";
-import { useUserStore } from "@/stores/user";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function Page() {
-  useGuestRedirect();
-
   const router = useRouter();
 
-  const status = useUserStore((state) => state.loginStatus);
-  const loginAction = useUserStore((state) => state.loginAction);
   const [isSuccessful, setIsSuccessful] = useState(false);
 
+  const [state, formAction] = useActionState<LoginActionState, FormData>(
+    login,
+    {
+      status: "idle",
+    },
+  );
+
+  const { update: updateSession } = useSession();
+
   useEffect(() => {
-    if (status === "failed") {
+    if (state.status === "failed") {
       toast.error("未知错误");
-    } else if (status === "invalid_data") {
+    } else if (state.status === "invalid_data") {
       toast.error("账号或密码错误");
-    } else if (status === "success") {
+    } else if (state.status === "success") {
       setIsSuccessful(true);
-      router.replace("/");
+      updateSession();
+      router.refresh();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  }, [state.status]);
 
-  const handleSubmit = async (formData: FormData) => {
-    await loginAction(formData);
+  const handleSubmit = (formData: FormData) => {
+    formAction(formData);
   };
 
   return (

@@ -86,7 +86,7 @@ export function AuthForm({
             htmlFor="phone"
             className="font-normal text-zinc-600 dark:text-zinc-400"
           >
-            密码
+            手机
           </Label>
 
           <Input
@@ -94,7 +94,7 @@ export function AuthForm({
             name="phone"
             className="bg-muted text-md md:text-sm"
             type="text"
-            placeholder="请输入电话"
+            placeholder="请输入手机号码"
             required
             onChange={resetStatus}
           />

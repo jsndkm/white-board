@@ -7,12 +7,12 @@ import { getScene } from "@/lib/api/scene";
 import { useDeleteProjectDialogStore } from "@/stores/delete-project-dialog";
 import { useProjectStore } from "@/stores/project";
 import { useSceneStore } from "@/stores/scene";
-import { useUserStore } from "@/stores/user";
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import { Folder, House, LogOut, Plus, RotateCcw, X } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -25,7 +25,6 @@ export default function ExcalidrawWrapper({
     useState<ExcalidrawImperativeAPI | null>(null);
 
   const router = useRouter();
-  const logout = useUserStore((state) => state.logoutAction);
 
   const setNewProjectDialogOpen = useSceneStore(
     (state) => state.setNewProjectDialogOpen,
@@ -90,10 +89,11 @@ export default function ExcalidrawWrapper({
             GitHub
           </MainMenu.ItemLink>
           <MainMenu.Item
-            onSelect={async () => {
-              await logout();
-              router.replace("/login");
-            }}
+            onSelect={async () =>
+              signOut({
+                redirectTo: "/",
+              })
+            }
           >
             <LogOut />
             退出登录

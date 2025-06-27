@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 import { fetcher } from "@/lib/api";
 import { GetProjectDetailEndpoint } from "@/lib/api/endpoint";
 import { ProjectDetail } from "@/lib/api/project";
@@ -18,8 +17,6 @@ const ExcalidrawWrapper = dynamic(
   },
 );
 export default function Page({}) {
-  useAuthRedirect();
-
   const params = useParams();
   const projectId = Number(params.id);
 
