@@ -8,6 +8,7 @@ export const GetProjectDetailEndpoint = (id: number) =>
 export const CreateProjectEndpoint = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects`;
 export const DeleteProjectEndpoint = (id: number) =>
   `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${id}`;
+
 export const InviteToJoinProjectEndpoint = (
   project_id: number,
   username: string,

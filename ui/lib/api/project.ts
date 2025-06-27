@@ -60,7 +60,10 @@ export const deleteProject = async (id: number) => {
 };
 
 // ============================== Invite To Join Project ==============================
-export const inviteToProject = async (project_id: number, username: string) => {
+export const inviteToJoinProject = async (
+  project_id: number,
+  username: string,
+) => {
   await fetcher<void>(InviteToJoinProjectEndpoint(project_id, username), {
     method: "POST",
   });

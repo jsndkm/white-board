@@ -1,5 +1,4 @@
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
-import { SubmitButton } from "@/components/form/submit-button";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -9,54 +8,45 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { deleteProject, inviteToProject } from "@/lib/api/project";
+import { useInviteToJoinProjectMutation } from "@/hooks/use-invite-project";
+import { deleteProject } from "@/lib/api/project";
 import { useHomeStore } from "@/stores/home";
+import { useUserStore } from "@/stores/user";
 import { Loader } from "lucide-react";
-import Form from "next/form";
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import { toast } from "sonner";
-import { z } from "zod";
 
-export function ProjectDetailDrawer() {
+export function ProjectDetailDrawer({
+  projectId,
+  name,
+  description,
+  isAdmin,
+}: {
+  projectId: number;
+  name: string;
+  description: string;
+  isAdmin: boolean;
+}) {
   const router = useRouter();
 
   const projectDetailsDialogOpen = useHomeStore(
-    (state) => state.projectDetailsDialogOpen,
+    (state) => state.projectDetailsDrawerOpen,
   );
-  const project = useHomeStore((state) => state.selectedProject);
+  const setProjectDetailDialogOpen = useHomeStore(
+    (state) => state.setProjectDetailsDrawerOpen,
+  );
 
-  const [isSuccessful, setIsSuccessful] = useState(false);
-  const handleSubmit = async (formData: FormData) => {
-    try {
-      const validated = z
-        .object({ username: z.string().min(1, "用户名不能为空") })
-        .parse({
-          username: formData.get("username"),
-        });
-      const username = validated.username;
-      if (!username || !project) {
-        return;
-      }
-      await inviteToProject(project.id, username);
-      setIsSuccessful(true);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast.error("请检查用户名");
-      } else {
-        toast.error("邀请失败");
-      }
-      setIsSuccessful(false);
-    }
-  };
+  const username = useUserStore((state) => state.username);
+  const invite = useInviteToJoinProjectMutation();
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   return (
     <Drawer
       open={projectDetailsDialogOpen}
-      onOpenChange={useHomeStore.getState().setProjectDetailsDialogOpen}
+      onOpenChange={setProjectDetailDialogOpen}
     >
       <Suspense fallback={<Loader />}>
         <DrawerContent>
@@ -68,24 +58,16 @@ export function ProjectDetailDrawer() {
             <div className="flex flex-3 flex-col justify-between">
               <div className="flex flex-col gap-2">
                 <h2 className="text-foreground text-2xl font-semibold">
-                  {project?.name}
+                  {name}
                 </h2>
-                <p className="text-muted-foreground">{project?.description}</p>
+                <p className="text-muted-foreground">{description}</p>
               </div>
 
-              <Form
-                action={handleSubmit}
-                className="flex w-full items-end-safe justify-center gap-4"
-              >
+              <div className="flex w-full items-end-safe justify-center gap-4">
                 <div className="flex w-full flex-col gap-2">
-                  <Label
-                    htmlFor="username"
-                    className="font-normal text-zinc-600 dark:text-zinc-400"
-                  >
-                    输入用户名以邀请用户加入项目
-                  </Label>
-
+                  <span className="text-sm">输入用户名以邀请用户加入项目</span>
                   <Input
+                    ref={inputRef}
                     id="username"
                     name="username"
                     className="bg-muted text-md md:text-sm"
@@ -96,8 +78,25 @@ export function ProjectDetailDrawer() {
                     autoFocus
                   />
                 </div>
-                <SubmitButton isSuccessful={isSuccessful}>邀请</SubmitButton>
-              </Form>
+                <Button
+                  onClick={() =>
+                    invite.mutate(
+                      { projectId, username },
+                      {
+                        onSuccess: () => {
+                          if (!inputRef.current?.value) return;
+                          inputRef.current.value = "";
+                          toast.success("邀请成功");
+                        },
+                      },
+                    )
+                  }
+                  disabled={invite.isPending}
+                  className="cursor-pointer"
+                >
+                  邀请
+                </Button>
+              </div>
             </div>
 
             <div className="flex flex-2 flex-col items-center justify-center gap-5">
@@ -106,20 +105,20 @@ export function ProjectDetailDrawer() {
                 <Button
                   className="cursor-pointer"
                   onClick={() => {
-                    router.replace(`/project/${project?.id}`);
-                    useHomeStore.getState().setProjectDetailsDialogOpen(false);
+                    router.replace(`/project/${projectId}`);
+                    useHomeStore.getState().setProjectDetailsDrawerOpen(false);
                   }}
                 >
                   打开项目
                 </Button>
-                {project?.admin && (
+                {isAdmin && (
                   <ConfirmDeleteButton
                     onConfirmAction={async () => {
-                      if (!project?.id) return;
-                      await deleteProject(project.id);
+                      if (!projectId) return;
+                      await deleteProject(projectId);
                       useHomeStore
                         .getState()
-                        .setProjectDetailsDialogOpen(false);
+                        .setProjectDetailsDrawerOpen(false);
                       router.replace("/");
                     }}
                     className="cursor-pointer"

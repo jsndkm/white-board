@@ -16,7 +16,7 @@ interface UserState {
   setIsHydrated: (isHydrated: boolean) => void;
   loginStatus: loginStatusType;
   registerStatus: registerStatusType;
-  username?: string;
+  username: string;
   token?: string;
   resetStatus: () => void;
   registerAction: (formData: FormData) => Promise<void>;
@@ -31,6 +31,7 @@ export const useUserStore = create<UserState>()(
       setIsHydrated: (isHydrated: boolean) => set({ isHydrated: isHydrated }),
       loginStatus: "idle",
       registerStatus: "idle",
+      username: "",
       resetStatus: () => set({ loginStatus: "idle", registerStatus: "idle" }),
       registerAction: async (formData) => {
         try {
@@ -46,8 +47,8 @@ export const useUserStore = create<UserState>()(
       },
       loginAction: async (formData) => {
         try {
-          const token = await login(formData);
-          set({ loginStatus: "success", token: token });
+          const [token, username] = await login(formData);
+          set({ loginStatus: "success", token: token, username: username });
         } catch (error) {
           if (error instanceof z.ZodError) {
             set({ loginStatus: "invalid_data" });

@@ -60,7 +60,7 @@ export const login = async (formData: FormData) => {
       }),
     });
 
-    return resp.token;
+    return [resp.token, resp.username];
   } catch (error) {
     throw error;
   }

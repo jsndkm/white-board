@@ -1,7 +1,6 @@
 "use client";
 
 import AppHeader from "@/components/home/app-header";
-import { ProjectDetailDrawer } from "@/components/home/project-detail-drawer";
 import { MyProjectContainer } from "@/components/my-project-container";
 import { NewProjectContainer } from "@/components/new-project-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -47,7 +46,6 @@ export default function Page() {
             <MyProjectContainer showDetailButton={true} />
           </TabsContent>
         </Tabs>
-        <ProjectDetailDrawer />
       </main>
     </div>
   );

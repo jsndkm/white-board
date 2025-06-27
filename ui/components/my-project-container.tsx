@@ -1,3 +1,4 @@
+import { ProjectDetailDrawer } from "@/components/home/project-detail-drawer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +14,7 @@ import { fetcher } from "@/lib/api";
 import { GetMyProjectListEndpoint } from "@/lib/api/endpoint";
 import { MyProjectListItem } from "@/lib/api/project";
 import { useHomeStore } from "@/stores/home";
+import { useSceneStore } from "@/stores/scene";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Suspense } from "react";
@@ -29,6 +31,8 @@ export function MyProjectContainer({
     { suspense: true },
   );
 
+  const selected = useHomeStore((state) => state.selectedProject);
+
   return (
     <div className="container mx-auto flex max-h-fit flex-wrap justify-start gap-4 overflow-auto p-4">
       <Suspense fallback={<LoaderCircle />}>
@@ -40,6 +44,12 @@ export function MyProjectContainer({
           />
         ))}
       </Suspense>
+      <ProjectDetailDrawer
+        projectId={selected?.id ?? 0}
+        name={selected?.name ?? ""}
+        description={selected?.description ?? ""}
+        isAdmin={selected?.admin ?? false}
+      />
     </div>
   );
 }
@@ -54,7 +64,7 @@ export function ProjectCard({
   const router = useRouter();
 
   const setProjectDetailsDialogOpen = useHomeStore(
-    (state) => state.setProjectDetailsDialogOpen,
+    (state) => state.setProjectDetailsDrawerOpen,
   );
 
   return (
@@ -83,11 +93,13 @@ export function ProjectCard({
           className="w-full cursor-pointer"
           onClick={() => {
             useHomeStore.getState().setSelectedProject(project);
+            useSceneStore.getState().setOpenProjectDialogOpen(false);
             router.push(`/project/${project.id}`);
           }}
         >
           打开项目
         </Button>
+
         {showDetailButton && (
           <Button
             variant="secondary"

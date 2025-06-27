@@ -7,12 +7,12 @@ interface HomeState {
   setIsHydrated: (isHydrated: boolean) => void;
   selectedTab: string;
   setSelectedTab: (name: string) => void;
-  selectedProject?: MyProjectListItem;
+  selectedProject: MyProjectListItem | null;
   setSelectedProject: (item: MyProjectListItem) => void;
   newProjectDialogOpen: boolean;
   setNewProjectDialogOpen: (status: boolean) => void;
-  projectDetailsDialogOpen: boolean;
-  setProjectDetailsDialogOpen: (status: boolean) => void;
+  projectDetailsDrawerOpen: boolean;
+  setProjectDetailsDrawerOpen: (status: boolean) => void;
 }
 
 export const useHomeStore = create<HomeState>()(
@@ -22,14 +22,15 @@ export const useHomeStore = create<HomeState>()(
       setIsHydrated: (isHydrated: boolean) => set({ isHydrated: isHydrated }),
       selectedTab: "new-project",
       setSelectedTab: (name) => set({ selectedTab: name }),
+      selectedProject: null,
       setSelectedProject: (iterm: MyProjectListItem) =>
         set({ selectedProject: iterm }),
       newProjectDialogOpen: false,
       setNewProjectDialogOpen: (status: boolean) =>
         set({ newProjectDialogOpen: status }),
-      projectDetailsDialogOpen: false,
-      setProjectDetailsDialogOpen: (status: boolean) =>
-        set({ projectDetailsDialogOpen: status }),
+      projectDetailsDrawerOpen: false,
+      setProjectDetailsDrawerOpen: (status: boolean) =>
+        set({ projectDetailsDrawerOpen: status }),
     }),
     {
       name: "home-store",
