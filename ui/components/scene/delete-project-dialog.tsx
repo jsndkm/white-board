@@ -23,7 +23,7 @@ export function DeleteProjectDialog() {
     (state) => state.setDeleteProjectDialogOpen,
   );
 
-  const project = useProjectStore((state) => state.project);
+  const project = useProjectStore((state) => state.projectDetail);
 
   const deleteProject = useProjectStore((state) => state.deleteProjectAction);
 

@@ -40,7 +40,7 @@ export function NewProject() {
   const status = useProjectStore((state) => state.newProjectStatus);
   const createProject = useProjectStore((state) => state.createProjectAction);
   const [isSuccessful, setIsSuccessful] = useState(false);
-  const project = useProjectStore((state) => state.project);
+  const project = useProjectStore((state) => state.projectDetail);
 
   useEffect(() => {
     if (status === "failed") {

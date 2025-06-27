@@ -35,6 +35,7 @@ export const useHomeStore = create<HomeState>()(
       name: "home-store",
       partialize: (state) => ({
         selectedTab: state.selectedTab,
+        selectedProject: state.selectedProject,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setIsHydrated(true);
