@@ -11,11 +11,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useInviteToJoinProjectMutation } from "@/hooks/use-invite-project";
 import { useDeleteProjectDialogStore } from "@/stores/delete-project-dialog";
 import { useHomeStore } from "@/stores/home";
-import { useUserStore } from "@/stores/user";
 import { Loader } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import * as React from "react";
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 import { toast } from "sonner";
 
 export function ProjectDetailDrawer({
@@ -38,9 +37,25 @@ export function ProjectDetailDrawer({
     (state) => state.setProjectDetailsDrawerOpen,
   );
 
-  const username = useUserStore((state) => state.username);
+  const { data: session } = useSession();
+  const username = session?.user.username;
+
   const invite = useInviteToJoinProjectMutation();
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleInvite = () => {
+    if (!username) return;
+    invite.mutate(
+      { projectId, username },
+      {
+        onSuccess: () => {
+          if (!inputRef.current?.value) return;
+          inputRef.current.value = "";
+          toast.success("邀请成功");
+        },
+      },
+    );
+  };
 
   return (
     <Drawer
@@ -78,18 +93,7 @@ export function ProjectDetailDrawer({
                   />
                 </div>
                 <Button
-                  onClick={() =>
-                    invite.mutate(
-                      { projectId, username },
-                      {
-                        onSuccess: () => {
-                          if (!inputRef.current?.value) return;
-                          inputRef.current.value = "";
-                          toast.success("邀请成功");
-                        },
-                      },
-                    )
-                  }
+                  onClick={handleInvite}
                   disabled={invite.isPending}
                   className="cursor-pointer"
                 >

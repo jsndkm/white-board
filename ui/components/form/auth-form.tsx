@@ -1,6 +1,5 @@
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { useUserStore } from "@/stores/user";
 import Form from "next/form";
 import React from "react";
 
@@ -15,8 +14,6 @@ export function AuthForm({
   children: React.ReactNode;
   isRegister: boolean;
 }) {
-  const resetStatus = useUserStore((state) => state.resetStatus);
-
   return (
     <Form action={action} className="flex flex-col gap-4 px-4 sm:px-16">
       <div className="flex flex-col gap-2">
@@ -36,7 +33,6 @@ export function AuthForm({
           autoComplete="username"
           required
           autoFocus
-          onChange={resetStatus}
         />
       </div>
 
@@ -55,7 +51,6 @@ export function AuthForm({
           type="password"
           placeholder="请输入密码"
           required
-          onChange={resetStatus}
         />
       </div>
 
@@ -75,7 +70,6 @@ export function AuthForm({
             type="email"
             placeholder="请输入邮箱"
             required
-            onChange={resetStatus}
           />
         </div>
       )}
@@ -96,7 +90,6 @@ export function AuthForm({
             type="text"
             placeholder="请输入手机号码"
             required
-            onChange={resetStatus}
           />
         </div>
       )}
