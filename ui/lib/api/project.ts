@@ -1,10 +1,8 @@
 import {
-  CreateProjectEndpoint,
   DeleteProjectEndpoint,
   InviteToJoinProjectEndpoint,
 } from "@/lib/api/endpoint";
 import { fetcher } from "@/lib/api/index";
-import { z } from "zod";
 
 // ============================== Get My Project List ==============================
 export type MyProjectListItem = {
@@ -25,31 +23,6 @@ export type ProjectDetail = {
       admin: boolean;
     },
   ];
-};
-
-// ============================== Create Project ==============================
-const newProjectInfoSchema = z.object({
-  name: z.string().min(2).max(12),
-  description: z.string().min(5).max(30),
-});
-
-export const createProject = async (formData: FormData) => {
-  try {
-    const validatedData = newProjectInfoSchema.parse({
-      name: formData.get("name"),
-      description: formData.get("description"),
-    });
-
-    return await fetcher<MyProjectListItem>(CreateProjectEndpoint, {
-      method: "POST",
-      body: JSON.stringify({
-        name: validatedData.name,
-        description: validatedData.description,
-      }),
-    });
-  } catch (error) {
-    throw error;
-  }
 };
 
 // ============================== Delete Project ==============================

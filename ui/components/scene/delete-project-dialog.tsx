@@ -8,30 +8,34 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useProjectStore } from "@/stores/project";
-import { useSceneStore } from "@/stores/scene";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { useDeleteProjectMutation } from "@/hooks/use-delete-project";
+import { useDeleteProjectDialogStore } from "@/stores/delete-project-dialog";
 
 export function DeleteProjectDialog() {
-  const router = useRouter();
-
-  const deleteProjectDialogOpen = useSceneStore(
-    (state) => state.deleteProjectDialogOpen,
+  const isOpen = useDeleteProjectDialogStore((state) => state.isOpen);
+  const setIsOpen = useDeleteProjectDialogStore((state) => state.setIsOpen);
+  const targetProjectId = useDeleteProjectDialogStore(
+    (state) => state.targetProjectId,
   );
-  const setDeleteProjectDialogOpen = useSceneStore(
-    (state) => state.setDeleteProjectDialogOpen,
-  );
+  const onSuccess = useDeleteProjectDialogStore((state) => state.onSuccess);
 
-  const project = useProjectStore((state) => state.projectDetail);
-
-  const deleteProject = useProjectStore((state) => state.deleteProjectAction);
+  const deleteProject = useDeleteProjectMutation();
+  const handleDeleteProject = () => {
+    if (!targetProjectId) return;
+    deleteProject.mutate(
+      { projectId: targetProjectId },
+      {
+        onSuccess: () => {
+          if (onSuccess) {
+            onSuccess();
+          }
+        },
+      },
+    );
+  };
 
   return (
-    <AlertDialog
-      open={deleteProjectDialogOpen}
-      onOpenChange={setDeleteProjectDialogOpen}
-    >
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>删除项目</AlertDialogTitle>
@@ -42,15 +46,7 @@ export function DeleteProjectDialog() {
         <AlertDialogFooter>
           <AlertDialogCancel className="cursor-pointer">取消</AlertDialogCancel>
           <AlertDialogAction
-            onClick={async () => {
-              if (!project) {
-                toast.error("找不到项目");
-                return;
-              }
-              await deleteProject(project.id);
-              toast.success("删除成功");
-              router.replace("/");
-            }}
+            onClick={handleDeleteProject}
             className="cursor-pointer"
           >
             确定

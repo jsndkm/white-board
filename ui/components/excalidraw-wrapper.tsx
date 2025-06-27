@@ -1,10 +1,10 @@
 "use client";
 
-import { DeleteProjectDialog } from "@/components/scene/delete-project-dialog";
 import { NewProjectDialog } from "@/components/scene/new-project-dialog";
 import { OpenProjectDialog } from "@/components/scene/open-project-dialog";
 import { ResetSceneDialog } from "@/components/scene/reset-scene-dialog";
 import { getScene } from "@/lib/api/scene";
+import { useDeleteProjectDialogStore } from "@/stores/delete-project-dialog";
 import { useProjectStore } from "@/stores/project";
 import { useSceneStore } from "@/stores/scene";
 import { useUserStore } from "@/stores/user";
@@ -16,7 +16,11 @@ import { Folder, House, LogOut, Plus, RotateCcw, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function ExcalidrawWrapper() {
+export default function ExcalidrawWrapper({
+  projectId,
+}: {
+  projectId: number;
+}) {
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
 
@@ -28,9 +32,6 @@ export default function ExcalidrawWrapper() {
   );
   const setOpenProjectDialogOpen = useSceneStore(
     (state) => state.setOpenProjectDialogOpen,
-  );
-  const setDeleteProjectDialogOpen = useSceneStore(
-    (state) => state.setDeleteProjectDialogOpen,
   );
   const setResetSceneDialogOpen = useSceneStore(
     (state) => state.setResetSceneDialogOpen,
@@ -60,7 +61,13 @@ export default function ExcalidrawWrapper() {
             打开项目
           </MainMenu.Item>
 
-          <MainMenu.Item onSelect={() => setDeleteProjectDialogOpen(true)}>
+          <MainMenu.Item
+            onSelect={() =>
+              useDeleteProjectDialogStore
+                .getState()
+                .openDialog(projectId, () => router.push("/"))
+            }
+          >
             <X />
             删除项目
           </MainMenu.Item>
@@ -100,7 +107,6 @@ export default function ExcalidrawWrapper() {
         <OpenProjectDialog />
 
         {/* ========== Delete Project Dialog ========== */}
-        <DeleteProjectDialog />
 
         {/* ========== Reset Scene Dialog ========== */}
         <ResetSceneDialog resetAction={() => excalidrawAPI?.resetScene()} />

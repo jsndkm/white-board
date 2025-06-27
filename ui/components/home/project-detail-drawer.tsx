@@ -1,4 +1,3 @@
-import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -10,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useInviteToJoinProjectMutation } from "@/hooks/use-invite-project";
-import { deleteProject } from "@/lib/api/project";
+import { useDeleteProjectDialogStore } from "@/stores/delete-project-dialog";
 import { useHomeStore } from "@/stores/home";
 import { useUserStore } from "@/stores/user";
 import { Loader } from "lucide-react";
@@ -112,17 +111,18 @@ export function ProjectDetailDrawer({
                   打开项目
                 </Button>
                 {isAdmin && (
-                  <ConfirmDeleteButton
-                    onConfirmAction={async () => {
-                      if (!projectId) return;
-                      await deleteProject(projectId);
-                      useHomeStore
-                        .getState()
-                        .setProjectDetailsDrawerOpen(false);
-                      router.replace("/");
-                    }}
+                  <Button
                     className="cursor-pointer"
-                  />
+                    onClick={() =>
+                      useDeleteProjectDialogStore
+                        .getState()
+                        .openDialog(projectId, () =>
+                          setProjectDetailDialogOpen(false),
+                        )
+                    }
+                  >
+                    删除
+                  </Button>
                 )}
               </div>
             </div>

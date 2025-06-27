@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 interface ConfirmDeleteButtonProps {
   onConfirmAction: () => void;
@@ -17,7 +16,7 @@ export function ConfirmDeleteButton({
   timeout = 10000,
 }: ConfirmDeleteButtonProps) {
   const [confirming, setConfirming] = useState(false);
-  
+
   useEffect(() => {
     if (!confirming) return;
     const timer = setTimeout(() => setConfirming(false), timeout);
@@ -27,7 +26,6 @@ export function ConfirmDeleteButton({
   const handleClick = () => {
     if (confirming) {
       onConfirmAction();
-      toast.success("删除成功");
       setConfirming(false);
     } else {
       setConfirming(true);

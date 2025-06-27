@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const newProjectInfoSchema = z.object({
+const createProjectSchema = z.object({
   name: z.string().min(2).max(12),
   description: z.string().min(5).max(30),
 });
@@ -20,7 +20,7 @@ export function useCreateProjectMutation() {
       name: string;
       description: string;
     }) => {
-      const validatedData = newProjectInfoSchema.parse({
+      const validatedData = createProjectSchema.parse({
         name: name,
         description: description,
       });

@@ -7,6 +7,7 @@ import { ProjectDetail } from "@/lib/api/project";
 import { useHomeStore } from "@/stores/home";
 import { useProjectStore } from "@/stores/project";
 import dynamic from "next/dynamic";
+import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import useSWR from "swr";
 
@@ -16,8 +17,11 @@ const ExcalidrawWrapper = dynamic(
     ssr: false,
   },
 );
-export default function Page() {
+export default function Page({}) {
   useAuthRedirect();
+
+  const params = useParams();
+  const projectId = Number(params.id);
 
   const { data } = useSWR(
     GetProjectDetailEndpoint(useHomeStore.getState().selectedProject?.id || 0),
@@ -29,5 +33,5 @@ export default function Page() {
     useProjectStore.getState().setProject(data);
   }, [data]);
 
-  return <ExcalidrawWrapper />;
+  return <ExcalidrawWrapper projectId={projectId} />;
 }
