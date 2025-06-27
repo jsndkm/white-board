@@ -2,7 +2,7 @@ package cn.edu.xmu.whiteboard.controller.dto.pb;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ElementDto {
+public class Arrow{
     private String id;
     private String type;
     private double x;
@@ -36,25 +36,42 @@ public class ElementDto {
     private Object startArrowhead;
     private String endArrowhead;
     private Boolean elbowed;
-    private Boolean polygon;
-    private Object[] pressures;
-    private Boolean simulatePressure;
-    private String text;
-    private Long fontSize;
-    private Long fontFamily;
-    private String textAlign;
-    private String verticalAlign;
-    private Object containerID;
-    private String originalText;
-    private Boolean autoResize;
-    private Double lineHeight;
-    private String status;
-    private String fileID;
-    private long[] scale;
-    private Object crop;
-    private String name;
 
-    public ElementDto() {}
+    public Arrow() {}
+    public Arrow(ElementDto elementDto) {
+        id=elementDto.getID();
+        type=elementDto.getType();
+        x=elementDto.getX();
+        y=elementDto.getY();
+        width=elementDto.getWidth();
+        height=elementDto.getHeight();
+        angle=elementDto.getAngle();
+        strokeColor=elementDto.getStrokeColor();
+        backgroundColor=elementDto.getBackgroundColor();
+        fillStyle=elementDto.getFillStyle();
+        strokeWidth=elementDto.getStrokeWidth();
+        strokeStyle=elementDto.getStrokeStyle();
+        roughness=elementDto.getRoughness();
+        opacity=elementDto.getOpacity();
+        groupIDS=elementDto.getGroupIDS();
+        frameID=elementDto.getFrameID();
+        index=elementDto.getIndex();
+        roundness=elementDto.getRoundness();
+        seed=elementDto.getSeed();
+        version=elementDto.getVersion();
+        versionNonce=elementDto.getVersionNonce();
+        isDeleted=elementDto.getIsDeleted();
+        updated=elementDto.getUpdated();
+        link=elementDto.getLink();
+        locked=elementDto.getLocked();
+        points=elementDto.getPoints();
+        lastCommittedPoint=elementDto.getLastCommittedPoint();
+        startBinding=elementDto.getStartBinding();
+        endBinding=elementDto.getEndBinding();
+        startArrowhead=elementDto.getStartArrowhead();
+        endArrowhead=elementDto.getEndArrowhead();
+        elbowed=elementDto.getElbowed();
+    }
 
     @JsonProperty("id")
     public String getID() { return id; }
@@ -220,89 +237,4 @@ public class ElementDto {
     public Boolean getElbowed() { return elbowed; }
     @JsonProperty("elbowed")
     public void setElbowed(Boolean value) { this.elbowed = value; }
-
-    @JsonProperty("polygon")
-    public Boolean getPolygon() { return polygon; }
-    @JsonProperty("polygon")
-    public void setPolygon(Boolean value) { this.polygon = value; }
-
-    @JsonProperty("pressures")
-    public Object[] getPressures() { return pressures; }
-    @JsonProperty("pressures")
-    public void setPressures(Object[] value) { this.pressures = value; }
-
-    @JsonProperty("simulatePressure")
-    public Boolean getSimulatePressure() { return simulatePressure; }
-    @JsonProperty("simulatePressure")
-    public void setSimulatePressure(Boolean value) { this.simulatePressure = value; }
-
-    @JsonProperty("text")
-    public String getText() { return text; }
-    @JsonProperty("text")
-    public void setText(String value) { this.text = value; }
-
-    @JsonProperty("fontSize")
-    public Long getFontSize() { return fontSize; }
-    @JsonProperty("fontSize")
-    public void setFontSize(Long value) { this.fontSize = value; }
-
-    @JsonProperty("fontFamily")
-    public Long getFontFamily() { return fontFamily; }
-    @JsonProperty("fontFamily")
-    public void setFontFamily(Long value) { this.fontFamily = value; }
-
-    @JsonProperty("textAlign")
-    public String getTextAlign() { return textAlign; }
-    @JsonProperty("textAlign")
-    public void setTextAlign(String value) { this.textAlign = value; }
-
-    @JsonProperty("verticalAlign")
-    public String getVerticalAlign() { return verticalAlign; }
-    @JsonProperty("verticalAlign")
-    public void setVerticalAlign(String value) { this.verticalAlign = value; }
-
-    @JsonProperty("containerId")
-    public Object getContainerID() { return containerID; }
-    @JsonProperty("containerId")
-    public void setContainerID(Object value) { this.containerID = value; }
-
-    @JsonProperty("originalText")
-    public String getOriginalText() { return originalText; }
-    @JsonProperty("originalText")
-    public void setOriginalText(String value) { this.originalText = value; }
-
-    @JsonProperty("autoResize")
-    public Boolean getAutoResize() { return autoResize; }
-    @JsonProperty("autoResize")
-    public void setAutoResize(Boolean value) { this.autoResize = value; }
-
-    @JsonProperty("lineHeight")
-    public Double getLineHeight() { return lineHeight; }
-    @JsonProperty("lineHeight")
-    public void setLineHeight(Double value) { this.lineHeight = value; }
-
-    @JsonProperty("status")
-    public String getStatus() { return status; }
-    @JsonProperty("status")
-    public void setStatus(String value) { this.status = value; }
-
-    @JsonProperty("fileId")
-    public String getFileID() { return fileID; }
-    @JsonProperty("fileId")
-    public void setFileID(String value) { this.fileID = value; }
-
-    @JsonProperty("scale")
-    public long[] getScale() { return scale; }
-    @JsonProperty("scale")
-    public void setScale(long[] value) { this.scale = value; }
-
-    @JsonProperty("crop")
-    public Object getCrop() { return crop; }
-    @JsonProperty("crop")
-    public void setCrop(Object value) { this.crop = value; }
-
-    @JsonProperty("name")
-    public String getName() { return name; }
-    @JsonProperty("name")
-    public void setName(String value) { this.name = value; }
 }

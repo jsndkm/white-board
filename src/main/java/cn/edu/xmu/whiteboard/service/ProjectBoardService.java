@@ -1,6 +1,7 @@
 package cn.edu.xmu.whiteboard.service;
 
-import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardDto;
+import cn.edu.xmu.whiteboard.controller.dto.pb.*;
+import cn.edu.xmu.whiteboard.ReturnData.ProjectBoardReturnData;
 import cn.edu.xmu.whiteboard.redis.DrawBoardKey;
 import cn.edu.xmu.whiteboard.redis.ProjectBoardKey;
 import cn.edu.xmu.whiteboard.redis.RedisService;
@@ -12,22 +13,60 @@ public class ProjectBoardService {
     @Autowired
     private RedisService redisService;
 
-    public String storeProjectBoard(ProjectBoardDto projectBoardDto,String id) {
-
-        // 存储到Redis
-        boolean result = redisService.set(ProjectBoardKey.getById, id, projectBoardDto);
+    public void storeProjectBoard(ProjectBoardDto projectBoardDto,int id) {
+        // 存储到 Redis
+        boolean result = redisService.set(ProjectBoardKey.getById, ""+id, projectBoardDto);
         if (!result) {
             throw new RuntimeException("Failed to store projectBoard data");
         }
-
-        return id;
     }
 
-    public ProjectBoardDto getProjectBoard(String id) {
-        return redisService.get(ProjectBoardKey.getById, id,ProjectBoardDto.class);
+    public ProjectBoardReturnData getProjectBoard(int id) {
+        ProjectBoardDto projectBoardDto=redisService.get(ProjectBoardKey.getById, ""+id,ProjectBoardDto.class);
+        return formReturnData(projectBoardDto);
     }
 
-    public boolean deleteDrawBoard(String id) {
-        return redisService.deleteBinary(DrawBoardKey.getById, id);
+    public boolean deleteDrawBoard(int id) {
+        return redisService.deleteBinary(DrawBoardKey.getById, ""+id);
+    }
+
+    public ProjectBoardReturnData formReturnData(ProjectBoardDto projectBoardDto) {
+        // 创建 ProjectBoardReturnData 对象
+        ProjectBoardReturnData projectBoardReturnData = new ProjectBoardReturnData();
+
+        // 设置 appState 和 files
+        projectBoardReturnData.setAppState(projectBoardDto.getAppState());
+        projectBoardReturnData.setFiles(projectBoardDto.getFiles());
+
+        // 遍历 elements 数组
+        for (ElementDto elementDto : projectBoardDto.getElements()) {
+            if ("rectangle".equals(elementDto.getType())||"diamond".equals(elementDto.getType())||"ellipse".equals(elementDto.getType())||"embeddable".equals(elementDto.getType())) {
+                Rectangle rectangle = new Rectangle(elementDto);
+                projectBoardReturnData.getElements().add(rectangle);
+            }else if("arrow".equals(elementDto.getType())) {
+                Arrow arrow = new Arrow(elementDto);
+                projectBoardReturnData.getElements().add(arrow);
+            }else if("line".equals(elementDto.getType())) {
+                Line line = new Line(elementDto);
+                projectBoardReturnData.getElements().add(line);
+            }else if("freedraw".equals(elementDto.getType())) {
+                FreeDraw freeDraw = new FreeDraw(elementDto);
+                projectBoardReturnData.getElements().add(freeDraw);
+            }else if("text".equals(elementDto.getType())) {
+                Text text = new Text(elementDto);
+                projectBoardReturnData.getElements().add(text);
+            }else if("image".equals(elementDto.getType())) {
+                Image image = new Image(elementDto);
+                projectBoardReturnData.getElements().add(image);
+            }else if("frame".equals(elementDto.getType())) {
+                Frame frame = new Frame(elementDto);
+                projectBoardReturnData.getElements().add(frame);
+            }
+            else {
+                // 直接将 ElementDto 对象添加到 elements 列表中
+                projectBoardReturnData.getElements().add(elementDto);
+            }
+        }
+        return projectBoardReturnData;
     }
 }
