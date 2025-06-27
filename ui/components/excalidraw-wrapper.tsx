@@ -4,6 +4,7 @@ import { DeleteProjectDialog } from "@/components/scene/delete-project-dialog";
 import { NewProjectDialog } from "@/components/scene/new-project-dialog";
 import { OpenProjectDialog } from "@/components/scene/open-project-dialog";
 import { ResetSceneDialog } from "@/components/scene/reset-scene-dialog";
+import { getScene } from "@/lib/api/scene";
 import { useProjectStore } from "@/stores/project";
 import { useSceneStore } from "@/stores/scene";
 import { useUserStore } from "@/stores/user";
@@ -46,7 +47,7 @@ export default function ExcalidrawWrapper() {
       <Excalidraw
         langCode="zh-CN"
         excalidrawAPI={(api) => setExcalidrawAPI(api)}
-        initialData={() => null}
+        initialData={() => getScene(1)}
       >
         <MainMenu>
           <MainMenu.Item onSelect={() => setNewProjectDialogOpen(true)}>

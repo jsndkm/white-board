@@ -10,12 +10,15 @@ export const DeleteProjectEndpoint = (id: number) =>
   `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${id}`;
 
 export const InviteToJoinProjectEndpoint = (
-  project_id: number,
+  projectId: number,
   username: string,
 ) =>
-  `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/join?project_id=${project_id}&username=${username}`;
-export const ExitProjectEndpoint = (project_id: number) =>
-  `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/exit?project_id=${project_id}`;
+  `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/join?project_id=${projectId}&username=${username}`;
+export const ExitProjectEndpoint = (projectId: number) =>
+  `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/exit?project_id=${projectId}`;
 
-export const GetSceneEndpoint = (project_id: number) =>
-  `${process.env.NEXT_PUBLIC_BASE_URL}/api/project-board/${project_id}`;
+export const GetSceneEndpoint = (projectId: number) =>
+  `${process.env.NEXT_PUBLIC_BASE_URL}/api/project-board/${projectId}`;
+
+export const UpdateSceneEndpoint = (projectId: number) =>
+  `${process.env.NEXT_PUBLIC_BASE_URL}/api/project-board/${projectId}`;
