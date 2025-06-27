@@ -1,7 +1,6 @@
 package cn.edu.xmu.whiteboard.controller;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
-import cn.edu.xmu.whiteboard.ReturnData.DrawBoardReturnData;
 import cn.edu.xmu.whiteboard.ReturnData.ProjectBoardReturnData;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardDto;
 import cn.edu.xmu.whiteboard.result.ResultUtil;

@@ -6,6 +6,9 @@ import cn.edu.xmu.whiteboard.redis.DrawBoardKey;
 import cn.edu.xmu.whiteboard.redis.ProjectBoardKey;
 import cn.edu.xmu.whiteboard.redis.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,16 +16,42 @@ public class ProjectBoardService {
     @Autowired
     private RedisService redisService;
 
+    // 添加MongoTemplate依赖
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
     public void storeProjectBoard(ProjectBoardDto projectBoardDto,int id) {
         // 存储到 Redis
         boolean result = redisService.set(ProjectBoardKey.getById, ""+id, projectBoardDto);
         if (!result) {
             throw new RuntimeException("Failed to store projectBoard data");
         }
+        // 存储到 MongoDB
+        try {
+            ProjectBoardMongo projectBoardMongo=new ProjectBoardMongo(id, projectBoardDto);
+            mongoTemplate.save(projectBoardMongo, "project_board");
+        } catch (Exception e) {
+            // 可以选择记录日志或抛出异常
+            throw new RuntimeException("Failed to store projectBoard data in MongoDB", e);
+        }
     }
 
     public ProjectBoardReturnData getProjectBoard(int id) {
+        // 先尝试从Redis获取
         ProjectBoardDto projectBoardDto=redisService.get(ProjectBoardKey.getById, ""+id,ProjectBoardDto.class);
+        // 如果Redis中没有，则从MongoDB获取
+        if (projectBoardDto == null) {
+            Query query = new Query(Criteria.where("id").is(id));
+            ProjectBoardMongo projectBoardMongo = mongoTemplate.findOne(query, ProjectBoardMongo.class, "project_board");
+
+            // 如果MongoDB中有，可以回写到Redis
+            if (projectBoardMongo != null) {
+                projectBoardDto=projectBoardMongo.getProjectBoard();
+                redisService.set(ProjectBoardKey.getById, ""+id, projectBoardDto);
+            }
+            else
+                throw new RuntimeException("Failed to find projectBoard");
+        }
         return formReturnData(projectBoardDto);
     }
 
