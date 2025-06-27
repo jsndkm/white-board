@@ -1,5 +1,5 @@
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
-import { SubmitButton } from "@/components/submit-button";
+import { SubmitButton } from "@/components/form/submit-button";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,

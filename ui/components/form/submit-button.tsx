@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { Loader } from "lucide-react";
 import React from "react";
 import { useFormStatus } from "react-dom";
@@ -24,7 +24,7 @@ export function SubmitButton({
       {children}
 
       {(pending || isSuccessful) && (
-        <span className="animate-spin absolute right-4">
+        <span className="absolute right-4 animate-spin">
           <Loader />
         </span>
       )}

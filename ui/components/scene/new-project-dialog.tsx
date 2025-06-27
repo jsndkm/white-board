@@ -1,4 +1,4 @@
-import { NewProject } from "@/components/new-project";
+import { NewProjectContainer } from "@/components/new-project-container";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,7 @@ export function NewProjectDialog() {
           <DialogTitle>新建项目</DialogTitle>
           <DialogDescription>选择模板</DialogDescription>
         </DialogHeader>
-        <NewProject />
+        <NewProjectContainer />
       </DialogContent>
     </Dialog>
   );

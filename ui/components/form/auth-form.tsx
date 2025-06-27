@@ -1,5 +1,5 @@
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import { useUserStore } from "@/stores/user";
 import Form from "next/form";
 import React from "react";

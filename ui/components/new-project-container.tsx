@@ -1,5 +1,5 @@
-import { NewProjectForm } from "@/components/scene/new-project-form";
-import { SubmitButton } from "@/components/submit-button";
+import { NewProjectForm } from "@/components/form/new-project-form";
+import { SubmitButton } from "@/components/form/submit-button";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -27,7 +27,7 @@ type ProjectProps = {
   name: string;
 };
 
-export function NewProject() {
+export function NewProjectContainer() {
   const router = useRouter();
 
   const newProjectInfoDialogOpen = useHomeStore(

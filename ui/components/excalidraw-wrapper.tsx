@@ -1,8 +1,8 @@
 "use client";
 
-import { OpenProjectDialog } from "@/components/open-project-dialog";
 import { DeleteProjectDialog } from "@/components/scene/delete-project-dialog";
 import { NewProjectDialog } from "@/components/scene/new-project-dialog";
+import { OpenProjectDialog } from "@/components/scene/open-project-dialog";
 import { ResetSceneDialog } from "@/components/scene/reset-scene-dialog";
 import { useProjectStore } from "@/stores/project";
 import { useSceneStore } from "@/stores/scene";

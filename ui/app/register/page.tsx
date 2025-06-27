@@ -1,7 +1,7 @@
 "use client";
 
-import { AuthForm } from "@/components/auth-form";
-import { SubmitButton } from "@/components/submit-button";
+import { AuthForm } from "@/components/form/auth-form";
+import { SubmitButton } from "@/components/form/submit-button";
 import { useGuestRedirect } from "@/hooks/use-guest-redirect";
 import { useUserStore } from "@/stores/user";
 import Link from "next/link";

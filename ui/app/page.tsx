@@ -1,9 +1,9 @@
 "use client";
 
-import AppHeader from "@/components/app-header";
+import AppHeader from "@/components/home/app-header";
 import { ProjectDetailDrawer } from "@/components/home/project-detail-drawer";
 import { MyProjectContainer } from "@/components/my-project-container";
-import { NewProject } from "@/components/new-project";
+import { NewProjectContainer } from "@/components/new-project-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 import { useHomeStore } from "@/stores/home";
@@ -41,7 +41,7 @@ export default function Page() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="new-project">
-            <NewProject />
+            <NewProjectContainer />
           </TabsContent>
           <TabsContent value="my-project">
             <MyProjectContainer showDetailButton={true} />
