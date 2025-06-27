@@ -1,5 +1,3 @@
-import { NewProjectForm } from "@/components/form/new-project-form";
-import { SubmitButton } from "@/components/form/submit-button";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,12 +14,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCreateProjectMutation } from "@/hooks/use-create-project";
 import { useHomeStore } from "@/stores/home";
-import { useProjectStore } from "@/stores/project";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import React, { useState } from "react";
 
 type ProjectProps = {
   name: string;
@@ -37,26 +36,16 @@ export function NewProjectContainer() {
     (state) => state.setNewProjectDialogOpen,
   );
 
-  const status = useProjectStore((state) => state.newProjectStatus);
-  const createProject = useProjectStore((state) => state.createProjectAction);
-  const [isSuccessful, setIsSuccessful] = useState(false);
-  const project = useProjectStore((state) => state.projectDetail);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
 
-  useEffect(() => {
-    if (status === "failed") {
-      toast.error("未知错误");
-    } else if (status === "invalid_data") {
-      toast.error("输入长度过短或过长");
-    } else if (status === "success") {
-      setIsSuccessful(true);
-      setNewProjectInfoDialogOpen(false);
-      router.push(`/project/${project?.id}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
-
-  const handleSubmit = async (formData: FormData) => {
-    await createProject(formData);
+  const create = useCreateProjectMutation();
+  const handleCreate = async (name: string, description: string) => {
+    const data = await create.mutateAsync({
+      name: name,
+      description: description,
+    });
+    router.push(`/project/${data.id}`);
   };
 
   return (
@@ -71,9 +60,37 @@ export function NewProjectContainer() {
             <DialogTitle>项目信息</DialogTitle>
             <DialogDescription>输入项目信息</DialogDescription>
           </DialogHeader>
-          <NewProjectForm action={handleSubmit}>
-            <SubmitButton isSuccessful={isSuccessful}>创建</SubmitButton>
-          </NewProjectForm>
+          <div className="flex h-[240px] w-[320px] flex-col justify-around gap-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="name">名称</Label>
+              <Input
+                id="name"
+                name="name"
+                className="bg-muted text-md md:text-sm"
+                type="text"
+                required
+                autoFocus
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="description">描述</Label>
+              <Input
+                id="description"
+                name="description"
+                className="bg-muted text-md md:text-sm"
+                type="text"
+                required
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+            <Button onClick={() => handleCreate(name, description)}>
+              创建
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
