@@ -17,17 +17,17 @@ public class ProjectBoardController {
     @Autowired
     private ProjectBoardService projectBoardService;
 
-    @PostMapping("/project-board")
+    @PostMapping("/project-board/{id}")
     public ResultUtil<Object> storeProjectBoard(
             @RequestHeader("Authorization") String authorization,
-            @RequestParam("project_id") int projectId,
+            @PathVariable("id") Integer id,
             @RequestBody ProjectBoardDto projectBoardDto) {
         try {
             //解析token
             JWTUtil.analyzeToken(authorization);
 
             // 存储画板数据
-            projectBoardService.storeProjectBoard(projectBoardDto,projectId);
+            projectBoardService.storeProjectBoard(projectBoardDto,id);
 
             // 返回响应
             return ResultUtil.success(null);
@@ -37,16 +37,16 @@ public class ProjectBoardController {
         }
     }
 
-    @GetMapping("/project-board")
+    @GetMapping("/project-board/{id}")
     public ProjectBoardReturnData getProjectBoard(
             @RequestHeader("Authorization") String authorization,
-            @RequestParam("project_id") int projectId) {
+            @PathVariable("id") Integer id) {
         try {
             //解析token
             JWTUtil.analyzeToken(authorization);
 
             // 获取画板数据
-            ProjectBoardReturnData resourceData = projectBoardService.getProjectBoard(projectId);
+            ProjectBoardReturnData resourceData = projectBoardService.getProjectBoard(id);
 
             return resourceData;
         } catch (Exception e) {
