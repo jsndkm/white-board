@@ -40,7 +40,7 @@ export const useProjectStore = create<ProjectState>()(
     {
       name: "project-store",
       partialize: (state) => ({
-        projectId: state.project?.id,
+        project: state.project,
       }),
     },
   ),

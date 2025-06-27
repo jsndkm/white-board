@@ -32,13 +32,10 @@ export function MyProjectContainer({
   return (
     <div className="container mx-auto flex max-h-fit flex-wrap justify-start gap-4 overflow-auto p-4">
       <Suspense fallback={<LoaderCircle />}>
-        {myProjectList?.map((proj, idx) => (
+        {myProjectList?.map((item, idx) => (
           <ProjectCard
             key={idx}
-            id={proj.id}
-            name={proj.name}
-            description={proj.description}
-            admin={proj.admin}
+            project={item}
             showDetailButton={showDetailButton}
           />
         ))}
@@ -48,16 +45,10 @@ export function MyProjectContainer({
 }
 
 export function ProjectCard({
-  id,
-  name,
-  description,
-  admin,
+  project,
   showDetailButton,
 }: {
-  id: number;
-  name: string;
-  description: string;
-  admin: boolean;
+  project: MyProjectListItem;
   showDetailButton?: boolean;
 }) {
   const router = useRouter();
@@ -68,7 +59,7 @@ export function ProjectCard({
 
   return (
     <Card className="relative h-[260px] w-[240px] shrink-0 sm:h-[300px] md:h-[340px]">
-      {admin ? (
+      {project.admin ? (
         <Badge
           variant="secondary"
           className="absolute top-4 right-4 bg-blue-500 text-white dark:bg-blue-600"
@@ -81,8 +72,8 @@ export function ProjectCard({
         </Badge>
       )}
       <CardHeader>
-        <CardTitle>{name}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle>{project.name}</CardTitle>
+        <CardDescription>{project.description}</CardDescription>
       </CardHeader>
       <CardContent className="size-full">
         <Skeleton className="mx-auto flex h-full w-full flex-col" />
@@ -90,7 +81,10 @@ export function ProjectCard({
       <CardFooter className="flex-col gap-2">
         <Button
           className="w-full cursor-pointer"
-          onClick={() => router.push(`/project/${id}`)}
+          onClick={() => {
+            useHomeStore.getState().setSelectedProject(project);
+            router.push(`/project/${project.id}`);
+          }}
         >
           打开项目
         </Button>
@@ -99,13 +93,7 @@ export function ProjectCard({
             variant="secondary"
             className="w-full cursor-pointer"
             onClick={() => {
-              const item: MyProjectListItem = {
-                id,
-                name,
-                description,
-                admin: admin,
-              };
-              useHomeStore.getState().setSelectedProject(item);
+              useHomeStore.getState().setSelectedProject(project);
               setProjectDetailsDialogOpen(true);
             }}
           >

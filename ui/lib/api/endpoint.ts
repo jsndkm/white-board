@@ -15,3 +15,6 @@ export const InviteToJoinProjectEndpoint = (
   `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/join?project_id=${project_id}&username=${username}`;
 export const ExitProjectEndpoint = (project_id: number) =>
   `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/exit?project_id=${project_id}`;
+
+export const GetSceneEndpoint = (project_id: number) =>
+  `${process.env.NEXT_PUBLIC_BASE_URL}/api/project-board/${project_id}`;

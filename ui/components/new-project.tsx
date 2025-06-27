@@ -1,4 +1,4 @@
-import { NewProjectForm } from "@/components/new-project-form";
+import { NewProjectForm } from "@/components/scene/new-project-form";
 import { SubmitButton } from "@/components/submit-button";
 import { Button } from "@/components/ui/button";
 import {
