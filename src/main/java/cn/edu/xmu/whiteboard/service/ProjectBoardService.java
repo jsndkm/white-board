@@ -31,7 +31,6 @@ public class ProjectBoardService {
             ProjectBoardMongo projectBoardMongo=new ProjectBoardMongo(id, projectBoardDto);
             mongoTemplate.save(projectBoardMongo, "project_board");
         } catch (Exception e) {
-            // 可以选择记录日志或抛出异常
             throw new RuntimeException("Failed to store projectBoard data in MongoDB", e);
         }
     }
@@ -44,7 +43,7 @@ public class ProjectBoardService {
             Query query = new Query(Criteria.where("id").is(id));
             ProjectBoardMongo projectBoardMongo = mongoTemplate.findOne(query, ProjectBoardMongo.class, "project_board");
 
-            // 如果MongoDB中有，可以回写到Redis
+            // 如果MongoDB中有，写到Redis
             if (projectBoardMongo != null) {
                 projectBoardDto=projectBoardMongo.getProjectBoard();
                 redisService.set(ProjectBoardKey.getById, ""+id, projectBoardDto);
