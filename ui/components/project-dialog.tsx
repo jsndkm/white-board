@@ -1,4 +1,5 @@
 import { ProjectCard } from "@/components/my-project-container";
+import { Template } from "@/components/new-project-container";
 import {
   Dialog,
   DialogContent,
@@ -47,7 +48,7 @@ export function ProjectDialog() {
   const getContent = () => {
     switch (dialogType) {
       case "newProject":
-        return <p>这里是新建项目的表单</p>;
+        return <Template name="空白模板" />;
 
       case "openProject":
         return (

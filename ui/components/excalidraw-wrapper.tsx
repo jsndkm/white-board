@@ -1,7 +1,6 @@
 "use client";
 
 import { ProjectDialog } from "@/components/project-dialog";
-import { OpenProjectDialog } from "@/components/scene/open-project-dialog";
 import { ResetSceneDialog } from "@/components/scene/reset-scene-dialog";
 import { getScene } from "@/lib/api/scene";
 import { useDeleteProjectDialogStore } from "@/stores/delete-project-alert";
@@ -27,12 +26,6 @@ export default function ExcalidrawWrapper({
 
   const router = useRouter();
 
-  const setNewProjectDialogOpen = useSceneStore(
-    (state) => state.setNewProjectDialogOpen,
-  );
-  // const setOpenProjectDialogOpen = useSceneStore(
-  //   (state) => state.setOpenProjectDialogOpen,
-  // );
   const setResetSceneDialogOpen = useSceneStore(
     (state) => state.setResetSceneDialogOpen,
   );
@@ -53,7 +46,7 @@ export default function ExcalidrawWrapper({
         initialData={() => getScene(1)}
       >
         <MainMenu>
-          <MainMenu.Item onSelect={() => setNewProjectDialogOpen(true)}>
+          <MainMenu.Item onSelect={() => openDialog("newProject")}>
             <Plus />
             新建项目
           </MainMenu.Item>
@@ -103,15 +96,7 @@ export default function ExcalidrawWrapper({
           </MainMenu.Item>
         </MainMenu>
 
-        {/* ========== New Project Dialog ========== */}
-        {/*<NewProjectDialog />*/}
-        {/*<ProjectDialog o></ProjectDialog>*/}
-
         <ProjectDialog />
-        {/* ========== Open Project Dialog ========== */}
-        <OpenProjectDialog />
-
-        {/* ========== Reset Scene Dialog ========== */}
         <ResetSceneDialog resetAction={() => excalidrawAPI?.resetScene()} />
       </Excalidraw>
     </div>

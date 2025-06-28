@@ -1,13 +1,18 @@
+import { getSession } from "next-auth/react";
 import { toast } from "sonner";
 
 export async function fetcher<T>(
   url: string,
   options: RequestInit = {},
 ): Promise<T> {
+  const session = await getSession();
+  const token = session?.user.token;
+
   const resp = await fetch(url, {
     ...options,
     headers: {
       ...options.headers,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
   });
 
