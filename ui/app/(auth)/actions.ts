@@ -68,7 +68,7 @@ export const register = async (
       phone: formData.get("phone"),
     });
 
-    const resp = await fetch(API.auth.login, {
+    const resp = await fetch(API.auth.register, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

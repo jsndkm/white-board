@@ -15,11 +15,12 @@ export async function fetcher<T>(
   const token = session?.accessToken;
 
   const resp = await fetch(url, {
-    ...options,
     headers: {
-      ...options.headers,
+      "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
     },
+    ...options,
   });
 
   const { message, data } = await resp.json();

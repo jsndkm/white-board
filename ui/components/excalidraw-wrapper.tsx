@@ -43,7 +43,7 @@ export default function ExcalidrawWrapper({
       <Excalidraw
         langCode="zh-CN"
         excalidrawAPI={(api) => setExcalidrawAPI(api)}
-        initialData={() => getScene(1)}
+        initialData={() => getScene(projectId)}
       >
         <MainMenu>
           <MainMenu.Item onSelect={() => openDialog("newProject")}>
