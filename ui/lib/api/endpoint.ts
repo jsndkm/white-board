@@ -1,6 +1,3 @@
-export const ExitProjectEndpoint = (projectId: number) =>
-  `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/exit?project_id=${projectId}`;
-
 export const GetSceneEndpoint = (projectId: number) =>
   `${process.env.NEXT_PUBLIC_BASE_URL}/api/project-board/${projectId}`;
 

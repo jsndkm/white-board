@@ -1,8 +1,8 @@
 "use client";
 
 import { register, RegisterActionState } from "@/app/(auth)/actions";
-import { AuthForm } from "@/components/form/auth-form";
-import { SubmitButton } from "@/components/form/submit-button";
+import { AuthForm } from "@/components/auth/auth-form";
+import { SubmitButton } from "@/components/auth/submit-button";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

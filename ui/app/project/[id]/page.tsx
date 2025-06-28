@@ -1,27 +1,24 @@
 "use client";
 
-import { useGetProject } from "@/hooks/use-get-project";
-import { useProjectStore } from "@/stores/project";
+import { LoaderCircle } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
 
 const ExcalidrawWrapper = dynamic(
   () => import("@/components/excalidraw-wrapper"),
   {
     ssr: false,
+    loading: () => (
+      <div className="flex h-screen w-screen flex-col items-center justify-center gap-4">
+        <LoaderCircle className="animate-spin" />
+        <span className="text-lg">首次加载需要较长时间...</span>
+      </div>
+    ),
   },
 );
 export default function Page() {
   const params = useParams();
   const projectId = Number(params.id);
-
-  const { data: projectDetail } = useGetProject(projectId);
-  
-  useEffect(() => {
-    if (!projectDetail) return;
-    useProjectStore.getState().setProject(projectDetail);
-  }, [projectDetail]);
 
   return <ExcalidrawWrapper projectId={projectId} />;
 }

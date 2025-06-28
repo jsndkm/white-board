@@ -1,9 +1,11 @@
 import { API } from "@/lib/api/endpoint";
 import { fetcher } from "@/lib/utils";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export function useProjectInviteMutation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async ({
       projectId,
@@ -16,6 +18,11 @@ export function useProjectInviteMutation() {
         method: "POST",
       });
     },
-    onSuccess: () => toast.success("邀请成功"),
+    onSuccess: async (_, variables) => {
+      toast.success("邀请成功");
+      await queryClient.invalidateQueries({
+        queryKey: ["project", variables.projectId],
+      });
+    },
   });
 }
