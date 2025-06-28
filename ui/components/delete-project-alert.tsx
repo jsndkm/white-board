@@ -9,9 +9,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useDeleteProjectMutation } from "@/hooks/use-delete-project";
-import { useDeleteProjectDialogStore } from "@/stores/delete-project-dialog";
+import { useDeleteProjectDialogStore } from "@/stores/delete-project-alert";
 
-export function DeleteProjectDialog() {
+export function DeleteProjectAlert() {
   const isOpen = useDeleteProjectDialogStore((state) => state.isOpen);
   const setIsOpen = useDeleteProjectDialogStore((state) => state.setIsOpen);
   const targetProjectId = useDeleteProjectDialogStore(

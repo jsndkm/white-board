@@ -1,11 +1,12 @@
 "use client";
 
-import { NewProjectDialog } from "@/components/scene/new-project-dialog";
+import { ProjectDialog } from "@/components/project-dialog";
 import { OpenProjectDialog } from "@/components/scene/open-project-dialog";
 import { ResetSceneDialog } from "@/components/scene/reset-scene-dialog";
 import { getScene } from "@/lib/api/scene";
-import { useDeleteProjectDialogStore } from "@/stores/delete-project-dialog";
+import { useDeleteProjectDialogStore } from "@/stores/delete-project-alert";
 import { useProjectStore } from "@/stores/project";
+import { useProjectDialogStore } from "@/stores/project-dialog";
 import { useSceneStore } from "@/stores/scene";
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
@@ -29,12 +30,14 @@ export default function ExcalidrawWrapper({
   const setNewProjectDialogOpen = useSceneStore(
     (state) => state.setNewProjectDialogOpen,
   );
-  const setOpenProjectDialogOpen = useSceneStore(
-    (state) => state.setOpenProjectDialogOpen,
-  );
+  // const setOpenProjectDialogOpen = useSceneStore(
+  //   (state) => state.setOpenProjectDialogOpen,
+  // );
   const setResetSceneDialogOpen = useSceneStore(
     (state) => state.setResetSceneDialogOpen,
   );
+
+  const openDialog = useProjectDialogStore((state) => state.openDialog);
 
   const resetStatus = useProjectStore((state) => state.resetStatus);
 
@@ -55,7 +58,7 @@ export default function ExcalidrawWrapper({
             新建项目
           </MainMenu.Item>
 
-          <MainMenu.Item onSelect={() => setOpenProjectDialogOpen(true)}>
+          <MainMenu.Item onSelect={() => openDialog("openProject")}>
             <Folder />
             打开项目
           </MainMenu.Item>
@@ -101,12 +104,12 @@ export default function ExcalidrawWrapper({
         </MainMenu>
 
         {/* ========== New Project Dialog ========== */}
-        <NewProjectDialog />
+        {/*<NewProjectDialog />*/}
+        {/*<ProjectDialog o></ProjectDialog>*/}
 
+        <ProjectDialog />
         {/* ========== Open Project Dialog ========== */}
         <OpenProjectDialog />
-
-        {/* ========== Delete Project Dialog ========== */}
 
         {/* ========== Reset Scene Dialog ========== */}
         <ResetSceneDialog resetAction={() => excalidrawAPI?.resetScene()} />

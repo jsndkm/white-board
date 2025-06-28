@@ -1,7 +1,7 @@
 "use client";
 
 import "./globals.css";
-import { DeleteProjectDialog } from "@/components/scene/delete-project-dialog";
+import { DeleteProjectAlert } from "@/components/delete-project-alert";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryClient } from "@tanstack/query-core";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -28,7 +28,7 @@ export default function RootLayout({
           >
             <SessionProvider>{children}</SessionProvider>
             <Toaster position="top-center" richColors />
-            <DeleteProjectDialog />
+            <DeleteProjectAlert />
           </ThemeProvider>
         </QueryClientProvider>
       </body>

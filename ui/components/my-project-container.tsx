@@ -14,6 +14,7 @@ import { fetcher } from "@/lib/api";
 import { GetMyProjectListEndpoint } from "@/lib/api/endpoint";
 import { MyProjectListItem } from "@/lib/api/project";
 import { useHomeStore } from "@/stores/home";
+import { useProjectDialogStore } from "@/stores/project-dialog";
 import { useSceneStore } from "@/stores/scene";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -94,6 +95,7 @@ export function ProjectCard({
           onClick={() => {
             useHomeStore.getState().setSelectedProject(project);
             useSceneStore.getState().setOpenProjectDialogOpen(false);
+            useProjectDialogStore.getState().setIsOpen(false);
             router.push(`/project/${project.id}`);
           }}
         >
