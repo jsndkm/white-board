@@ -6,6 +6,8 @@ import cn.edu.xmu.whiteboard.WebSocket.pojo.Message;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
 import cn.edu.xmu.whiteboard.utils.JWTUtil;
 import com.alibaba.fastjson.JSONArray;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class WebSocketController {
 
     @PostMapping("/send-message")
-    public ResultUtil<Object> sendMessage(@RequestHeader("Authorization") String authorization,@RequestBody String message){
+    public ResponseEntity<ResultUtil<Object>> sendMessage(@RequestHeader("Authorization") String authorization, @RequestBody String message){
         try {
             //解析token
             String username=JWTUtil.analyzeToken(authorization);
@@ -26,7 +28,9 @@ public class WebSocketController {
             WebSocketServer.sendInfo(json);
 
             // 返回响应
-            return ResultUtil.success(null);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(ResultUtil.success(null));
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);

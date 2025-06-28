@@ -11,7 +11,7 @@ git pull
 ### 装依赖
 
 ```bash
-npm i
+npm ci
 ```
 
 ### 配置变量
@@ -22,9 +22,10 @@ npm i
 
 ```
 NEXT_PUBLIC_BASE_URL = http://127.0.0.1:8080
+AUTH_SECRET = llmons
 ```
 
-其中的值改为实际后端 url
+其中的值改为实际后端 url，AUTH_SECRET 用于 jwt 加密解密
 
 ### 启动
 

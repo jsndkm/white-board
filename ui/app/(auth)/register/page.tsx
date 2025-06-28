@@ -1,40 +1,47 @@
 "use client";
 
+import { register, RegisterActionState } from "@/app/(auth)/actions";
 import { AuthForm } from "@/components/form/auth-form";
 import { SubmitButton } from "@/components/form/submit-button";
-import { useGuestRedirect } from "@/hooks/use-guest-redirect";
-import { useUserStore } from "@/stores/user";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function Page() {
-  useGuestRedirect();
   const router = useRouter();
 
-  const status = useUserStore((state) => state.registerStatus);
-  const registerAction = useUserStore((state) => state.registerAction);
   const [isSuccessful, setIsSuccessful] = useState(false);
 
+  const [state, formAction] = useActionState<RegisterActionState, FormData>(
+    register,
+    {
+      status: "idle",
+    },
+  );
+
+  const { update: updateSession } = useSession();
+
   useEffect(() => {
-    if (status === "user_exists") {
+    if (state.status === "user_exists") {
       toast.error("用户名已存在");
-    } else if (status === "failed") {
+    } else if (state.status === "failed") {
       toast.error("未知错误");
-    } else if (status === "invalid_data") {
+    } else if (state.status === "invalid_data") {
       toast.error("用户名或密码不符合要求");
-    } else if (status === "success") {
+    } else if (state.status === "success") {
       toast.success("注册成功");
 
       setIsSuccessful(true);
-      router.replace("/login");
+      updateSession();
+      router.refresh();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  }, [state.status]);
 
-  const handleSubmit = async (formData: FormData) => {
-    await registerAction(formData);
+  const handleSubmit = (formData: FormData) => {
+    formAction(formData);
   };
 
   return (

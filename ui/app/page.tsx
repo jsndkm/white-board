@@ -4,13 +4,10 @@ import AppHeader from "@/components/home/app-header";
 import { MyProjectContainer } from "@/components/my-project-container";
 import { NewProjectContainer } from "@/components/new-project-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 import { useHomeStore } from "@/stores/home";
-import { Loader } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 
 export default function Page() {
-  useAuthRedirect();
-
   const selectedTab = useHomeStore((state) => state.selectedTab);
   const setSelectedTab = useHomeStore((state) => state.setSelectedTab);
   const isHydrated = useHomeStore((state) => state.isHydrated);
@@ -18,7 +15,7 @@ export default function Page() {
   if (!isHydrated)
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <LoaderCircle className="text-muted-foreground h-6 w-6 animate-spin" />
       </div>
     );
 

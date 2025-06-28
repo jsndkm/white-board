@@ -20,7 +20,7 @@ public class DrawBoardController {
     private DrawBoardService drawBoardService;
 
     @PostMapping(value = "/scenes", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResultUtil<Object> storeDrawBoard(
+    public ResponseEntity<ResultUtil<Object>> storeDrawBoard(
             @RequestHeader("Authorization") String authorization,
             @RequestBody byte[] sceneData) {
         try {
@@ -32,7 +32,9 @@ public class DrawBoardController {
 
             // 返回响应
             DrawBoardReturnData data=new DrawBoardReturnData(sceneId);
-            return ResultUtil.success(data);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(ResultUtil.success(data));
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);
