@@ -1,6 +1,7 @@
 "use client";
 
 import "./globals.css";
+import { GlobalConfirmDialog } from "@/components/confirm-dialog";
 import { DeleteProjectAlert } from "@/components/delete-project-alert";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryClient } from "@tanstack/query-core";
@@ -29,6 +30,7 @@ export default function RootLayout({
             <SessionProvider>{children}</SessionProvider>
             <Toaster position="top-center" richColors />
             <DeleteProjectAlert />
+            <GlobalConfirmDialog />
           </ThemeProvider>
         </QueryClientProvider>
       </body>

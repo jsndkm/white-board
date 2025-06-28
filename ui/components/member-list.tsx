@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDeleteMemberMutation } from "@/hooks/use-delete-member";
+import { useGlobalConfirmDialogStore } from "@/stores/confirm-dialog";
 import { Trash2 } from "lucide-react";
 
 type Member = {
@@ -25,6 +26,19 @@ export function MemberList({
   projectId,
 }: MemberListProps) {
   const deleteMember = useDeleteMemberMutation();
+
+  const handleDeleteMember = (projectId: number, username: string) => {
+    useGlobalConfirmDialogStore.getState().openDialog({
+      type: "removeMember",
+      title: "移出成员",
+      description: `您确定要移出成员 ${username} 吗？`,
+      onConfirm: () =>
+        deleteMember.mutate({
+          projectId,
+          username,
+        }),
+    });
+  };
 
   return (
     <div>
@@ -56,12 +70,7 @@ export function MemberList({
                   size="icon"
                   variant="ghost"
                   className="cursor-pointer rounded-full text-sm font-medium"
-                  onClick={() =>
-                    deleteMember.mutate({
-                      projectId,
-                      username: member.username,
-                    })
-                  }
+                  onClick={() => handleDeleteMember(projectId, member.username)}
                 >
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>

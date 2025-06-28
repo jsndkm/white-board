@@ -9,9 +9,11 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDeleteProjectMutation } from "@/hooks/use-delete-project";
+import { useExitProjectMutation } from "@/hooks/use-exit-project";
 import { useGetProject } from "@/hooks/use-get-project";
 import { useProjectInviteMutation } from "@/hooks/use-invite-project";
-import { useDeleteProjectDialogStore } from "@/stores/delete-project-alert";
+import { useGlobalConfirmDialogStore } from "@/stores/confirm-dialog";
 import { useProjectDetailsStore } from "@/stores/project-detail-drawer";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -41,6 +43,9 @@ export function ProjectDetailDrawer() {
     invite.mutate({ projectId: project.id, username: inviteUsername });
     setInviteUsername("");
   };
+
+  const exitProject = useExitProjectMutation();
+  const deleteProject = useDeleteProjectMutation();
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
@@ -108,16 +113,41 @@ export function ProjectDetailDrawer() {
                 >
                   打开项目
                 </Button>
-                {project?.admin && (
+                {project?.admin ? (
                   <Button
                     className="cursor-pointer"
                     onClick={() =>
-                      useDeleteProjectDialogStore
-                        .getState()
-                        .openDialog(project?.id, () => setIsOpen(false))
+                      useGlobalConfirmDialogStore.getState().openDialog({
+                        type: "exitProject",
+                        title: "删除项目",
+                        description: "您确定要删除此项目吗？",
+                        onConfirm: () =>
+                          deleteProject.mutate(
+                            { projectId: project?.id || 0 },
+                            { onSuccess: () => setIsOpen(false) },
+                          ),
+                      })
                     }
                   >
                     删除
+                  </Button>
+                ) : (
+                  <Button
+                    className="cursor-pointer"
+                    onClick={() =>
+                      useGlobalConfirmDialogStore.getState().openDialog({
+                        type: "exitProject",
+                        title: "退出项目",
+                        description: "您确定要退出此项目吗？",
+                        onConfirm: () =>
+                          exitProject.mutate(
+                            { projectId: project?.id || 0 },
+                            { onSuccess: () => setIsOpen(false) },
+                          ),
+                      })
+                    }
+                  >
+                    退出项目
                   </Button>
                 )}
               </div>
