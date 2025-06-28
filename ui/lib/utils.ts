@@ -12,7 +12,7 @@ export async function fetcher<T>(
   options: RequestInit = {},
 ): Promise<T> {
   const session = await getSession();
-  const token = session?.user.token;
+  const token = session?.accessToken;
 
   const resp = await fetch(url, {
     ...options,
