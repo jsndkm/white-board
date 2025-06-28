@@ -1,7 +1,7 @@
 "use server";
 
 import { signIn } from "./auth";
-import { API } from "@/lib/api/endpoint";
+import { API } from "@/lib/endpoint";
 import { z } from "zod";
 
 const registerFormSchema = z.object({

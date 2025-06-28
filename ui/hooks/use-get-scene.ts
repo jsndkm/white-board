@@ -1,4 +1,4 @@
-import { API } from "@/lib/api/endpoint";
+import { API } from "@/lib/endpoint";
 import { fetcher } from "@/lib/utils";
 import { ExcalidrawInitialDataState } from "@excalidraw/excalidraw/types";
 import { useSuspenseQuery } from "@tanstack/react-query";

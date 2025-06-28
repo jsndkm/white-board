@@ -1,9 +1,3 @@
-export const GetSceneEndpoint = (projectId: number) =>
-  `${process.env.NEXT_PUBLIC_BASE_URL}/api/project-board/${projectId}`;
-
-export const UpdateSceneEndpoint = (projectId: number) =>
-  `${process.env.NEXT_PUBLIC_BASE_URL}/api/project-board/${projectId}`;
-
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const API = {

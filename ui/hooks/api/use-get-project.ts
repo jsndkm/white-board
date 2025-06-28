@@ -1,4 +1,4 @@
-import { API } from "@/lib/api/endpoint";
+import { API } from "@/lib/endpoint";
 import { ProjectDetail } from "@/lib/types/project";
 import { fetcher } from "@/lib/utils";
 import { useSuspenseQuery } from "@tanstack/react-query";

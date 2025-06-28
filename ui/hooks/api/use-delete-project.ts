@@ -1,4 +1,4 @@
-import { API } from "@/lib/api/endpoint";
+import { API } from "@/lib/endpoint";
 import { fetcher } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
