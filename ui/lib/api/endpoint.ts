@@ -1,15 +1,3 @@
-export const GetMyProjectListEndpoint = `${process.env.NEXT_PUBLIC_BASE_URL}/api/project-list`;
-export const GetProjectDetailEndpoint = (id: number) =>
-  `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${id}`;
-export const CreateProjectEndpoint = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects`;
-export const DeleteProjectEndpoint = (id: number) =>
-  `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${id}`;
-
-export const InviteToJoinProjectEndpoint = (
-  projectId: number,
-  username: string,
-) =>
-  `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/join?project_id=${projectId}&username=${username}`;
 export const ExitProjectEndpoint = (projectId: number) =>
   `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/exit?project_id=${projectId}`;
 

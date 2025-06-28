@@ -1,4 +1,4 @@
-import { DeleteProjectEndpoint } from "@/lib/api/endpoint";
+import { API } from "@/lib/api/endpoint";
 import { fetcher } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -6,7 +6,7 @@ import { toast } from "sonner";
 export function useDeleteProjectMutation() {
   return useMutation({
     mutationFn: async ({ projectId }: { projectId: number }) => {
-      return await fetcher<void>(DeleteProjectEndpoint(projectId), {
+      return await fetcher<void>(API.projects.delete(projectId), {
         method: "DELETE",
       });
     },

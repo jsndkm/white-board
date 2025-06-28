@@ -1,4 +1,4 @@
-import { CreateProjectEndpoint } from "@/lib/api/endpoint";
+import { API } from "@/lib/api/endpoint";
 import { CreateProjectRespData } from "@/lib/types/project";
 import { fetcher } from "@/lib/utils";
 import { useHomeStore } from "@/stores/home";
@@ -25,7 +25,7 @@ export function useCreateProjectMutation() {
         description: description,
       });
 
-      return await fetcher<CreateProjectRespData>(CreateProjectEndpoint, {
+      return await fetcher<CreateProjectRespData>(API.projects.create, {
         method: "POST",
         body: JSON.stringify({
           name: validatedData.name,

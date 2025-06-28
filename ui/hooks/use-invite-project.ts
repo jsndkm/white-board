@@ -1,14 +1,19 @@
-import { inviteToJoinProject } from "@/lib/api/project";
+import { API } from "@/lib/api/endpoint";
+import { fetcher } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 
-export function useInviteToJoinProjectMutation() {
+export function useProjectInviteMutation() {
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       projectId,
       username,
     }: {
       projectId: number;
       username: string;
-    }) => inviteToJoinProject(projectId, username),
+    }) => {
+      return await fetcher<void>(API.projects.invite(projectId, username), {
+        method: "POST",
+      });
+    },
   });
 }

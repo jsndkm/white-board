@@ -1,4 +1,4 @@
-import { Project } from "@/lib/api/project";
+import { Project } from "@/lib/types/project";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useInviteToJoinProjectMutation } from "@/hooks/use-invite-project";
+import { useProjectInviteMutation } from "@/hooks/use-invite-project";
 import { useDeleteProjectDialogStore } from "@/stores/delete-project-alert";
 import { useHomeStore } from "@/stores/home";
 import { Loader } from "lucide-react";
@@ -40,7 +40,7 @@ export function ProjectDetailDrawer({
   const { data: session } = useSession();
   const username = session?.user.username;
 
-  const invite = useInviteToJoinProjectMutation();
+  const invite = useProjectInviteMutation();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleInvite = () => {

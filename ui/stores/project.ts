@@ -1,4 +1,4 @@
-import { deleteProject, ProjectDetail } from "@/lib/api/project";
+import { ProjectDetail } from "@/lib/types/project";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -7,7 +7,6 @@ interface ProjectState {
   setProject: (projectDetail: ProjectDetail) => void;
   newProjectStatus: "idle" | "success" | "failed" | "invalid_data";
   resetStatus: () => void;
-  deleteProjectAction: (id: number) => Promise<void>;
 }
 
 export const useProjectStore = create<ProjectState>()(
@@ -18,9 +17,6 @@ export const useProjectStore = create<ProjectState>()(
         set({ projectDetail: project }),
       newProjectStatus: "idle",
       resetStatus: () => set({ newProjectStatus: "idle" }),
-      deleteProjectAction: async (id: number) => {
-        await deleteProject(id);
-      },
     }),
     {
       name: "project-store",
