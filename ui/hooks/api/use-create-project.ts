@@ -1,7 +1,6 @@
 import { API } from "@/lib/api/endpoint";
 import { CreateProjectRespData } from "@/lib/types/project";
 import { fetcher } from "@/lib/utils";
-import { useHomeStore } from "@/stores/home";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -34,7 +33,6 @@ export function useCreateProjectMutation() {
       });
     },
     onSuccess: () => {
-      useHomeStore.getState().setNewProjectDialogOpen(false);
       toast.success("项目创建成功");
     },
     onError: (error) => {

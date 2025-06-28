@@ -10,10 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Project } from "@/lib/types/project";
-import { useHomeStore } from "@/stores/home";
 import { useProjectDetailsStore } from "@/stores/project-detail";
 import { useProjectDialogStore } from "@/stores/project-dialog";
-import { useSceneStore } from "@/stores/scene";
 import { useRouter } from "next/navigation";
 
 export function ProjectCard({
@@ -52,8 +50,6 @@ export function ProjectCard({
         <Button
           className="w-full cursor-pointer"
           onClick={() => {
-            useHomeStore.getState().setSelectedProject(project);
-            useSceneStore.getState().setOpenProjectDialogOpen(false);
             useProjectDialogStore.getState().setIsOpen(false);
             router.push(`/project/${project.id}`);
           }}

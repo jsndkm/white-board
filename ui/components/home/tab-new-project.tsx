@@ -18,43 +18,58 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCreateProjectMutation } from "@/hooks/api/use-create-project";
-import { useHomeStore } from "@/stores/home";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-
-type ProjectProps = {
-  name: string;
-};
+import { useState } from "react";
 
 export function TabNewProject() {
+  return (
+    <div className="container mx-auto flex flex-wrap justify-start gap-4 p-4">
+      <Template templateName="空白模板" />
+    </div>
+  );
+}
+
+export function Template({ templateName }: { templateName: string }) {
   const router = useRouter();
 
-  const newProjectInfoDialogOpen = useHomeStore(
-    (state) => state.newProjectDialogOpen,
-  );
-  const setNewProjectInfoDialogOpen = useHomeStore(
-    (state) => state.setNewProjectDialogOpen,
-  );
+  const [isOpen, setIsOpen] = useState(false);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
   const create = useCreateProjectMutation();
   const handleCreate = async (name: string, description: string) => {
-    const data = await create.mutateAsync({
-      name: name,
-      description: description,
-    });
+    const data = await create.mutateAsync(
+      {
+        name: name,
+        description: description,
+      },
+      {
+        onSuccess: () => setIsOpen(false),
+      },
+    );
     router.push(`/project/${data.id}`);
   };
-
   return (
-    <div className="container mx-auto flex flex-wrap justify-start gap-4 p-4">
-      <Template name="空白模板" />
-      <Dialog
-        open={newProjectInfoDialogOpen}
-        onOpenChange={setNewProjectInfoDialogOpen}
-      >
+    <>
+      <Card className="h-[260px] w-[240px] shrink-0 sm:h-[300px] md:h-[340px]">
+        <CardHeader>
+          <CardTitle>{templateName}</CardTitle>
+          <CardDescription>发挥你的想象力！</CardDescription>
+        </CardHeader>
+        <CardContent className="size-full">
+          <Skeleton className="mx-auto flex h-full w-full flex-col" />
+        </CardContent>
+        <CardFooter className="flex-col gap-2">
+          <Button
+            className="w-full cursor-pointer"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            使用此模板
+          </Button>
+        </CardFooter>
+      </Card>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="!max-w-fit">
           <DialogHeader>
             <DialogTitle>项目信息</DialogTitle>
@@ -87,38 +102,15 @@ export function TabNewProject() {
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
-            <Button onClick={() => handleCreate(name, description)}>
+            <Button
+              className="cursor-pointer"
+              onClick={() => handleCreate(name, description)}
+            >
               创建
             </Button>
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-export function Template({ name }: ProjectProps) {
-  const setNewProjectInfoDialogOpen = useHomeStore(
-    (state) => state.setNewProjectDialogOpen,
-  );
-
-  return (
-    <Card className="h-[260px] w-[240px] shrink-0 sm:h-[300px] md:h-[340px]">
-      <CardHeader>
-        <CardTitle>{name}</CardTitle>
-        <CardDescription>发挥你的想象力！</CardDescription>
-      </CardHeader>
-      <CardContent className="size-full">
-        <Skeleton className="mx-auto flex h-full w-full flex-col" />
-      </CardContent>
-      <CardFooter className="flex-col gap-2">
-        <Button
-          className="w-full cursor-pointer"
-          onClick={async () => setNewProjectInfoDialogOpen(true)}
-        >
-          使用此模板
-        </Button>
-      </CardFooter>
-    </Card>
+    </>
   );
 }

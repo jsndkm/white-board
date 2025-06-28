@@ -1,8 +1,9 @@
 "use client";
 
 import { ProjectDialog } from "@/components/project-dialog";
+import { useDeleteProjectMutation } from "@/hooks/api/use-delete-project";
 import { useGetScene } from "@/hooks/use-get-scene";
-import { useDeleteProjectDialogStore } from "@/stores/delete-project-alert";
+import { useGlobalConfirmDialogStore } from "@/stores/confirm-dialog";
 import { useProjectDialogStore } from "@/stores/project-dialog";
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
@@ -22,6 +23,24 @@ export default function ExcalidrawWrapper({
 
   const router = useRouter();
   const { data: initScene } = useGetScene(projectId);
+
+  const deleteProject = useDeleteProjectMutation();
+
+  const handleDeleteProject = () => {
+    useGlobalConfirmDialogStore.getState().openDialog({
+      type: "deleteProject",
+      title: "删除项目",
+      description: "确定要删除当前项目吗？",
+      onConfirm: () => {
+        deleteProject.mutate(
+          { projectId: projectId },
+          {
+            onSuccess: () => router.push("/"),
+          },
+        );
+      },
+    });
+  };
 
   return (
     <div className="custom-styles h-screen w-screen">
@@ -57,13 +76,7 @@ export default function ExcalidrawWrapper({
               打开项目
             </MainMenu.Item>
 
-            <MainMenu.Item
-              onSelect={() =>
-                useDeleteProjectDialogStore
-                  .getState()
-                  .openDialog(projectId, () => router.push("/"))
-              }
-            >
+            <MainMenu.Item onSelect={handleDeleteProject}>
               <X />
               删除项目
             </MainMenu.Item>
