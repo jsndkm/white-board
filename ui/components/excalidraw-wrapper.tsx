@@ -18,8 +18,7 @@ export default function ExcalidrawWrapper({
 }: {
   projectId: number;
 }) {
-  const [excalidrawAPI, setExcalidrawAPI] =
-    useState<ExcalidrawImperativeAPI | null>(null);
+  const [, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null);
 
   const router = useRouter();
   const { data: initScene } = useGetScene(projectId);
