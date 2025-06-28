@@ -1,4 +1,4 @@
-import { MyProjectContainer } from "@/components/my-project-container";
+import { TabMyProject } from "@/components/home/tab-my-project";
 import {
   Dialog,
   DialogContent,
@@ -26,7 +26,7 @@ export function OpenProjectDialog() {
           <DialogTitle>打开项目</DialogTitle>
           <DialogDescription>打开已有项目</DialogDescription>
         </DialogHeader>
-        <MyProjectContainer showDetailButton={false} />
+        <TabMyProject showDetailButton={false} />
       </DialogContent>
     </Dialog>
   );

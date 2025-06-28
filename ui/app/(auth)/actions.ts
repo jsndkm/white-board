@@ -1,7 +1,7 @@
 "use server";
 
 import { signIn } from "./auth";
-import { RegisterEndpoint } from "@/lib/api/endpoint";
+import { API } from "@/lib/api/endpoint";
 import { z } from "zod";
 
 const registerFormSchema = z.object({
@@ -68,7 +68,7 @@ export const register = async (
       phone: formData.get("phone"),
     });
 
-    const resp = await fetch(RegisterEndpoint, {
+    const resp = await fetch(API.auth.login, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

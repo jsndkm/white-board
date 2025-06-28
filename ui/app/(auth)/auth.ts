@@ -1,5 +1,5 @@
 import { authConfig } from "./auth.config";
-import { LoginEndpoint } from "@/lib/api/endpoint";
+import { API } from "@/lib/api/endpoint";
 import NextAuth, { type DefaultSession } from "next-auth";
 import type { DefaultJWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
@@ -44,7 +44,7 @@ export const {
           password: string;
         };
 
-        const res = await fetch(LoginEndpoint, {
+        const res = await fetch(API.auth.login, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password }),

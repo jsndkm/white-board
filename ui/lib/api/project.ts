@@ -2,10 +2,10 @@ import {
   DeleteProjectEndpoint,
   InviteToJoinProjectEndpoint,
 } from "@/lib/api/endpoint";
-import { fetcher } from "@/lib/api/index";
+import { fetcher } from "@/lib/utils";
 
 // ============================== Get My Project List ==============================
-export type MyProjectListItem = {
+export type Project = {
   id: number;
   name: string;
   description: string;

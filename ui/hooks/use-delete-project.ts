@@ -1,5 +1,5 @@
-import { fetcher } from "@/lib/api";
 import { DeleteProjectEndpoint } from "@/lib/api/endpoint";
+import { fetcher } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 

@@ -1,4 +1,4 @@
-import { ProjectCard } from "@/components/my-project-container";
+import { ProjectCard } from "@/components/home/tab-my-project";
 import { Template } from "@/components/new-project-container";
 import {
   Dialog,
@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useGetProjectList } from "@/hooks/use-get-project-list";
+import { useGetProjects } from "@/hooks/use-get-projects";
 import { useProjectDialogStore } from "@/stores/project-dialog";
 import { LoaderCircle } from "lucide-react";
 
@@ -17,7 +17,7 @@ export function ProjectDialog() {
   const setIsOpen = useProjectDialogStore((state) => state.setIsOpen);
   const dialogType = useProjectDialogStore((state) => state.dialogType);
 
-  const query = useGetProjectList(isOpen && dialogType === "openProject");
+  const query = useGetProjects(isOpen && dialogType === "openProject");
 
   const getTitle = () => {
     switch (dialogType) {
@@ -75,8 +75,10 @@ export function ProjectDialog() {
           <DialogTitle>{getTitle()}</DialogTitle>
           <DialogDescription>{getDescription()}</DialogDescription>
         </DialogHeader>
-        <ScrollArea className="flex-1 pr-2">
-          <div className="flex flex-wrap gap-4">{getContent()}</div>
+        <ScrollArea className="min-h-0 flex-1 pr-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {getContent()}
+          </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>

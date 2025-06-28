@@ -1,5 +1,5 @@
 import { GetSceneEndpoint, UpdateSceneEndpoint } from "@/lib/api/endpoint";
-import { fetcher } from "@/lib/api/index";
+import { fetcher } from "@/lib/utils";
 import { NonDeletedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import { ExcalidrawInitialDataState } from "@excalidraw/excalidraw/types";
 

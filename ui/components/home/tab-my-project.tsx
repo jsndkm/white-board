@@ -9,49 +9,48 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher } from "@/lib/api";
-import { GetMyProjectListEndpoint } from "@/lib/api/endpoint";
-import { MyProjectListItem } from "@/lib/api/project";
+import { useGetProjects } from "@/hooks/use-get-projects";
+import { Project } from "@/lib/api/project";
 import { useHomeStore } from "@/stores/home";
 import { useProjectDialogStore } from "@/stores/project-dialog";
 import { useSceneStore } from "@/stores/scene";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Suspense } from "react";
-import useSWR from "swr";
 
-export function MyProjectContainer({
+export function TabMyProject({
   showDetailButton = true,
 }: {
   showDetailButton?: boolean;
 }) {
-  const { data: myProjectList } = useSWR<MyProjectListItem[]>(
-    GetMyProjectListEndpoint,
-    fetcher<MyProjectListItem[]>,
-    { suspense: true },
-  );
+  const { data: projects } = useGetProjects(true);
 
   const selected = useHomeStore((state) => state.selectedProject);
 
   return (
-    <div className="container mx-auto flex max-h-fit flex-wrap justify-start gap-4 overflow-auto p-4">
-      <Suspense fallback={<LoaderCircle />}>
-        {myProjectList?.map((item, idx) => (
-          <ProjectCard
-            key={idx}
-            project={item}
-            showDetailButton={showDetailButton}
-          />
-        ))}
-      </Suspense>
+    <>
+      <ScrollArea className="h-[80vh] w-full px-8 py-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <Suspense fallback={<LoaderCircle className="animate-spin" />}>
+            {projects?.map((item, idx) => (
+              <ProjectCard
+                key={idx}
+                project={item}
+                showDetailButton={showDetailButton}
+              />
+            ))}
+          </Suspense>
+        </div>
+      </ScrollArea>
       <ProjectDetailDrawer
         projectId={selected?.id ?? 0}
         name={selected?.name ?? ""}
         description={selected?.description ?? ""}
         isAdmin={selected?.admin ?? false}
       />
-    </div>
+    </>
   );
 }
 
@@ -59,7 +58,7 @@ export function ProjectCard({
   project,
   showDetailButton,
 }: {
-  project: MyProjectListItem;
+  project: Project;
   showDetailButton?: boolean;
 }) {
   const router = useRouter();
@@ -69,7 +68,7 @@ export function ProjectCard({
   );
 
   return (
-    <Card className="relative h-[260px] w-[240px] shrink-0 sm:h-[300px] md:h-[340px]">
+    <Card className="relative flex aspect-[4/3] flex-col">
       {project.admin ? (
         <Badge
           variant="secondary"
@@ -82,12 +81,14 @@ export function ProjectCard({
           参与
         </Badge>
       )}
-      <CardHeader>
+      <CardHeader className="min-h-[96px]">
         <CardTitle>{project.name}</CardTitle>
-        <CardDescription>{project.description}</CardDescription>
+        <CardDescription className="line-clamp-2">
+          {project.description}
+        </CardDescription>
       </CardHeader>
-      <CardContent className="size-full">
-        <Skeleton className="mx-auto flex h-full w-full flex-col" />
+      <CardContent className="h-full">
+        <Skeleton className="h-full w-full rounded-md" />
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Button

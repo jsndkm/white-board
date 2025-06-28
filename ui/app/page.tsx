@@ -1,7 +1,7 @@
 "use client";
 
 import AppHeader from "@/components/home/app-header";
-import { MyProjectContainer } from "@/components/my-project-container";
+import { TabMyProject } from "@/components/home/tab-my-project";
 import { NewProjectContainer } from "@/components/new-project-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHomeStore } from "@/stores/home";
@@ -40,7 +40,7 @@ export default function Page() {
             <NewProjectContainer />
           </TabsContent>
           <TabsContent value="my-project">
-            <MyProjectContainer showDetailButton={true} />
+            <TabMyProject showDetailButton={true} />
           </TabsContent>
         </Tabs>
       </main>

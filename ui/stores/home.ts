@@ -1,4 +1,4 @@
-import { MyProjectListItem } from "@/lib/api/project";
+import { Project } from "@/lib/api/project";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -7,8 +7,8 @@ interface HomeState {
   setIsHydrated: (isHydrated: boolean) => void;
   selectedTab: string;
   setSelectedTab: (name: string) => void;
-  selectedProject: MyProjectListItem | null;
-  setSelectedProject: (item: MyProjectListItem) => void;
+  selectedProject: Project | null;
+  setSelectedProject: (item: Project) => void;
   newProjectDialogOpen: boolean;
   setNewProjectDialogOpen: (status: boolean) => void;
   projectDetailsDrawerOpen: boolean;
@@ -23,8 +23,7 @@ export const useHomeStore = create<HomeState>()(
       selectedTab: "new-project",
       setSelectedTab: (name) => set({ selectedTab: name }),
       selectedProject: null,
-      setSelectedProject: (iterm: MyProjectListItem) =>
-        set({ selectedProject: iterm }),
+      setSelectedProject: (iterm: Project) => set({ selectedProject: iterm }),
       newProjectDialogOpen: false,
       setNewProjectDialogOpen: (status: boolean) =>
         set({ newProjectDialogOpen: status }),

@@ -1,8 +1,8 @@
 "use client";
 
-import { fetcher } from "@/lib/api";
 import { GetProjectDetailEndpoint } from "@/lib/api/endpoint";
 import { ProjectDetail } from "@/lib/api/project";
+import { fetcher } from "@/lib/utils";
 import { useHomeStore } from "@/stores/home";
 import { useProjectStore } from "@/stores/project";
 import dynamic from "next/dynamic";
