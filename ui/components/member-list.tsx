@@ -45,7 +45,7 @@ export function MemberList({
       成员列表
       <ScrollArea className="max-h-[300px]">
         <div className="mt-2 flex flex-col gap-3">
-          {members.slice(0, 6).map((member, idx) => (
+          {members.slice(0, 5).map((member, idx) => (
             <div
               key={idx}
               className="flex items-center justify-between rounded-md border px-4 py-2"
