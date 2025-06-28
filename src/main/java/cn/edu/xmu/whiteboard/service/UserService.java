@@ -67,7 +67,7 @@ public class UserService {
         }
         // 生成 cookie
         String token = JWTUtil.generateToken(user.getUsername());
-        addCookie(response, token, user);
+        //addCookie(response, token, user);
         LoginReturnData data=new LoginReturnData(user.getId(),token,user.getUsername());
         return data;
     }

@@ -39,12 +39,13 @@ public class RoomController {
                     .headers(headers)
                     .body(resourceData);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @PutMapping(value = "/rooms/{id}", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResultUtil<Object> modifyRoom(
+    public ResponseEntity<ResultUtil<Object>> modifyRoom(
             @RequestHeader("Authorization") String authorization,
             @PathVariable("id") String id,
             @RequestBody byte[] roomData) {
@@ -55,7 +56,9 @@ public class RoomController {
             String ID = roomService.modifyRoom(roomData, id);
 
             DrawBoardReturnData data=new DrawBoardReturnData(ID);
-            return ResultUtil.success(data);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(ResultUtil.success(data));
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);

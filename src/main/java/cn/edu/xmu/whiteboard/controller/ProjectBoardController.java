@@ -7,6 +7,8 @@ import cn.edu.xmu.whiteboard.result.ResultUtil;
 import cn.edu.xmu.whiteboard.service.ProjectBoardService;
 import cn.edu.xmu.whiteboard.utils.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +19,7 @@ public class ProjectBoardController {
     private ProjectBoardService projectBoardService;
 
     @PostMapping("/project-board/{id}")
-    public ResultUtil<Object> storeProjectBoard(
+    public ResponseEntity<ResultUtil<Object>> storeProjectBoard(
             @RequestHeader("Authorization") String authorization,
             @PathVariable("id") Integer id,
             @RequestBody ProjectBoardDto projectBoardDto) {
@@ -29,7 +31,9 @@ public class ProjectBoardController {
             projectBoardService.storeProjectBoard(projectBoardDto,id);
 
             // 返回响应
-            return ResultUtil.success(null);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(ResultUtil.success(null));
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);
@@ -37,7 +41,7 @@ public class ProjectBoardController {
     }
 
     @GetMapping("/project-board/{id}")
-    public ResultUtil<Object> getProjectBoard(
+    public ResponseEntity<ResultUtil<Object>> getProjectBoard(
             @RequestHeader("Authorization") String authorization,
             @PathVariable("id") Integer id) {
         try {
@@ -47,7 +51,9 @@ public class ProjectBoardController {
             // 获取画板数据
             ProjectBoardReturnData resourceData = projectBoardService.getProjectBoard(id);
 
-            return ResultUtil.success(resourceData);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(ResultUtil.success(resourceData));
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);
