@@ -5,7 +5,7 @@ interface ProjectDetailsDrawerState {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   project: Project | null;
-  openDialog: (project: Project, onSuccess: () => void) => void;
+  openDialog: (project: Project) => void;
 }
 
 export const useProjectDetailsStore = create<ProjectDetailsDrawerState>(

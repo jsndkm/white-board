@@ -25,6 +25,8 @@ export const API = {
       `${BASE_URL}/api/projects/join?project_id=${projectId}&username=${username}`,
     exit: (projectId: number) =>
       `${BASE_URL}/api/projects/exit?project_id=${projectId}`,
+    deleteMember: (projectId: number, username: string) =>
+      `${BASE_URL}/api/projects/kick?project_id=${projectId}&username=${username}`,
   },
 
   board: {

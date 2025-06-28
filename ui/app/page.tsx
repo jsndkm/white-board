@@ -40,7 +40,7 @@ export default function Page() {
             <TabNewProject />
           </TabsContent>
           <TabsContent value="my-project">
-            <TabMyProject showDetailButton={true} />
+            <TabMyProject />
           </TabsContent>
         </Tabs>
       </main>
