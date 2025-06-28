@@ -57,6 +57,10 @@ public class ProjectUserDao {
         return projectUserPoMapper.deleteByProjectIdAndUsername(pid,uname);
     }
 
+    public List<ProjectUserPO> findByPid(int pid){
+        return projectUserPoMapper.findByProjectId(pid);
+    }
+
     public ProjectUserPO findByPidAndUname(int pid,String uname){
         if(uname == null){
             throw new IllegalArgumentException("username can not be null");

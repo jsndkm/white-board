@@ -1,5 +1,7 @@
 package cn.edu.xmu.whiteboard.WebSocket.pojo;
 
+import com.alibaba.fastjson2.JSONObject;
+
 public class Message {
     private String name;
     private String message;
@@ -28,6 +30,10 @@ public class Message {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String toJsonString() {
+        return JSONObject.toJSONString(this); // 使用 FastJSON 自动序列化
     }
 
 }

@@ -37,6 +37,7 @@ public class CodeMsg {
     public static CodeMsg PROJECT_NOT_ALLOW_TO_DELETE = new CodeMsg(500317,"非项目所有者不允许删除项目");
     public static CodeMsg PROJECT_NOT_ALLOW_TO_JOIN = new CodeMsg(500318,"没有邀请权限");
     public static CodeMsg PROJECT_NOT_ALLOW_TO_KICK = new CodeMsg(500319,"没有踢人权限");
+    public static CodeMsg PROJECT_MEMBER_FULL = new CodeMsg(500400,"项目人数已满");
 
     //想法模块
     public static CodeMsg CONTENT_NOT_EXIST = new CodeMsg(500410,"想法内容不能为空");

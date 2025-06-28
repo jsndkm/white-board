@@ -66,6 +66,8 @@ public class ProjectBoardService {
         projectBoardReturnData.setAppState(projectBoardDto.getAppState());
         projectBoardReturnData.setFiles(projectBoardDto.getFiles());
 
+        if(projectBoardDto.getElements()==null)
+            return projectBoardReturnData;
         // 遍历 elements 数组
         for (ElementDto elementDto : projectBoardDto.getElements()) {
             if ("rectangle".equals(elementDto.getType())||"diamond".equals(elementDto.getType())||"ellipse".equals(elementDto.getType())||"embeddable".equals(elementDto.getType())) {

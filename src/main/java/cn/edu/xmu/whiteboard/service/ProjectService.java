@@ -7,6 +7,7 @@ import cn.edu.xmu.whiteboard.ReturnData.ProjectCompleteData;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectModifyDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectUserDto;
+import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardDto;
 import cn.edu.xmu.whiteboard.dao.ProjectDao;
 import cn.edu.xmu.whiteboard.dao.ProjectUserDao;
 import cn.edu.xmu.whiteboard.dao.UserDao;
@@ -32,6 +33,9 @@ public class ProjectService {
     @Autowired
     private ProjectUserDao projectUserDao;
 
+    @Autowired
+    private ProjectBoardService projectBoardService;
+
     public ProjectReturnData newProject(String username, ProjectDto projectDto){
         if(projectDto == null){
             throw new IllegalArgumentException("projectDTO is null");
@@ -43,6 +47,8 @@ public class ProjectService {
         ProjectPO project = projectDao.createProject(username,projectDto);
         projectUserDao.createProjectUser(username,project);
         ProjectReturnData data = new ProjectReturnData(project.getId(),project.getName(),project.getDescription());
+        ProjectBoardDto projectBoardDto=new ProjectBoardDto();
+        projectBoardService.storeProjectBoard(projectBoardDto,project.getId());
         return data;
     }
 
@@ -91,6 +97,11 @@ public class ProjectService {
             throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
         } else if (!projectPO.getUsername().equals(admin)) {
             throw new GlobalException(CodeMsg.PROJECT_NOT_ALLOW_TO_JOIN);
+        }
+        // 检查项目成员人数是否已满（==5）
+        List<ProjectUserPO> members = projectUserDao.findByPid(projectId);
+        if (members != null && members.size() == 5) {
+            throw new GlobalException(CodeMsg.PROJECT_MEMBER_FULL);
         }
         ProjectUserPO projectUserPO=projectUserDao.findByPidAndUname(projectId,username);
         if(projectUserPO!=null||projectPO.getUsername().equals(username)){

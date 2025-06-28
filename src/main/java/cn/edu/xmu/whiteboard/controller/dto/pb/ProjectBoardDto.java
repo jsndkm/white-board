@@ -7,7 +7,16 @@ public class ProjectBoardDto {
     private AppStateDto appState;
     private FileDto files;
 
-    public ProjectBoardDto() {}
+    public ProjectBoardDto() {
+        elements = null;
+        appState=new AppStateDto();
+        appState.setGridSize(20);
+        appState.setGridStep(5);
+        appState.setGridModeEnabled(false);
+        appState.setViewBackgroundColor("#ffffff");
+        appState.setLockedMultiSelections(null);
+        files = null;
+    }
 
     @JsonProperty("elements")
     public ElementDto[] getElements() { return elements; }
