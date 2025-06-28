@@ -2,15 +2,15 @@
 
 import AppHeader from "@/components/home/app-header";
 import { TabMyProject } from "@/components/home/tab-my-project";
-import { NewProjectContainer } from "@/components/new-project-container";
+import { TabNewProject } from "@/components/home/tab-new-project";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useHomeStore } from "@/stores/home";
+import { useHomeTabsStore } from "@/stores/home-tabs";
 import { LoaderCircle } from "lucide-react";
 
 export default function Page() {
-  const selectedTab = useHomeStore((state) => state.selectedTab);
-  const setSelectedTab = useHomeStore((state) => state.setSelectedTab);
-  const isHydrated = useHomeStore((state) => state.isHydrated);
+  const selectedTab = useHomeTabsStore((state) => state.selectedTab);
+  const setSelectedTab = useHomeTabsStore((state) => state.setSelectedTab);
+  const isHydrated = useHomeTabsStore((state) => state.isHydrated);
 
   if (!isHydrated)
     return (
@@ -37,7 +37,7 @@ export default function Page() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="new-project">
-            <NewProjectContainer />
+            <TabNewProject />
           </TabsContent>
           <TabsContent value="my-project">
             <TabMyProject showDetailButton={true} />

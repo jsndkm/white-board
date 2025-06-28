@@ -26,7 +26,7 @@ type ProjectProps = {
   name: string;
 };
 
-export function NewProjectContainer() {
+export function TabNewProject() {
   const router = useRouter();
 
   const newProjectInfoDialogOpen = useHomeStore(
