@@ -1,7 +1,7 @@
-import { ProjectDetailDrawer } from "@/components/home/project-detail-drawer";
+import { ProjectDetailSheet } from "@/components/home/project-detail-sheet";
 import { ProjectCard } from "@/components/project-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useGetProjects } from "@/hooks/use-get-projects";
+import { useGetProjects } from "@/hooks/api/use-get-projects";
 import { LoaderCircle } from "lucide-react";
 
 export function TabMyProject() {
@@ -23,7 +23,7 @@ export function TabMyProject() {
           ))}
         </div>
       </ScrollArea>
-      <ProjectDetailDrawer />
+      <ProjectDetailSheet />
     </>
   );
 }

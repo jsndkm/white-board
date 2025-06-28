@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useGetProjects } from "@/hooks/use-get-projects";
+import { useGetProjects } from "@/hooks/api/use-get-projects";
 import { useProjectDialogStore } from "@/stores/project-dialog";
 import { LoaderCircle } from "lucide-react";
 

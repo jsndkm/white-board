@@ -17,6 +17,7 @@ export const API = {
     list: `${BASE_URL}/api/project-list`,
     detail: (id: number) => `${BASE_URL}/api/projects/${id}`,
     create: `${BASE_URL}/api/projects`,
+    update: (id: number) => `${BASE_URL}/api/projects/${id}`,
     delete: (id: number) => `${BASE_URL}/api/projects/${id}`,
     invite: (projectId: number, username: string) =>
       `${BASE_URL}/api/projects/join?project_id=${projectId}&username=${username}`,

@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCreateProjectMutation } from "@/hooks/use-create-project";
+import { useCreateProjectMutation } from "@/hooks/api/use-create-project";
 import { useHomeStore } from "@/stores/home";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";

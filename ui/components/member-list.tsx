@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useDeleteMemberMutation } from "@/hooks/use-delete-member";
+import { useDeleteMemberMutation } from "@/hooks/api/use-delete-member";
 import { useGlobalConfirmDialogStore } from "@/stores/confirm-dialog";
 import { Trash2 } from "lucide-react";
 
