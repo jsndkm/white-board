@@ -3,8 +3,7 @@
 import "./globals.css";
 import { GlobalConfirmDialog } from "@/components/confirm-dialog";
 import { ThemeProvider } from "@/components/theme-provider";
-import { QueryClient } from "@tanstack/query-core";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import React, { useState } from "react";
 import { Toaster } from "sonner";
