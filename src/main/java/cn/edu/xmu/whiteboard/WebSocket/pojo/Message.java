@@ -30,7 +30,4 @@ public class Message {
         this.message = message;
     }
 
-    public String toJsonString(){
-        return "{\"name\":\" "+name+"\"," +"\"message\":\" "+message+"\"}";
-    }
 }

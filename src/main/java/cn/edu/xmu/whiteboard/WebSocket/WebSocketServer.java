@@ -1,6 +1,7 @@
 package cn.edu.xmu.whiteboard.WebSocket;
 
 import cn.edu.xmu.whiteboard.WebSocket.pojo.Message;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
@@ -24,6 +25,7 @@ public class WebSocketServer {
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
 
+    private String username;
     /**
      * 连接建立成功调用的方法
      */
@@ -33,10 +35,14 @@ public class WebSocketServer {
         //加入set中
         webSocketSet.add(this);
         //在线数加1
+        this.username = "user"+Integer.toString(webSocketSet.size());
+        //初始化用户名
+
+        Message message = new Message(username,"connect success");
         addOnlineCount();
         log.info("有新连接加入！当前在线人数为" + getOnlineCount());
         try {
-            WebSocketServer.sendInfo("connect success");
+            WebSocketServer.sendInfo(JSON.toJSONString(message));
         } catch (IOException e) {
             log.error("websocket IO异常");
         }
@@ -47,11 +53,17 @@ public class WebSocketServer {
      */
     @OnClose
     public void onClose() {
+        Message message = new Message(username,"disconnect");
+        try {
+            WebSocketServer.sendInfo(JSON.toJSONString(message));
+        } catch (IOException e) {
+            log.error("websocket IO异常");
+        }
         //从set中删除
         webSocketSet.remove(this);
         //在线数减1
         subOnlineCount();
-        log.info("有一连接关闭！当前在线人数为" + getOnlineCount());
+        log.info("{"+username+"}连接关闭！当前在线人数为" + getOnlineCount());
     }
 
     /**
@@ -61,15 +73,13 @@ public class WebSocketServer {
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-        log.info("来自客户端的消息:" + message);
+        log.info("来自客户端的消息:" + "{" + username + "}" + message);
 
-        Message msg = new Message();
-        msg.setName("unknown");
-        msg.setMessage(message);
+        Message msg = new Message(username,message);
         //群发消息
         for (WebSocketServer item : webSocketSet) {
             try {
-                item.sendMessage(msg.toJsonString());
+                item.sendMessage(JSON.toJSONString(msg));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -87,15 +97,7 @@ public class WebSocketServer {
     }
 
     public void sendMessage(String message) throws IOException {
-        JSONObject object = JSONObject.parseObject(message);
-        Message msg = new Message("unknown","null");
-        if(object.getString("name")!=null) {
-            msg.setName(object.getString("name"));
-        }
-        if(object.getString("message")!=null) {
-            msg.setMessage(object.getString("message"));
-        }
-        this.session.getBasicRemote().sendText(msg.toJsonString());
+        this.session.getBasicRemote().sendText(message);
     }
 
     /**
@@ -103,12 +105,10 @@ public class WebSocketServer {
      */
     public static void sendInfo(String message) throws IOException {
         log.info(message);
-        Message msg = new Message();
-        msg.setName("unknown");
-        msg.setMessage(message);
+
         for (WebSocketServer item : webSocketSet) {
             try {
-                item.sendMessage(msg.toJsonString());
+                item.sendMessage(message);
             } catch (IOException e) {
                 continue;
             }
