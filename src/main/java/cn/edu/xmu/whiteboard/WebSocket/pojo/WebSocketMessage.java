@@ -5,12 +5,12 @@ import cn.edu.xmu.whiteboard.controller.dto.pb.ElementDto;
 import cn.edu.xmu.whiteboard.controller.dto.pb.FileDto;
 import lombok.Data;
 import java.util.List;
-import java.util.Map;
 
 @Data
 public class WebSocketMessage {
     private String type;
     private Object data;
+    private long timestamp;
 
     @Data
     public static class InitRoomData {
@@ -35,13 +35,18 @@ public class WebSocketMessage {
 
     @Data
     public static class ServerBroadcastData {
+        private String roomId;
         private List<ElementDto> elements;
+        private AppStateDto appState;
+        private FileDto file;
     }
 
     @Data
-    public static class ServerVolatileBroadcastData {
-        private AppStateDto appState;
-        private FileDto file;
+    public static class ServerPointerBroadcastData {
+        private String roomId;
+        private String username;
+        private double x;
+        private double y;
     }
 
     @Data
@@ -49,6 +54,19 @@ public class WebSocketMessage {
         private List<ElementDto> elements;
         private AppStateDto appState;
         private FileDto file;
+    }
+
+    @Data
+    public static class ClientPointerBroadcastData {
+        private String roomId;
+        private List<PointerInfo> users;
+    }
+
+    @Data
+    public static class PointerInfo {
+        private String username;
+        private double x;
+        private double y;
     }
 
     @Data
