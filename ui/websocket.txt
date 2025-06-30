@@ -27,6 +27,7 @@
 {
   "type": "server-broadcast",
   "data": {
+    "roomId": "room123",
     "elements": []
   }
 }
@@ -34,6 +35,7 @@
 {
   "type": "server-volatile-broadcast",
   "data": {
+    "roomId": "room123",
     "appState": {},
     "file": {}
   }

@@ -2,6 +2,7 @@ package cn.edu.xmu.whiteboard.WebSocket;
 
 import cn.edu.xmu.whiteboard.WebSocket.pojo.Message;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
@@ -74,14 +75,42 @@ public class WebSocketServer {
     public void onMessage(String message, Session session) {
         log.info("来自客户端的消息:" + "{" + username + "}" + message);
 
-        Message msg = new Message(username,message);
-        //群发消息
-        for (WebSocketServer item : webSocketSet) {
-            try {
-                item.sendMessage(JSON.toJSONString(msg));
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            JSONObject json = JSON.parseObject(message);
+            String type = json.getString("type");
+            JSONObject data = json.getJSONObject("data");
+
+            switch (type) {
+                case "init-room":
+                    handleInitRoom(data);
+                    break;
+                case "join-room":
+                    handleJoinRoom(data);
+                    break;
+                case "room-user-change":
+                    // 通常由服务端发送，客户端不应发送此消息
+                    log.warn("客户端不应发送room-user-change消息");
+                    break;
+                case "server-broadcast":
+                    handleServerBroadcast(data);
+                    break;
+                case "server-volatile-broadcast":
+                    handleServerVolatileBroadcast(data);
+                    break;
+                case "client-broadcast":
+                    handleClientBroadcast(data);
+                    break;
+                case "disconnecting":
+                    handleDisconnecting(data);
+                    break;
+                case "disconnect":
+                    handleDisconnect(data);
+                    break;
+                default:
+                    log.error("未知消息类型: " + type);
             }
+        } catch (Exception e) {
+            log.error("消息处理错误: " + e.getMessage());
         }
     }
 
@@ -124,5 +153,31 @@ public class WebSocketServer {
 
     public static synchronized void subOnlineCount() {
         WebSocketServer.onlineCount--;
+    }
+
+    // 内部类表示房间信息
+    private static class RoomInfo {
+        private final String roomId;
+        private final CopyOnWriteArraySet<String> users = new CopyOnWriteArraySet<>();
+
+        public RoomInfo(String roomId) {
+            this.roomId = roomId;
+        }
+
+        public String getRoomId() {
+            return roomId;
+        }
+
+        public CopyOnWriteArraySet<String> getUsers() {
+            return users;
+        }
+
+        public void addUser(String username) {
+            users.add(username);
+        }
+
+        public boolean removeUser(String username) {
+            return users.remove(username);
+        }
     }
 }
