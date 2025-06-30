@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeleteProjectMutation } from "@/hooks/api/use-delete-project";
+import { useDeleteProjectMutation } from "@/hooks/api/project/use-delete-project";
 import { useGlobalConfirmDialogStore } from "@/stores/confirm-dialog";
 import { useProjectDialogStore } from "@/stores/project-dialog";
 import { MainMenu } from "@excalidraw/excalidraw";

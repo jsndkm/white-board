@@ -8,7 +8,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useGetProjects } from "@/hooks/api/use-get-projects";
+import { useGetProjectList } from "@/hooks/api/project/use-get-project-list";
+import { useGetTemplateList } from "@/hooks/api/template/use-get-template-list";
 import { useProjectDialogStore } from "@/stores/project-dialog";
 import { LoaderCircle } from "lucide-react";
 
@@ -17,7 +18,12 @@ export function ProjectDialog() {
   const setIsOpen = useProjectDialogStore((state) => state.setIsOpen);
   const dialogType = useProjectDialogStore((state) => state.dialogType);
 
-  const query = useGetProjects(isOpen && dialogType === "openProject");
+  const queryProjectList = useGetProjectList(
+    isOpen && dialogType === "openProject",
+  );
+  const queryTemplateNameList = useGetTemplateList(
+    isOpen && dialogType === "newProject",
+  );
 
   const getTitle = () => {
     switch (dialogType) {
@@ -48,13 +54,20 @@ export function ProjectDialog() {
   const getContent = () => {
     switch (dialogType) {
       case "newProject":
-        return <TemplateCard templateName="空白模板" />;
+        return (
+          <>
+            {queryTemplateNameList.isLoading && <LoaderCircle />}
+            {queryTemplateNameList.data?.map((item, idx) => (
+              <TemplateCard key={idx} templateName={item} />
+            ))}
+          </>
+        );
 
       case "openProject":
         return (
           <>
-            {query.isLoading && <LoaderCircle />}
-            {query.data?.map((item, idx) => (
+            {queryProjectList.isLoading && <LoaderCircle />}
+            {queryProjectList.data?.map((item, idx) => (
               <ProjectCard key={idx} project={item} showDetailButton={false} />
             ))}
           </>

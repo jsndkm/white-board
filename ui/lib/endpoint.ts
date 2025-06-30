@@ -9,6 +9,10 @@ export const API = {
     logout: `${BASE_URL}/api/logout`,
   },
 
+  template: {
+    list: `${BASE_URL}/api/template-list`,
+  },
+
   projects: {
     list: `${BASE_URL}/api/project-list`,
     detail: (id: number) => `${BASE_URL}/api/projects/${id}`,

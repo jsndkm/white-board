@@ -3,7 +3,7 @@ import { Project } from "@/lib/types/project";
 import { fetcher } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 
-export function useGetProjects(enabled: boolean) {
+export function useGetProjectList(enabled: boolean) {
   return useQuery({
     queryKey: ["project-list"],
     queryFn: async () => {

@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCreateProjectMutation } from "@/hooks/api/use-create-project";
+import { useCreateProjectMutation } from "@/hooks/api/project/use-create-project";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -48,9 +48,7 @@ export function TemplateCard({ templateName }: { templateName: string }) {
       <Card className="relative flex aspect-[4/3] flex-col">
         <CardHeader className="min-h-[72px]">
           <CardTitle>{templateName}</CardTitle>
-          <CardDescription className="line-clamp-1">
-            发挥你的想象力！
-          </CardDescription>
+          <CardDescription className="sr-only">{templateName}</CardDescription>
         </CardHeader>
         <CardContent className="h-full">
           <Skeleton className="h-full w-full rounded-md" />

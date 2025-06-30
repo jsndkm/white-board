@@ -4,7 +4,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useUpdateProjectMutation } from "@/hooks/api/use-update-project";
+import { useUpdateProjectMutation } from "@/hooks/api/project/use-update-project";
 import { useState } from "react";
 
 export function EditableSheetHeader({
