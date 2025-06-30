@@ -104,7 +104,7 @@ public class WebSocketServer {
 
             switch (type) {
                 case "join-room":
-                    handleJoinRoom(data);
+                    //handleJoinRoom(data);
                     break;
                 case "server-broadcast":
                     handleServerBroadcast(data);
@@ -113,10 +113,10 @@ public class WebSocketServer {
                     handleServerPointerBroadcast(data);
                     break;
                 case "disconnecting":
-                    handleDisconnecting(data);
+                    //handleDisconnecting(data);
                     break;
                 case "disconnect":
-                    handleDisconnect(data);
+                    //handleDisconnect(data);
                     break;
                 default:
                     log.error("未知消息类型: " + type);
