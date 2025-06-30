@@ -3,7 +3,7 @@
 import { ProjectDialog } from "@/components/common/project-dialog";
 import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
 import { useGetScene } from "@/hooks/api/use-get-scene";
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw, LiveCollaborationTrigger } from "@excalidraw/excalidraw";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import "@excalidraw/excalidraw/index.css";
 import {
@@ -63,6 +63,15 @@ export default function ExcalidrawWrapper({
           onChange={handleChange}
           onPointerUpdate={handlePointerUpdate}
           isCollaborating={true}
+          renderTopRightUI={() => (
+            <LiveCollaborationTrigger
+              isCollaborating={true}
+              onSelect={() => {
+                window.alert("You clicked on collab button");
+                // setIsCollaborating(true);
+              }}
+            />
+          )}
         >
           <ExcalidrawMenu projectId={projectId} />
           <ProjectDialog />

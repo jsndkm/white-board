@@ -1,5 +1,5 @@
 import { ProjectCard } from "@/components/common/project-card";
-import { Template } from "@/components/home/tab-new-project";
+import { TemplateCard } from "@/components/common/template-card";
 import {
   Dialog,
   DialogContent,
@@ -48,7 +48,7 @@ export function ProjectDialog() {
   const getContent = () => {
     switch (dialogType) {
       case "newProject":
-        return <Template templateName="空白模板" />;
+        return <TemplateCard templateName="空白模板" />;
 
       case "openProject":
         return (

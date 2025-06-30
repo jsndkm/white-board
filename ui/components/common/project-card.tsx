@@ -37,7 +37,7 @@ export function ProjectCard({
           参与
         </Badge>
       )}
-      <CardHeader className="min-h-[96px]">
+      <CardHeader className="min-h-[72px]">
         <CardTitle>{project.name}</CardTitle>
         <CardDescription className="line-clamp-2">
           {project.description}
