@@ -3,7 +3,8 @@
   "type": "init-room",
   "data": {
     "roomId": "room123"
-  }
+  },
+  "timestamp": 1630000000
 }
 //join-room
 {
@@ -11,7 +12,8 @@
   "data": {
     "projectId": 1,
     "username": "name"
-  }
+  },
+  "timestamp": 1630000000,
 }
 //room-user-change
 {
@@ -19,7 +21,8 @@
   "data": [
       {"username": "user1"},
       {"username": "user2"}
-    ]
+    ],
+  "timestamp": 1630000000
 }
 //server-broadcast
 {
@@ -29,7 +32,8 @@
     "elements": [],
     "appState": {},
         "file": {}
-  }
+  },
+  "timestamp": 1630000000
 }
 //server-pointer-broadcast
 {
@@ -39,7 +43,8 @@
     "username": "user1",
     "x": 10.0,
     "y": 10.0
-  }
+  },
+  "timestamp": 1630000000
 }
 //client-broadcast
 {
@@ -48,7 +53,8 @@
     "elements": [],
     "appState": {},
     "file": {}
-  }
+  },
+  "timestamp": 1630000000
 }
 //client-pointer-broadcast
 {
@@ -60,14 +66,16 @@
         "x": 10.0,
         "y": 10.0
     ]
-  }
+  },
+  "timestamp": 1630000000
 }
 //disconnecting
 {
   "type": "disconnecting",
   "data": {
     "username": "user1"
-  }
+  },
+  "timestamp": 1630000000
 }
 //disconnect
 {
@@ -75,5 +83,6 @@
   "data": {
     "username": "user1",
     "isExpected": true                   // 是否预期内的断开
-  }
+  },
+  "timestamp": 1630000000
 }
