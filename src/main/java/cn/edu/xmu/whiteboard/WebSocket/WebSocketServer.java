@@ -10,6 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @ServerEndpoint(value = "/ws")
@@ -21,11 +25,17 @@ public class WebSocketServer {
     private static int onlineCount = 0;
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
     private static CopyOnWriteArraySet<WebSocketServer> webSocketSet = new CopyOnWriteArraySet<WebSocketServer>();
+    // 房间信息：roomId -> RoomInfo
+    private static final Map<String, RoomInfo> roomMap = new ConcurrentHashMap<>();
+    // 用户会话：username -> WebSocketServer
+    private static final Map<String, WebSocketServer> userSessionMap = new ConcurrentHashMap<>();
 
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
 
     private String username;
+    // 当前房间ID
+    private String currentRoomId;
     /**
      * 连接建立成功调用的方法
      */
@@ -81,24 +91,14 @@ public class WebSocketServer {
             JSONObject data = json.getJSONObject("data");
 
             switch (type) {
-                case "init-room":
-                    handleInitRoom(data);
-                    break;
                 case "join-room":
                     handleJoinRoom(data);
-                    break;
-                case "room-user-change":
-                    // 通常由服务端发送，客户端不应发送此消息
-                    log.warn("客户端不应发送room-user-change消息");
                     break;
                 case "server-broadcast":
                     handleServerBroadcast(data);
                     break;
                 case "server-volatile-broadcast":
                     handleServerVolatileBroadcast(data);
-                    break;
-                case "client-broadcast":
-                    handleClientBroadcast(data);
                     break;
                 case "disconnecting":
                     handleDisconnecting(data);

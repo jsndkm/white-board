@@ -16,28 +16,29 @@
 //room-user-change
 {
   "type": "room-user-change",
-  "data": {
-    "users": [
+  "data": [
       {"username": "user1"},
       {"username": "user2"}
     ]
-  }
 }
 //server-broadcast
 {
   "type": "server-broadcast",
   "data": {
     "roomId": "room123",
-    "elements": []
+    "elements": [],
+    "appState": {},
+        "file": {}
   }
 }
-//server-volatile-broadcast
+//server-pointer-broadcast
 {
-  "type": "server-volatile-broadcast",
+  "type": "server-pointer-broadcast",
   "data": {
     "roomId": "room123",
-    "appState": {},
-    "file": {}
+    "username": "user1",
+    "x": 10.0,
+    "y": 10.0
   }
 }
 //client-broadcast
@@ -47,6 +48,18 @@
     "elements": [],
     "appState": {},
     "file": {}
+  }
+}
+//client-pointer-broadcast
+{
+  "type": "client-pointer-broadcast",
+  "data": {
+    "roomId": "room123",
+    "users":[
+        "username": "user1",
+        "x": 10.0,
+        "y": 10.0
+    ]
   }
 }
 //disconnecting
