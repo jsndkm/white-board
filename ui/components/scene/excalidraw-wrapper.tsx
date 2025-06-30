@@ -4,8 +4,14 @@ import { ProjectDialog } from "@/components/common/project-dialog";
 import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
 import { useGetScene } from "@/hooks/api/use-get-scene";
 import { Excalidraw } from "@excalidraw/excalidraw";
+import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import "@excalidraw/excalidraw/index.css";
-import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import {
+  AppState,
+  BinaryFiles,
+  ExcalidrawImperativeAPI,
+  Gesture,
+} from "@excalidraw/excalidraw/types";
 import { LoaderCircle } from "lucide-react";
 import { Suspense, useState } from "react";
 
@@ -17,6 +23,28 @@ export default function ExcalidrawWrapper({
   const [, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null);
 
   const { data: initScene } = useGetScene(projectId);
+
+  const handleChange = (
+    elements: readonly OrderedExcalidrawElement[],
+    appState: AppState,
+    files: BinaryFiles,
+  ) => {
+    console.log("elements changed:", elements);
+    console.log("appState changed:", appState);
+    console.log("files changed:", files);
+  };
+
+  const handlePointerUpdate = (payload: {
+    pointer: {
+      x: number;
+      y: number;
+      tool: "pointer" | "laser";
+    };
+    button: "down" | "up";
+    pointersMap: Gesture["pointers"];
+  }) => {
+    console.log("handlePointerUpdate", payload);
+  };
 
   return (
     <div className="custom-styles h-screen w-screen">
@@ -32,6 +60,9 @@ export default function ExcalidrawWrapper({
           langCode="zh-CN"
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
           initialData={initScene}
+          onChange={handleChange}
+          onPointerUpdate={handlePointerUpdate}
+          isCollaborating={true}
         >
           <ExcalidrawMenu projectId={projectId} />
           <ProjectDialog />
