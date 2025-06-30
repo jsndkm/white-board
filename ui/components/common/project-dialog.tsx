@@ -48,7 +48,7 @@ export function ProjectDialog() {
   const getContent = () => {
     switch (dialogType) {
       case "newProject":
-        return <Template name="空白模板" />;
+        return <Template templateName="空白模板" />;
 
       case "openProject":
         return (
