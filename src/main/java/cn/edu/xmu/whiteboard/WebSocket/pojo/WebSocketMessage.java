@@ -25,7 +25,8 @@ public class WebSocketMessage {
 
     @Data
     public static class RoomUserChangeData {
-        private List<UserInfo> users;
+        private String username;
+        private String action;
     }
 
     @Data

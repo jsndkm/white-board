@@ -18,10 +18,10 @@
 //room-user-change
 {
   "type": "room-user-change",
-  "data": [
-      {"username": "user1"},
-      {"username": "user2"}
-    ],
+  "data": {
+      "username": "user1",
+      "action": "leave"
+    },
   "timestamp": 1630000000
 }
 //server-broadcast
