@@ -1,7 +1,6 @@
 package cn.edu.xmu.whiteboard.WebSocket;
 
 import cn.edu.xmu.whiteboard.WebSocket.pojo.WebSocketMessage;
-import cn.edu.xmu.whiteboard.WebSocket.pojo.Message;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardDto;
 import cn.edu.xmu.whiteboard.redis.PointerKey;
 import cn.edu.xmu.whiteboard.redis.ProjectBoardKey;
@@ -52,8 +51,6 @@ public class WebSocketServer {
         //加入set中
         webSocketSet.add(this);
         //在线数加1
-        long currentTimeMillis = System.currentTimeMillis();
-        //初始化用户名
         addOnlineCount();
         log.info("有新连接加入！当前在线人数为" + getOnlineCount());
         log.info("user connect success!");
