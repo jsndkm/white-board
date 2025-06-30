@@ -1,5 +1,5 @@
+import { ProjectCard } from "@/components/common/project-card";
 import { ProjectDetailSheet } from "@/components/home/project-detail-sheet";
-import { ProjectCard } from "@/components/project-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGetProjects } from "@/hooks/api/use-get-projects";
 import { LoaderCircle } from "lucide-react";

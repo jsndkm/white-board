@@ -1,5 +1,5 @@
+import { ProjectCard } from "@/components/common/project-card";
 import { Template } from "@/components/home/tab-new-project";
-import { ProjectCard } from "@/components/project-card";
 import {
   Dialog,
   DialogContent,

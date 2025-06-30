@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 
 const ExcalidrawWrapper = dynamic(
-  () => import("@/components/excalidraw-wrapper"),
+  () => import("@/components/scene/excalidraw-wrapper"),
   {
     ssr: false,
     loading: () => (

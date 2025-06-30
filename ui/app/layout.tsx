@@ -1,8 +1,8 @@
 "use client";
 
 import "./globals.css";
-import { GlobalConfirmDialog } from "@/components/confirm-dialog";
-import { ThemeProvider } from "@/components/theme-provider";
+import { GlobalConfirmDialog } from "@/components/common/confirm-dialog";
+import { ThemeProvider } from "@/components/common/theme-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import React, { useState } from "react";
