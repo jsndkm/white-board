@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,8 +41,6 @@ public class WebSocketServer {
 
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
-
-    private String username;
     // 当前房间ID
     private String currentRoomId;
     /**
@@ -57,17 +52,11 @@ public class WebSocketServer {
         //加入set中
         webSocketSet.add(this);
         //在线数加1
-        this.username = "user"+Integer.toString(webSocketSet.size());
+        long currentTimeMillis = System.currentTimeMillis();
         //初始化用户名
-
-        Message message = new Message(username,"connect success");
         addOnlineCount();
         log.info("有新连接加入！当前在线人数为" + getOnlineCount());
-        try {
-            WebSocketServer.sendInfo(JSON.toJSONString(message));
-        } catch (IOException e) {
-            log.error("websocket IO异常");
-        }
+        log.info("user connect success!");
     }
 
     /**
@@ -75,17 +64,12 @@ public class WebSocketServer {
      */
     @OnClose
     public void onClose() {
-        Message message = new Message(username,"disconnect");
         //从set中删除
         webSocketSet.remove(this);
         //在线数减1
         subOnlineCount();
-        log.info("{"+username+"}连接关闭！当前在线人数为" + getOnlineCount());
-        try {
-            WebSocketServer.sendInfo(JSON.toJSONString(message));
-        } catch (IOException e) {
-            log.error("websocket IO异常");
-        }
+        log.info("连接关闭！当前在线人数为" + getOnlineCount());
+        log.info("user disconnect");
     }
 
     /**
@@ -95,7 +79,7 @@ public class WebSocketServer {
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-        log.info("来自客户端的消息:" + "{" + username + "}" + message);
+        log.info("来自客户端的消息:" + message);
 
         try {
             JSONObject json = JSON.parseObject(message);
@@ -104,7 +88,7 @@ public class WebSocketServer {
 
             switch (type) {
                 case "join-room":
-                    //handleJoinRoom(data);
+                    handleJoinRoom(data);
                     break;
                 case "server-broadcast":
                     handleServerBroadcast(data);
@@ -113,10 +97,7 @@ public class WebSocketServer {
                     handleServerPointerBroadcast(data);
                     break;
                 case "disconnecting":
-                    //handleDisconnecting(data);
-                    break;
-                case "disconnect":
-                    //handleDisconnect(data);
+                    handleDisconnecting(data);
                     break;
                 default:
                     log.error("未知消息类型: " + type);
@@ -146,21 +127,6 @@ public class WebSocketServer {
             sendMessage(errorMessage);
         } catch (IOException e) {
             log.error("发送错误消息失败", e);
-        }
-    }
-
-    /**
-     * 群发自定义消息
-     */
-    public static void sendInfo(String message) throws IOException {
-        log.info(message);
-
-        for (WebSocketServer item : webSocketSet) {
-            try {
-                item.sendMessage(message);
-            } catch (IOException e) {
-                continue;
-            }
         }
     }
 
@@ -294,5 +260,76 @@ public class WebSocketServer {
                 }
             });
         }
+    }
+
+    private void initRoom(String username, int projectId){
+        //生成roomId
+        String roomId = "Room" + projectId;
+        this.currentRoomId = roomId;
+        RoomInfo roomInfo = new RoomInfo(roomId);
+        roomInfo.users.add(username);
+
+        WebSocketMessage.InitRoomData data = new WebSocketMessage.InitRoomData();
+        data.setRoomId(roomId);
+
+        broadcastToRoom(roomId,"init-room",data);
+    }
+
+    private void handleJoinRoom(JSONObject data){
+        WebSocketMessage.JoinRoomData request = data.toJavaObject(WebSocketMessage.JoinRoomData.class);
+        String user = request.getUsername();
+        if(user == null){
+            sendError("用户名不能为空");
+            return;
+        }
+        if(request.getProjectId()>0) {
+            RoomInfo room = roomMap.get("Room"+request.getProjectId());
+            if(room==null){
+                initRoom(user,request.getProjectId());
+                return;
+            }
+            currentRoomId = room.roomId;
+            room.users.add(user);
+
+            WebSocketMessage.RoomUserChangeData Data = new WebSocketMessage.RoomUserChangeData();
+            Data.setUsername(user);
+            Data.setAction("join-in-room:"+currentRoomId);
+            broadcastToRoom(currentRoomId,"room-user-change",Data);
+        }
+        else {
+            sendError("项目ID无效");
+        }
+    }
+
+    private void handleDisconnecting(JSONObject data){
+        WebSocketMessage.DisconnectingData request = data.toJavaObject(WebSocketMessage.DisconnectingData.class);
+        String user = request.getUsername();
+        if(user == null){
+            sendError("用户名不能为空");
+            return;
+        }
+        WebSocketMessage.DisconnectData disconnectData = new WebSocketMessage.DisconnectData();
+        disconnectData.setUsername(user);
+        disconnectData.setIsExpected(true);
+
+        try {
+            onClose();
+        } catch (Exception e) {
+            log.error("webSocket disconnect error");
+            disconnectData.setIsExpected(false);
+        }
+        try {
+            RoomInfo room = roomMap.get(currentRoomId);
+            room.removeUser(user);
+            WebSocketMessage.RoomUserChangeData userChangeData = new WebSocketMessage.RoomUserChangeData();
+            userChangeData.setUsername(user);
+            userChangeData.setAction("quit-room:"+currentRoomId);
+            broadcastToRoom(currentRoomId,"room-user-change",userChangeData);
+        } catch (Exception e){
+            log.error("quit room error");
+            disconnectData.setIsExpected(false);
+        }
+
+        broadcastToRoom(currentRoomId,"disconnect",disconnectData);
     }
 }

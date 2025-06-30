@@ -234,4 +234,12 @@ public class WebSocketMessage {
             this.isExpected = isExpected;
         }
     }
+
+    @Data
+    public static class DisconnectingData {
+        private String username;
+
+        public String getUsername() {return username;}
+        public void setUsername(String username) {this.username = username;}
+    }
 }
