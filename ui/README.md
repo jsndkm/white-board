@@ -21,7 +21,8 @@ npm ci
 输入以下内容：
 
 ```
-NEXT_PUBLIC_BASE_URL = http://127.0.0.1:8080
+NEXT_PUBLIC_BASE_URL = http://127.0.0.1:4523/m1/6629948-6337524-default
+NEXT_PUBLIC_WEB_SOCKET_URL = ws://localhost:3002
 AUTH_SECRET = llmons
 ```
 

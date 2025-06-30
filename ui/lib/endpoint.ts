@@ -1,4 +1,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+export const WEBSOCKET_URL =
+  process.env.NEXT_PUBLIC_WEB_SOCKET_URL || "ws://localhost:8080/ws";
 
 export const API = {
   auth: {

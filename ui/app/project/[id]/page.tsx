@@ -16,9 +16,10 @@ const ExcalidrawWrapper = dynamic(
     ),
   },
 );
+
 export default function Page() {
   const params = useParams();
   const projectId = Number(params.id);
 
-  return <ExcalidrawWrapper projectId={projectId} />;
+  return <ExcalidrawWrapper projectId={projectId} mode="open" />;
 }

@@ -2,36 +2,96 @@
 
 import { ProjectDialog } from "@/components/common/project-dialog";
 import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
-import { useGetScene } from "@/hooks/api/use-get-scene";
-import { Excalidraw, LiveCollaborationTrigger } from "@excalidraw/excalidraw";
+import { useWebSocketClient } from "@/hooks/use-websocket";
+import { WEBSOCKET_URL } from "@/lib/endpoint";
+import { Excalidraw } from "@excalidraw/excalidraw";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import "@excalidraw/excalidraw/index.css";
 import {
   AppState,
   BinaryFiles,
+  Collaborator,
+  CollaboratorPointer,
   ExcalidrawImperativeAPI,
   Gesture,
+  SocketId,
 } from "@excalidraw/excalidraw/types";
 import { LoaderCircle } from "lucide-react";
-import { Suspense, useState } from "react";
+import { useSession } from "next-auth/react";
+import { Suspense, useEffect, useState } from "react";
 
 export default function ExcalidrawWrapper({
+  mode,
   projectId,
 }: {
+  mode: "create" | "open";
   projectId: number;
 }) {
-  const [, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null);
+  const { data: session } = useSession();
+  const username = session?.user.username;
 
-  const { data: initScene } = useGetScene(projectId);
+  const [excalidrawAPI, setExcalidrawAPI] =
+    useState<ExcalidrawImperativeAPI | null>(null);
+
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const [collaborators, setCollaborators] = useState(
+    new Map<SocketId, Collaborator>(),
+  );
+
+  const client = useWebSocketClient(WEBSOCKET_URL, {
+    "init-room": (data) => {
+      setRoomId(data.roomId);
+    },
+    "room-user-change": (data) => {
+      const newCollaborators = new Map(collaborators);
+      if (data.action === "join")
+        newCollaborators.set(data.userName as SocketId, {} as Collaborator);
+      else newCollaborators.delete(data.userName as SocketId);
+      setCollaborators(newCollaborators);
+    },
+    "server-broadcast": (data) => {
+      const { elements, appState } = data;
+      excalidrawAPI?.updateScene({
+        elements: elements as readonly OrderedExcalidrawElement[],
+        appState,
+      });
+    },
+    "server-pointer-broadcast": (data) => {
+      const { users } = data;
+      const newCollaborators = new Map<SocketId, Collaborator>();
+      users.forEach((user) => {
+        newCollaborators.set(user.username as SocketId, {
+          id: user.username as SocketId,
+          pointer: {
+            x: user.x,
+            y: user.y,
+          } as CollaboratorPointer,
+          username: user.username,
+        });
+      });
+      setCollaborators(newCollaborators);
+    },
+    disconnect: (data) => {
+      console.log("[WebSocket] Disconnected:", data);
+    },
+  });
+
+  useEffect(() => {
+    if (!roomId) return;
+    client.joinRoom(roomId);
+  }, [client, roomId]);
+
+  useEffect(() => {
+    excalidrawAPI?.updateScene({ collaborators });
+  }, [collaborators, excalidrawAPI]);
 
   const handleChange = (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => {
-    console.log("elements changed:", elements);
-    console.log("appState changed:", appState);
-    console.log("files changed:", files);
+    if (!roomId) return;
+    client.broadcast({ roomId, elements, appState, files });
   };
 
   const handlePointerUpdate = (payload: {
@@ -43,7 +103,13 @@ export default function ExcalidrawWrapper({
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => {
-    console.log("handlePointerUpdate", payload);
+    if (!roomId) return;
+    client.pointerBroadcast({
+      roomId,
+      x: payload.pointer.x,
+      y: payload.pointer.y,
+      username: username ?? "",
+    });
   };
 
   return (
@@ -59,19 +125,10 @@ export default function ExcalidrawWrapper({
         <Excalidraw
           langCode="zh-CN"
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
-          initialData={initScene}
+          initialData={null}
           onChange={handleChange}
           onPointerUpdate={handlePointerUpdate}
           isCollaborating={true}
-          renderTopRightUI={() => (
-            <LiveCollaborationTrigger
-              isCollaborating={true}
-              onSelect={() => {
-                window.alert("You clicked on collab button");
-                // setIsCollaborating(true);
-              }}
-            />
-          )}
         >
           <ExcalidrawMenu projectId={projectId} />
           <ProjectDialog />
