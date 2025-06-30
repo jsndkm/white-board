@@ -1,0 +1,64 @@
+//init-room
+{
+  "type": "init-room",
+  "data": {
+    "roomId": "room123"
+  }
+}
+//join-room
+{
+  "type": "join-room",
+  "data": {
+    "projectId": 1,
+    "username": "name"
+  }
+}
+//room-user-change
+{
+  "type": "room-user-change",
+  "data": {
+    "users": [
+      {"username": "user1"},
+      {"username": "user2"}
+    ]
+  }
+}
+//server-broadcast
+{
+  "type": "server-broadcast",
+  "data": {
+    "elements": []
+  }
+}
+//server-volatile-broadcast
+{
+  "type": "server-volatile-broadcast",
+  "data": {
+    "appState": {},
+    "file": {}
+  }
+}
+//client-broadcast
+{
+  "type": "client-broadcast",
+  "data": {
+    "elements": [],
+    "appState": {},
+    "file": {}
+  }
+}
+//disconnecting
+{
+  "type": "disconnecting",
+  "data": {
+    "username": "user1"
+  }
+}
+//disconnect
+{
+  "type": "disconnect",
+  "data": {
+    "username": "user1",
+    "isExpected": true                   // 是否预期内的断开
+  }
+}
