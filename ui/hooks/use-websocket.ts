@@ -67,7 +67,11 @@ type HandlerMap = Partial<{
   disconnect: (data: DisconnectData) => void;
 }>;
 
-export function useWebSocketClient(url: string, handlers: HandlerMap) {
+export function useWebSocketClient(
+  url: string,
+  handlers: HandlerMap,
+  joinRoomPayload?: JoinRoomData,
+) {
   const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -76,6 +80,16 @@ export function useWebSocketClient(url: string, handlers: HandlerMap) {
 
     socket.onopen = () => {
       console.log("[WebSocket] connected");
+      if (joinRoomPayload) {
+        console.log("[WebSocket] Joining room with payload:", joinRoomPayload);
+        socket.send(
+          JSON.stringify({
+            type: "join-room",
+            data: joinRoomPayload,
+            timestamp: Date.now(),
+          }),
+        );
+      }
     };
 
     socket.onmessage = (event) => {
@@ -120,7 +134,7 @@ export function useWebSocketClient(url: string, handlers: HandlerMap) {
         socket.close();
       }
     };
-  }, [handlers, url]);
+  }, [handlers, joinRoomPayload, url]);
 
   const send = (type: MessageType, data?: unknown) => {
     const socket = socketRef.current;
@@ -133,10 +147,6 @@ export function useWebSocketClient(url: string, handlers: HandlerMap) {
 
   return {
     send,
-    joinRoom: (payload: JoinRoomData) => {
-      if (socketRef.current?.readyState !== WebSocket.OPEN) return;
-      send("join-room", payload);
-    },
     broadcast: (payload: ClientBroadcastData) => {
       if (socketRef.current?.readyState !== WebSocket.OPEN) return;
       send("client-broadcast", { ...payload });
