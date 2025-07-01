@@ -23,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api", produces = "application/json;charset=UTF-8")
-@CrossOrigin(origins = "http://192.168.137.1:3000")
+//@CrossOrigin(origins = {"http://192.168.137.1:3000", "http://localhost:3000"})
 public class ProjectController {
 
     @Autowired

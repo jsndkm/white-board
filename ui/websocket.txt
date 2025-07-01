@@ -24,35 +24,14 @@
     },
   "timestamp": 1630000000
 }
-//server-broadcast
-{
-  "type": "server-broadcast",
-  "data": {
-    "roomId": "room123",
-    "elements": [],
-    "appState": {},
-        "file": {}
-  },
-  "timestamp": 1630000000
-}
-//server-pointer-broadcast
-{
-  "type": "server-pointer-broadcast",
-  "data": {
-    "roomId": "room123",
-    "username": "user1",
-    "x": 10.0,
-    "y": 10.0
-  },
-  "timestamp": 1630000000
-}
 //client-broadcast
 {
   "type": "client-broadcast",
   "data": {
+    "projectId": 1,
     "elements": [],
     "appState": {},
-    "file": {}
+        "file": {}
   },
   "timestamp": 1630000000
 }
@@ -60,7 +39,28 @@
 {
   "type": "client-pointer-broadcast",
   "data": {
-    "roomId": "room123",
+    "projectId": 1,
+    "username": "user1",
+    "x": 10.0,
+    "y": 10.0
+  },
+  "timestamp": 1630000000
+}
+//server-broadcast
+{
+  "type": "server-broadcast",
+  "data": {
+    "elements": [],
+    "appState": {},
+    "file": {}
+  },
+  "timestamp": 1630000000
+}
+//server-pointer-broadcast
+{
+  "type": "server-pointer-broadcast",
+  "data": {
+    "projectId": 1,
     "users":[
         "username": "user1",
         "x": 10.0,
@@ -73,6 +73,7 @@
 {
   "type": "disconnecting",
   "data": {
+    "projectId": 1,
     "username": "user1"
   },
   "timestamp": 1630000000
