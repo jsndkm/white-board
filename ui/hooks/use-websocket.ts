@@ -169,7 +169,7 @@ export function useStableWebSocket(url: string) {
   const socketRef = useRef<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
 
-  const send = useCallback((type: string, data?: any) => {
+  const send = useCallback((type: string, data?: unknown) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
       socketRef.current.send(
         JSON.stringify({ type, data, timestamp: Date.now() }),
