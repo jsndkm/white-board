@@ -2,7 +2,14 @@
 
 import { ProjectDialog } from "@/components/common/project-dialog";
 import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
-import { useWebSocketClient } from "@/hooks/use-websocket";
+import {
+  DisconnectData,
+  InitRoomData,
+  RoomUserChangeData,
+  ServerBroadcastData,
+  ServerPointerBroadcast,
+  useWebSocketClient,
+} from "@/hooks/use-websocket";
 import { WEBSOCKET_URL } from "@/lib/endpoint";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
@@ -18,7 +25,7 @@ import {
 } from "@excalidraw/excalidraw/types";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 export default function ExcalidrawWrapper({
   mode,
@@ -38,47 +45,58 @@ export default function ExcalidrawWrapper({
     new Map<SocketId, Collaborator>(),
   );
 
-  const client = useWebSocketClient(WEBSOCKET_URL, {
-    "init-room": (data) => {
-      setRoomId(data.roomId);
-    },
-    "room-user-change": (data) => {
-      const newCollaborators = new Map(collaborators);
-      if (data.action === "join")
-        newCollaborators.set(data.userName as SocketId, {} as Collaborator);
-      else newCollaborators.delete(data.userName as SocketId);
-      setCollaborators(newCollaborators);
-    },
-    "server-broadcast": (data) => {
-      const { elements, appState } = data;
-      excalidrawAPI?.updateScene({
-        elements: elements as readonly OrderedExcalidrawElement[],
-        appState,
-      });
-    },
-    "server-pointer-broadcast": (data) => {
-      const { users } = data;
-      const newCollaborators = new Map<SocketId, Collaborator>();
-      users.forEach((user) => {
-        newCollaborators.set(user.username as SocketId, {
-          id: user.username as SocketId,
-          pointer: {
-            x: user.x,
-            y: user.y,
-          } as CollaboratorPointer,
-          username: user.username,
+  const handles = useMemo(
+    () => ({
+      "init-room": (data: InitRoomData) => {
+        setRoomId(data.roomId);
+      },
+      "room-user-change": (data: RoomUserChangeData) => {
+        const newCollaborators = new Map(collaborators);
+        if (data.action === "join")
+          newCollaborators.set(data.userName as SocketId, {} as Collaborator);
+        else newCollaborators.delete(data.userName as SocketId);
+        setCollaborators(newCollaborators);
+      },
+      "server-broadcast": (data: ServerBroadcastData) => {
+        const { elements, appState } = data;
+        excalidrawAPI?.updateScene({
+          elements: elements as readonly OrderedExcalidrawElement[],
+          appState,
         });
-      });
-      setCollaborators(newCollaborators);
-    },
-    disconnect: (data) => {
-      console.log("[WebSocket] Disconnected:", data);
-    },
-  });
+      },
+      "server-pointer-broadcast": (data: ServerPointerBroadcast) => {
+        const { users } = data;
+        const newCollaborators = new Map<SocketId, Collaborator>();
+        users.forEach((user) => {
+          newCollaborators.set(user.username as SocketId, {
+            id: user.username as SocketId,
+            pointer: {
+              x: user.x,
+              y: user.y,
+            } as CollaboratorPointer,
+            username: user.username,
+          });
+        });
+        setCollaborators(newCollaborators);
+      },
+      disconnect: (data: DisconnectData) => {
+        console.log("[WebSocket] Disconnected:", data);
+      },
+    }),
+    [collaborators, excalidrawAPI],
+  );
+
+  const client = useWebSocketClient(WEBSOCKET_URL, handles);
+
+  useEffect(() => {
+    setRoomId("1");
+  }, []);
 
   useEffect(() => {
     if (!roomId) return;
     client.joinRoom(roomId);
+    //   debug
+    setRoomId("1");
   }, [client, roomId]);
 
   useEffect(() => {
@@ -90,7 +108,10 @@ export default function ExcalidrawWrapper({
     appState: AppState,
     files: BinaryFiles,
   ) => {
+    console.log("[Excalidraw] Scene changed:");
+    console.log("roomId:", roomId);
     if (!roomId) return;
+    console.log("[Excalidraw] Scene changed, broadcasting to room:", roomId);
     client.broadcast({ roomId, elements, appState, files });
   };
 
@@ -125,7 +146,10 @@ export default function ExcalidrawWrapper({
         <Excalidraw
           langCode="zh-CN"
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
-          initialData={null}
+          initialData={() => {
+            if (mode == "create") return null;
+            return null;
+          }}
           onChange={handleChange}
           onPointerUpdate={handlePointerUpdate}
           isCollaborating={true}

@@ -69,12 +69,15 @@ type HandlerMap = Partial<{
 export function useWebSocketClient(url: string, handlers: HandlerMap) {
   const socketRef = useRef<WebSocket | null>(null);
 
+  let isOpen = false;
+
   useEffect(() => {
     const socket = new WebSocket(url);
     socketRef.current = socket;
 
     socket.onopen = () => {
       console.log("[WebSocket] connected");
+      isOpen = true;
     };
 
     socket.onmessage = (event) => {
@@ -115,7 +118,8 @@ export function useWebSocketClient(url: string, handlers: HandlerMap) {
     };
 
     return () => {
-      socket.close();
+      if (isOpen) socket.close();
+      else socket.addEventListener("open", () => socket.close());
     };
   }, [handlers, url]);
 
@@ -131,9 +135,13 @@ export function useWebSocketClient(url: string, handlers: HandlerMap) {
   return {
     send,
     joinRoom: (roomId: string) => send("join-room", roomId),
-    broadcast: (payload: ClientBroadcastData) =>
-      send("client-broadcast", { ...payload }),
-    pointerBroadcast: (payload: ClientPointerBroadcastData) =>
-      send("client-pointer-broadcast", { ...payload }),
+    broadcast: (payload: ClientBroadcastData) => {
+      console.log("[WebSocket] Broadcasting to room:", payload.roomId);
+      send("client-broadcast", { ...payload });
+    },
+    pointerBroadcast: (payload: ClientPointerBroadcastData) => {
+      console.log("[WebSocket] Pointer broadcasting to room:", payload.roomId);
+      send("client-pointer-broadcast", { ...payload });
+    },
   };
 }

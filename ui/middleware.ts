@@ -4,6 +4,10 @@ import { type NextRequest, NextResponse } from "next/server";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  if (request.nextUrl.pathname === "/favicon.ico") {
+    return NextResponse.next();
+  }
+
   if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();
   }
