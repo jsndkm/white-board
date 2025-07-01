@@ -20,14 +20,16 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import cn.edu.xmu.whiteboard.WebSocket.SpringContextHolder;
 
 @ServerEndpoint(value = "/ws")
 @Component
 public class WebSocketServer {
     private final static Logger log = LoggerFactory.getLogger(WebSocketServer.class);
 
-    @Autowired
-    private RedisService redisService;
+    private RedisService getRedisService() {
+        return SpringContextHolder.getBean(RedisService.class);
+    }
 
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
     private static CopyOnWriteArraySet<WebSocketServer> webSocketSet = new CopyOnWriteArraySet<WebSocketServer>();
@@ -188,6 +190,7 @@ public class WebSocketServer {
         ptrInfo.setX(request.getX());
         ptrInfo.setY(request.getY());
 
+        RedisService redisService = getRedisService(); // 动态获取 RedisService
         boolean result = redisService.set(PointerKey.getByHash, userPointerKey, ptrInfo);
         if (!result) {
             throw new RuntimeException("Failed to store pointer data");
@@ -258,18 +261,18 @@ public class WebSocketServer {
     private void handleJoinRoom(JSONObject data){
         WebSocketMessage.JoinRoomData request = data.toJavaObject(WebSocketMessage.JoinRoomData.class);
         String user = request.getUsername();
-        userSessionMap.put(user,this);
         if(user == null){
             sendError("用户名不能为空");
             return;
         }
+        userSessionMap.put(user,this);
         if(request.getProjectId()>0) {
             if(currentRoomId!=null){
                 RoomInfo tmp = roomMap.get(currentRoomId);
                 tmp.removeUser(user);
                 WebSocketMessage.RoomUserChangeData userChangeData = new WebSocketMessage.RoomUserChangeData();
                 userChangeData.setUsername(user);
-                userChangeData.setAction("quit-room:"+currentRoomId);
+                userChangeData.setAction("leave");
                 broadcastToRoom(currentRoomId,"room-user-change",userChangeData);
                 log.info(user+"离开房间:"+currentRoomId);
             }
@@ -280,11 +283,12 @@ public class WebSocketServer {
             else {
                 currentRoomId = room.roomId;
                 room.addUser(user);
+                roomMap.put(room.roomId,room);
             }
 
             WebSocketMessage.RoomUserChangeData Data = new WebSocketMessage.RoomUserChangeData();
             Data.setUsername(user);
-            Data.setAction("join-in-room:"+currentRoomId);
+            Data.setAction("join");
             broadcastToRoom(currentRoomId,"room-user-change",Data);
             log.info(user+"加入房间:"+currentRoomId);
         }
@@ -315,7 +319,7 @@ public class WebSocketServer {
             room.removeUser(user);
             WebSocketMessage.RoomUserChangeData userChangeData = new WebSocketMessage.RoomUserChangeData();
             userChangeData.setUsername(user);
-            userChangeData.setAction("quit-room:"+currentRoomId);
+            userChangeData.setAction("leave");
             broadcastToRoom(currentRoomId,"room-user-change",userChangeData);
             log.info(user+"断开连接");
         } catch (Exception e){

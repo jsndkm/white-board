@@ -220,6 +220,15 @@ public class WebSocketMessage {
         public void setY(double y) {
             this.y = y;
         }
+        public String getUsername() {
+            return username;
+        }
+        public double getX() {
+            return x;
+        }
+        public double getY() {
+            return y;
+        }
     }
 
     @Data
@@ -232,6 +241,12 @@ public class WebSocketMessage {
         }
         public void setIsExpected(boolean isExpected) {
             this.isExpected = isExpected;
+        }
+        public boolean isExpected() {
+            return isExpected;
+        }
+        public String getUsername() {
+            return username;
         }
     }
 
