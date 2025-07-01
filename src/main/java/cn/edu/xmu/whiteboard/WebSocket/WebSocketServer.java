@@ -89,7 +89,7 @@ public class WebSocketServer {
                 case "client-pointer-broadcast":
                     handleServerPointerBroadcast(data);
                     break;
-                case "disconnecting":
+                case "dis-connecting":
                     handleDisconnecting(data);
                     break;
                 default:
@@ -153,20 +153,22 @@ public class WebSocketServer {
     private void handleServerBroadcast(JSONObject data) {
         WebSocketMessage.ServerBroadcastData request = data.toJavaObject(WebSocketMessage.ServerBroadcastData.class);
 
-        if (request.getRoomId() == null || request.getRoomId().isEmpty()) {
-            sendError("房间ID不能为空");
+        if(request.getProjectId()<0)
+        {
+            sendError("项目ID无效");
             return;
         }
+        String roomId = "Room" + request.getProjectId();
 
         // 广播给房间内所有用户
-        RoomInfo roomInfo = roomMap.get(request.getRoomId());
+        RoomInfo roomInfo = roomMap.get(roomId);
         if (roomInfo != null) {
             WebSocketMessage.ClientBroadcastData response = new WebSocketMessage.ClientBroadcastData();
             response.setElements(request.getElements());
             response.setAppState(request.getAppState());
             response.setFile(request.getFile());
 
-            broadcastToRoom(request.getRoomId(), "server-broadcast", response);
+            broadcastToRoom(roomId, "server-broadcast", response);
         } else {
             sendError("房间不存在");
         }
@@ -176,10 +178,12 @@ public class WebSocketServer {
     private void handleServerPointerBroadcast(JSONObject data) {
         WebSocketMessage.ServerPointerBroadcastData request = data.toJavaObject(WebSocketMessage.ServerPointerBroadcastData.class);
 
-        if (request.getRoomId() == null || request.getRoomId().isEmpty()) {
-            sendError("房间ID不能为空");
+        if(request.getProjectId()<0)
+        {
+            sendError("项目ID无效");
             return;
         }
+        String roomId = "Room" + request.getProjectId();
 
         // 存储当前用户的指针位置到 Redis
         String userPointerKey = request.getUsername() + ":pointer";
@@ -197,10 +201,10 @@ public class WebSocketServer {
         }
 
         // 广播给房间内所有用户
-        RoomInfo roomInfo = roomMap.get(request.getRoomId());
+        RoomInfo roomInfo = roomMap.get(roomId);
         if (roomInfo != null) {
             WebSocketMessage.ClientPointerBroadcastData response = new WebSocketMessage.ClientPointerBroadcastData();
-            response.setRoomId(request.getRoomId());
+            response.setProjectId(request.getProjectId());
 
             List<WebSocketMessage.PointerInfo> pointerInfos = new ArrayList<>();
             // 获取房间所有用户
@@ -216,7 +220,7 @@ public class WebSocketServer {
             }
             response.setUsers(pointerInfos);
 
-            broadcastToRoom(request.getRoomId(), "server-pointer-broadcast", response);
+            broadcastToRoom(roomId, "server-pointer-broadcast", response);
         } else {
             sendError("房间不存在");
         }
@@ -267,9 +271,10 @@ public class WebSocketServer {
         }
         userSessionMap.put(user,this);
         if(request.getProjectId()>0) {
-            if(currentRoomId!=null){
+            if(currentRoomId!=null&&!currentRoomId.isEmpty()){
                 RoomInfo tmp = roomMap.get(currentRoomId);
                 tmp.removeUser(user);
+                roomMap.put(currentRoomId,tmp);
                 WebSocketMessage.RoomUserChangeData userChangeData = new WebSocketMessage.RoomUserChangeData();
                 userChangeData.setUsername(user);
                 userChangeData.setAction("leave");
@@ -300,8 +305,14 @@ public class WebSocketServer {
     private void handleDisconnecting(JSONObject data){
         WebSocketMessage.DisconnectingData request = data.toJavaObject(WebSocketMessage.DisconnectingData.class);
         String user = request.getUsername();
+        int projectId= request.getProjectId();
+        String roomId="Room"+projectId;
         if(user == null){
             sendError("用户名不能为空");
+            return;
+        }
+        if(projectId<0){
+            sendError("项目ID无效");
             return;
         }
         WebSocketMessage.DisconnectData disconnectData = new WebSocketMessage.DisconnectData();
@@ -315,18 +326,19 @@ public class WebSocketServer {
             disconnectData.setIsExpected(false);
         }
         try {
-            RoomInfo room = roomMap.get(currentRoomId);
+            RoomInfo room = roomMap.get(roomId);
             room.removeUser(user);
+            roomMap.put(room.roomId,room);
             WebSocketMessage.RoomUserChangeData userChangeData = new WebSocketMessage.RoomUserChangeData();
             userChangeData.setUsername(user);
             userChangeData.setAction("leave");
-            broadcastToRoom(currentRoomId,"room-user-change",userChangeData);
+            broadcastToRoom(roomId,"room-user-change",userChangeData);
             log.info(user+"断开连接");
         } catch (Exception e){
             log.error("quit room error");
             disconnectData.setIsExpected(false);
         }
 
-        broadcastToRoom(currentRoomId,"disconnect",disconnectData);
+        broadcastToRoom(roomId,"disconnect",disconnectData);
     }
 }

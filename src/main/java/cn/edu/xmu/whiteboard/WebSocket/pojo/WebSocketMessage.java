@@ -96,13 +96,13 @@ public class WebSocketMessage {
 
     @Data
     public static class ServerBroadcastData {
-        private String roomId;
+        private int projectId;
         private List<ElementDto> elements;
         private AppStateDto appState;
         private FileDto file;
 
-        public void setRoomId(String roomId) {
-            this.roomId = roomId;
+        public void setProjectId(int projectId) {
+            this.projectId = projectId;
         }
         public void setElements(List<ElementDto> elements) {
             this.elements = elements;
@@ -113,8 +113,8 @@ public class WebSocketMessage {
         public void setFile(FileDto file) {
             this.file = file;
         }
-        public String getRoomId() {
-            return roomId;
+        public int getProjectId() {
+            return projectId;
         }
         public List<ElementDto> getElements() {
             return elements;
@@ -129,13 +129,13 @@ public class WebSocketMessage {
 
     @Data
     public static class ServerPointerBroadcastData {
-        private String roomId;
+        private int projectId;
         private String username;
         private double x;
         private double y;
 
-        public void setRoomId(String roomId) {
-            this.roomId = roomId;
+        public void setProjectId(int projectId) {
+            this.projectId = projectId;
         }
         public void setUsername(String username) {
             this.username = username;
@@ -146,8 +146,8 @@ public class WebSocketMessage {
         public void setY(double y) {
             this.y = y;
         }
-        public String getRoomId() {
-            return roomId;
+        public int getProjectId() {
+            return projectId;
         }
         public String getUsername() {
             return username;
@@ -188,11 +188,11 @@ public class WebSocketMessage {
 
     @Data
     public static class ClientPointerBroadcastData {
-        private String roomId;
+        private int projectId;
         private List<PointerInfo> users;
 
-        public void setRoomId(String roomId) {
-            this.roomId = roomId;
+        public void setProjectId(int projectId) {
+            this.projectId = projectId;
         }
         public void setUsers(List<PointerInfo> users) {
             this.users = users;
@@ -200,8 +200,8 @@ public class WebSocketMessage {
         public List<PointerInfo> getUsers() {
             return users;
         }
-        public String getRoomId() {
-            return roomId;
+        public int getProjectId() {
+            return projectId;
         }
     }
 
@@ -252,8 +252,15 @@ public class WebSocketMessage {
 
     @Data
     public static class DisconnectingData {
+        private int projectId;
         private String username;
 
+        public void setProjectId(int projectId) {
+            this.projectId = projectId;
+        }
+        public int getProjectId() {
+            return projectId;
+        }
         public String getUsername() {return username;}
         public void setUsername(String username) {this.username = username;}
     }
