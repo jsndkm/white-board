@@ -264,7 +264,7 @@ public class WebSocketServer {
         String roomId = "Room" + projectId;
         this.currentRoomId = roomId;
         RoomInfo roomInfo = new RoomInfo(roomId);
-        roomInfo.users.add(username);
+        roomInfo.addUser(username);
         roomMap.put(roomId,roomInfo);
 
         WebSocketMessage.InitRoomData data = new WebSocketMessage.InitRoomData();
@@ -284,11 +284,10 @@ public class WebSocketServer {
             RoomInfo room = roomMap.get("Room"+request.getProjectId());
             if(room==null){
                 initRoom(user,request.getProjectId());
-                return;
             }
             else {
                 currentRoomId = room.roomId;
-                room.users.add(user);
+                room.addUser(user);
             }
 
             WebSocketMessage.RoomUserChangeData Data = new WebSocketMessage.RoomUserChangeData();
