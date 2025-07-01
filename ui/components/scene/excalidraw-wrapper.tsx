@@ -88,6 +88,7 @@ export default function ExcalidrawWrapper({
   useEffect(() => {
     if (hasJoined.current) return;
     client.joinRoom({ projectId, username: username ?? "" });
+    hasJoined.current = true;
   }, [client, projectId, username]);
 
   useEffect(() => {
