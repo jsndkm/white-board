@@ -62,6 +62,7 @@ export function useCustomWebSocket(
     options.onServerBroadcast,
     options.onServerPointerBroadcast,
     options.onDisconnect,
+    options,
   ]);
 
   return {

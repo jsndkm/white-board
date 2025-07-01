@@ -6,17 +6,15 @@ import { useGetProjectScene } from "@/hooks/api/project/use-get-project-scene";
 import { useCustomWebSocket } from "@/hooks/use-custom-websocket";
 import { WEBSOCKET_URL } from "@/lib/endpoint";
 import { RoomUserChangeData } from "@/lib/types/websocket";
+import { useRoomState } from "@/stores/room";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import "@excalidraw/excalidraw/index.css";
 import {
   AppState,
   BinaryFiles,
-  Collaborator,
-  CollaboratorPointer,
   ExcalidrawImperativeAPI,
   Gesture,
-  SocketId,
 } from "@excalidraw/excalidraw/types";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -35,19 +33,17 @@ export default function ExcalidrawWrapper({
     useState<ExcalidrawImperativeAPI | null>(null);
 
   const { data: scene, isError } = useGetProjectScene(projectId);
-  const [collaborators, setCollaborators] = useState(
-    new Map<SocketId, Collaborator>(),
-  );
+  const { collaborators } = useRoomState();
 
   const { readyState, sendJsonMessage } = useCustomWebSocket(WEBSOCKET_URL, {
     onRoomUserChange: (data: RoomUserChangeData) => {
-      setCollaborators((prev) => {
-        const newMap = new Map(prev);
-        if (data.action === "join")
-          newMap.set(data.userName as SocketId, {} as Collaborator);
-        else newMap.delete(data.userName as SocketId);
-        return newMap;
-      });
+      if (data.userName === username) {
+        if (data.action === "join") {
+          useRoomState.getState().addUser(data.userName);
+        } else {
+          useRoomState.getState().removeUser(data.userName);
+        }
+      }
     },
     onServerBroadcast: (data) => {
       const { elements, appState } = data;
@@ -56,21 +52,8 @@ export default function ExcalidrawWrapper({
         appState,
       });
     },
-    onServerPointerBroadcast: (data) => {
-      const { users } = data;
-      const newCollaborators = new Map<SocketId, Collaborator>();
-      users.forEach((user) => {
-        newCollaborators.set(user.username as SocketId, {
-          id: user.username as SocketId,
-          pointer: {
-            x: user.x,
-            y: user.y,
-          } as CollaboratorPointer,
-          username: user.username,
-        });
-      });
-      setCollaborators(newCollaborators);
-    },
+    onServerPointerBroadcast: (data) =>
+      useRoomState.getState().updatePointers(data.users),
   });
 
   useEffect(() => {
