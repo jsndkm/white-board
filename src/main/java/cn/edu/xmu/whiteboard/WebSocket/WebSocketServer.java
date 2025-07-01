@@ -276,6 +276,7 @@ public class WebSocketServer {
     private void handleJoinRoom(JSONObject data){
         WebSocketMessage.JoinRoomData request = data.toJavaObject(WebSocketMessage.JoinRoomData.class);
         String user = request.getUsername();
+        userSessionMap.put(user,this);
         if(user == null){
             sendError("用户名不能为空");
             return;
