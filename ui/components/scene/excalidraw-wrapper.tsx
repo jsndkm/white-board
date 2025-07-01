@@ -25,12 +25,11 @@ import {
 } from "@excalidraw/excalidraw/types";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 export default function ExcalidrawWrapper({
   projectId,
 }: {
-  mode: "create" | "open";
   projectId: number;
 }) {
   const { data: session } = useSession();
@@ -82,14 +81,10 @@ export default function ExcalidrawWrapper({
     }),
     [collaborators, excalidrawAPI],
   );
-  const client = useWebSocketClient(WEBSOCKET_URL, handles);
-
-  const hasJoined = useRef(false);
-  useEffect(() => {
-    if (hasJoined.current) return;
-    client.joinRoom({ projectId, username: username ?? "" });
-    hasJoined.current = true;
-  }, [client, projectId, username]);
+  const client = useWebSocketClient(WEBSOCKET_URL, handles, {
+    projectId,
+    username: username ?? "",
+  });
 
   useEffect(() => {
     excalidrawAPI?.updateScene({ collaborators });
@@ -100,7 +95,7 @@ export default function ExcalidrawWrapper({
     appState: AppState,
     files: BinaryFiles,
   ) => {
-    if (!projectId || !hasJoined.current) return;
+    if (!projectId) return;
     client.broadcast({ projectId, elements, appState, files });
   };
 
@@ -113,7 +108,7 @@ export default function ExcalidrawWrapper({
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => {
-    if (!projectId || !hasJoined.current) return;
+    if (!projectId) return;
     client.pointerBroadcast({
       projectId,
       x: payload.pointer.x,
