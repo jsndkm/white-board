@@ -1,8 +1,9 @@
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
-import { useEffect, useRef } from "react";
+// useStableWebSocket.ts
+import { useCallback, useEffect, useRef, useState } from "react";
 
-type MessageType =
+export type MessageType =
   | "init-room"
   | "join-room"
   | "room-user-change"
@@ -39,6 +40,12 @@ export type ClientBroadcastData = {
 
 export type ClientPointerBroadcastData = {
   projectId: number;
+  username: string;
+  x: number;
+  y: number;
+};
+
+export type PointerData = {
   username: string;
   x: number;
   y: number;
@@ -156,4 +163,42 @@ export function useWebSocketClient(
       send("client-pointer-broadcast", { ...payload });
     },
   };
+}
+
+export function useStableWebSocket(url: string) {
+  const socketRef = useRef<WebSocket | null>(null);
+  const [connected, setConnected] = useState(false);
+
+  const send = useCallback((type: string, data?: any) => {
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
+      socketRef.current.send(
+        JSON.stringify({ type, data, timestamp: Date.now() }),
+      );
+    } else {
+      console.warn("[WebSocket] Not open. Can't send:", type);
+    }
+  }, []);
+
+  useEffect(() => {
+    const socket = new WebSocket(url);
+    socketRef.current = socket;
+
+    socket.onopen = () => {
+      console.log("[WebSocket] connected");
+      setConnected(true);
+    };
+    socket.onclose = () => {
+      console.log("[WebSocket] disconnected");
+      setConnected(false);
+    };
+    socket.onerror = (e) => {
+      console.error("[WebSocket] error", e);
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, [url]);
+
+  return { socket: socketRef, connected, send };
 }
