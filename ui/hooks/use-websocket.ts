@@ -15,6 +15,7 @@ type MessageType =
 
 export type JoinRoomData = {
   projectId: number;
+  username: string;
 };
 
 export type RoomUserChangeData = {
