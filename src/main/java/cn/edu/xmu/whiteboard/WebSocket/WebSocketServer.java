@@ -16,11 +16,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.*;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import cn.edu.xmu.whiteboard.WebSocket.SpringContextHolder;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 @ServerEndpoint(value = "/ws")
 @Component
@@ -30,6 +31,14 @@ public class WebSocketServer {
     private RedisService getRedisService() {
         return SpringContextHolder.getBean(RedisService.class);
     }
+    // 用于生成服务器端时间戳
+    private static final AtomicLong timestampGenerator = new AtomicLong(System.currentTimeMillis());
+    // 消息处理线程池
+    private static final ExecutorService messageExecutor = Executors.newFixedThreadPool(10);
+
+    // 待处理消息队列（按timestamp排序）
+    private static final PriorityBlockingQueue<PendingMessage> messageQueue = new PriorityBlockingQueue<>(11,
+            Comparator.comparingLong(msg -> msg.timestamp));
 
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
     private static CopyOnWriteArraySet<WebSocketServer> webSocketSet = new CopyOnWriteArraySet<WebSocketServer>();
@@ -42,6 +51,8 @@ public class WebSocketServer {
     private Session session;
     // 当前房间ID
     private String currentRoomId;
+    // 标记是否正在处理消息，防止重复处理
+    private volatile boolean isProcessing = false;
     /**
      * 连接建立成功调用的方法
      */
@@ -78,25 +89,79 @@ public class WebSocketServer {
             JSONObject json = JSON.parseObject(message);
             String type = json.getString("type");
             JSONObject data = json.getJSONObject("data");
+            long timestamp = json.getLongValue("timestamp");
 
-            switch (type) {
-                case "join-room":
-                    handleJoinRoom(data);
-                    break;
-                case "client-broadcast":
-                    handleServerBroadcast(data);
-                    break;
-                case "client-pointer-broadcast":
-                    handleServerPointerBroadcast(data);
-                    break;
-                case "dis-connecting":
-                    handleDisconnecting(data);
-                    break;
-                default:
-                    log.error("未知消息类型: " + type);
+            // 如果客户端没有提供timestamp，使用服务器时间
+            if (timestamp <= 0) {
+                timestamp = timestampGenerator.getAndIncrement();
+            }
+
+            // 将消息加入队列
+            messageQueue.put(new PendingMessage(type, data, timestamp, this));
+
+            // 如果没有在处理消息，则启动处理
+            if (!isProcessing) {
+                processMessages();
             }
         } catch (Exception e) {
             log.error("消息处理错误: " + e.getMessage());
+        }
+    }
+
+    // 处理消息队列中的消息
+    private void processMessages() {
+        if (isProcessing) {
+            return;
+        }
+
+        isProcessing = true;
+        messageExecutor.execute(() -> {
+            try {
+                while (!messageQueue.isEmpty()) {
+                    PendingMessage pendingMsg = messageQueue.poll();
+                    if (pendingMsg != null) {
+                        // 使用消息中的timestamp作为服务器响应的时间戳基础
+                        long responseTimestamp = timestampGenerator.getAndIncrement();
+
+                        // 处理消息
+                        handleMessage(pendingMsg.type, pendingMsg.data, pendingMsg.timestamp, responseTimestamp);
+                    }
+                }
+            } catch (Exception e) {
+                log.error("处理消息队列出错", e);
+            } finally {
+                isProcessing = false;
+                // 检查是否有新消息到达
+                if (!messageQueue.isEmpty()) {
+                    processMessages();
+                }
+            }
+        });
+    }
+
+    // 处理具体消息
+    private void handleMessage(String type, JSONObject data, long originalTimestamp, long responseTimestamp) {
+        try {
+            switch (type) {
+                case "join-room":
+                    handleJoinRoom(data, responseTimestamp);
+                    break;
+                case "client-broadcast":
+                    handleServerBroadcast(data, responseTimestamp);
+                    break;
+                case "client-pointer-broadcast":
+                    handleServerPointerBroadcast(data, responseTimestamp);
+                    break;
+                case "dis-connecting":
+                    handleDisconnecting(data, responseTimestamp);
+                    break;
+                default:
+                    log.error("未知消息类型: " + type);
+                    sendError("未知消息类型: " + type, responseTimestamp);
+            }
+        } catch (Exception e) {
+            log.error("消息处理错误: " + e.getMessage());
+            sendError("消息处理错误: " + e.getMessage(), responseTimestamp);
         }
     }
 
@@ -110,14 +175,21 @@ public class WebSocketServer {
         error.printStackTrace();
     }
 
-    public void sendMessage(String message) throws IOException {
+    // 发送消息（包含时间戳）
+    public void sendMessage(String type, Object data, long responseTimestamp) throws IOException {
+        WebSocketMessage response = new WebSocketMessage();
+        response.setType(type);
+        response.setData(data);
+        response.setTimestamp(responseTimestamp); // 使用服务器生成的时间戳
+
+        String message = JSON.toJSONString(response);
         this.session.getBasicRemote().sendText(message);
     }
 
-    // 发送错误消息
-    private void sendError(String errorMessage) {
+    // 发送错误消息（包含时间戳）
+    private void sendError(String errorMessage, long responseTimestamp) {
         try {
-            sendMessage(errorMessage);
+            sendMessage("error", errorMessage, responseTimestamp);
         } catch (IOException e) {
             log.error("发送错误消息失败", e);
         }
@@ -149,13 +221,28 @@ public class WebSocketServer {
         }
     }
 
+    // 内部类表示待处理消息
+    private static class PendingMessage {
+        String type;
+        JSONObject data;
+        long timestamp;
+        WebSocketServer sender;
+
+        public PendingMessage(String type, JSONObject data, long timestamp, WebSocketServer sender) {
+            this.type = type;
+            this.data = data;
+            this.timestamp = timestamp;
+            this.sender = sender;
+        }
+    }
+
     // 处理服务器广播
-    private void handleServerBroadcast(JSONObject data) {
+    private void handleServerBroadcast(JSONObject data,long responseTimestamp) {
         WebSocketMessage.ServerBroadcastData request = data.toJavaObject(WebSocketMessage.ServerBroadcastData.class);
 
         if(request.getProjectId()<0)
         {
-            sendError("项目ID无效");
+            sendError("项目ID无效",responseTimestamp);
             return;
         }
         String roomId = "Room" + request.getProjectId();
@@ -168,19 +255,19 @@ public class WebSocketServer {
             response.setAppState(request.getAppState());
             response.setFile(request.getFile());
 
-            broadcastToRoom(roomId, "server-broadcast", response);
+            broadcastToRoom(roomId, "server-broadcast", response,responseTimestamp);
         } else {
-            sendError("房间不存在");
+            sendError("房间不存在",responseTimestamp);
         }
     }
 
     // 处理服务器光标广播
-    private void handleServerPointerBroadcast(JSONObject data) {
+    private void handleServerPointerBroadcast(JSONObject data,long responseTimestamp) {
         WebSocketMessage.ServerPointerBroadcastData request = data.toJavaObject(WebSocketMessage.ServerPointerBroadcastData.class);
 
         if(request.getProjectId()<0)
         {
-            sendError("项目ID无效");
+            sendError("项目ID无效",responseTimestamp);
             return;
         }
         String roomId = "Room" + request.getProjectId();
@@ -220,26 +307,21 @@ public class WebSocketServer {
             }
             response.setUsers(pointerInfos);
 
-            broadcastToRoom(roomId, "server-pointer-broadcast", response);
+            broadcastToRoom(roomId, "server-pointer-broadcast", response,responseTimestamp);
         } else {
-            sendError("房间不存在");
+            sendError("房间不存在",responseTimestamp);
         }
     }
 
     // 向指定房间广播消息
-    private void broadcastToRoom(String roomId, String type, Object data) {
+    private void broadcastToRoom(String roomId, String type, Object data,long responseTimestamp) {
         RoomInfo roomInfo = roomMap.get(roomId);
         if (roomInfo != null) {
-            String message = JSON.toJSONString(new WebSocketMessage() {{
-                setType(type);
-                setData(data);
-            }});
-
             roomInfo.getUsers().forEach(username -> {
                 WebSocketServer client = userSessionMap.get(username);
                 if (client != null) {
                     try {
-                        client.sendMessage(message);
+                        client.sendMessage(type,data,responseTimestamp);
                     } catch (IOException e) {
                         log.error("发送消息给用户 {} 失败", username, e);
                     }
@@ -248,7 +330,7 @@ public class WebSocketServer {
         }
     }
 
-    private void initRoom(String username, int projectId){
+    private void initRoom(String username, int projectId,long responseTimestamp){
         //生成roomId
         String roomId = "Room" + projectId;
         this.currentRoomId = roomId;
@@ -259,14 +341,14 @@ public class WebSocketServer {
         WebSocketMessage.InitRoomData data = new WebSocketMessage.InitRoomData();
         data.setRoomId(roomId);
 
-        broadcastToRoom(roomId,"init-room",data);
+        broadcastToRoom(roomId,"init-room",data,responseTimestamp);
     }
 
-    private void handleJoinRoom(JSONObject data){
+    private void handleJoinRoom(JSONObject data,long responseTimestamp){
         WebSocketMessage.JoinRoomData request = data.toJavaObject(WebSocketMessage.JoinRoomData.class);
         String user = request.getUsername();
         if(user == null){
-            sendError("用户名不能为空");
+            sendError("用户名不能为空",responseTimestamp);
             return;
         }
         userSessionMap.put(user,this);
@@ -278,12 +360,12 @@ public class WebSocketServer {
                 WebSocketMessage.RoomUserChangeData userChangeData = new WebSocketMessage.RoomUserChangeData();
                 userChangeData.setUsername(user);
                 userChangeData.setAction("leave");
-                broadcastToRoom(currentRoomId,"room-user-change",userChangeData);
+                broadcastToRoom(currentRoomId,"room-user-change",userChangeData,responseTimestamp);
                 log.info(user+"离开房间:"+currentRoomId);
             }
             RoomInfo room = roomMap.get("Room"+request.getProjectId());
             if(room==null){
-                initRoom(user,request.getProjectId());
+                initRoom(user,request.getProjectId(),responseTimestamp);
             }
             else {
                 currentRoomId = room.roomId;
@@ -294,25 +376,25 @@ public class WebSocketServer {
             WebSocketMessage.RoomUserChangeData Data = new WebSocketMessage.RoomUserChangeData();
             Data.setUsername(user);
             Data.setAction("join");
-            broadcastToRoom(currentRoomId,"room-user-change",Data);
+            broadcastToRoom(currentRoomId,"room-user-change",Data,responseTimestamp);
             log.info(user+"加入房间:"+currentRoomId);
         }
         else {
-            sendError("项目ID无效");
+            sendError("项目ID无效",responseTimestamp);
         }
     }
 
-    private void handleDisconnecting(JSONObject data){
+    private void handleDisconnecting(JSONObject data,long responseTimestamp){
         WebSocketMessage.DisconnectingData request = data.toJavaObject(WebSocketMessage.DisconnectingData.class);
         String user = request.getUsername();
         int projectId= request.getProjectId();
         String roomId="Room"+projectId;
         if(user == null){
-            sendError("用户名不能为空");
+            sendError("用户名不能为空",responseTimestamp);
             return;
         }
         if(projectId<0){
-            sendError("项目ID无效");
+            sendError("项目ID无效",responseTimestamp);
             return;
         }
         WebSocketMessage.DisconnectData disconnectData = new WebSocketMessage.DisconnectData();
@@ -332,13 +414,13 @@ public class WebSocketServer {
             WebSocketMessage.RoomUserChangeData userChangeData = new WebSocketMessage.RoomUserChangeData();
             userChangeData.setUsername(user);
             userChangeData.setAction("leave");
-            broadcastToRoom(roomId,"room-user-change",userChangeData);
+            broadcastToRoom(roomId,"room-user-change",userChangeData,responseTimestamp);
             log.info(user+"断开连接");
         } catch (Exception e){
             log.error("quit room error");
             disconnectData.setIsExpected(false);
         }
 
-        broadcastToRoom(roomId,"disconnect",disconnectData);
+        broadcastToRoom(roomId,"disconnect",disconnectData,responseTimestamp);
     }
 }
