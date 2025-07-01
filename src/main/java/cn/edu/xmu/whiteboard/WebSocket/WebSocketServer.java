@@ -286,6 +286,8 @@ public class WebSocketServer {
                 initRoom(user,request.getProjectId());
             }
             else {
+                RoomInfo tmp = roomMap.get(currentRoomId);
+                tmp.removeUser(user);
                 currentRoomId = room.roomId;
                 room.addUser(user);
             }
