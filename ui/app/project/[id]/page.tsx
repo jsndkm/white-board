@@ -21,5 +21,5 @@ export default function Page() {
   const params = useParams();
   const projectId = Number(params.id);
 
-  return <ExcalidrawWrapper projectId={projectId} mode="open" />;
+  return <ExcalidrawWrapper projectId={projectId} />;
 }
