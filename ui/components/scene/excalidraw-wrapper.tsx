@@ -25,7 +25,7 @@ import {
 } from "@excalidraw/excalidraw/types";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 
 export default function ExcalidrawWrapper({
   projectId,
@@ -84,9 +84,11 @@ export default function ExcalidrawWrapper({
   );
   const client = useWebSocketClient(WEBSOCKET_URL, handles);
 
+  const hasJoined = useRef(false);
   useEffect(() => {
-    client.joinRoom({ projectId });
-  }, [client, projectId]);
+    if (hasJoined.current) return;
+    client.joinRoom({ projectId, username: username ?? "" });
+  }, [client, projectId, username]);
 
   useEffect(() => {
     excalidrawAPI?.updateScene({ collaborators });
@@ -97,7 +99,7 @@ export default function ExcalidrawWrapper({
     appState: AppState,
     files: BinaryFiles,
   ) => {
-    if (!projectId) return;
+    if (!projectId || !hasJoined.current) return;
     client.broadcast({ projectId, elements, appState, files });
   };
 
@@ -110,7 +112,7 @@ export default function ExcalidrawWrapper({
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => {
-    if (!projectId) return;
+    if (!projectId || !hasJoined.current) return;
     client.pointerBroadcast({
       projectId,
       x: payload.pointer.x,
