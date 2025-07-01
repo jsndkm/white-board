@@ -31,7 +31,7 @@ export default function ExcalidrawMenu({ projectId }: { projectId: number }) {
         deleteProject.mutate(
           { projectId: projectId },
           {
-            onSuccess: () => router.push("/"),
+            onSuccess: () => router.push("/home"),
           },
         );
       },
@@ -55,7 +55,7 @@ export default function ExcalidrawMenu({ projectId }: { projectId: number }) {
         删除项目
       </MainMenu.Item>
 
-      <MainMenu.Item onSelect={() => router.push("/")}>
+      <MainMenu.Item onSelect={() => router.push("/home")}>
         <House />
         回到主页
       </MainMenu.Item>

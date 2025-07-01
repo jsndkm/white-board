@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!token && (pathname === "/" || pathname.startsWith("/project"))) {
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = new URL("/home", request.url);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -29,6 +29,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/",
+    "/home",
     "/project/:id",
     "/api/:path*",
     "/login",
