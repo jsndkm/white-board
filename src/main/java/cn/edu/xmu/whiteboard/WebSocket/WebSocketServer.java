@@ -29,8 +29,6 @@ public class WebSocketServer {
     @Autowired
     private RedisService redisService;
 
-    //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
-    private static int onlineCount = 0;
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
     private static CopyOnWriteArraySet<WebSocketServer> webSocketSet = new CopyOnWriteArraySet<WebSocketServer>();
     // 房间信息：roomId -> RoomInfo
@@ -50,9 +48,7 @@ public class WebSocketServer {
         this.session = session;
         //加入set中
         webSocketSet.add(this);
-        //在线数加1
-        addOnlineCount();
-        log.info("有新连接加入！当前在线人数为" + getOnlineCount());
+        log.info("有新连接加入！当前在线人数为" + webSocketSet.size());
         log.info("user connect success!");
     }
 
@@ -63,9 +59,7 @@ public class WebSocketServer {
     public void onClose() {
         //从set中删除
         webSocketSet.remove(this);
-        //在线数减1
-        subOnlineCount();
-        log.info("连接关闭！当前在线人数为" + getOnlineCount());
+        log.info("连接关闭！当前在线人数为" + webSocketSet.size());
         log.info("user disconnect");
     }
 
@@ -125,18 +119,6 @@ public class WebSocketServer {
         } catch (IOException e) {
             log.error("发送错误消息失败", e);
         }
-    }
-
-    public static synchronized int getOnlineCount() {
-        return onlineCount;
-    }
-
-    public static synchronized void addOnlineCount() {
-        WebSocketServer.onlineCount++;
-    }
-
-    public static synchronized void subOnlineCount() {
-        WebSocketServer.onlineCount--;
     }
 
     // 内部类表示房间信息
@@ -282,15 +264,20 @@ public class WebSocketServer {
             return;
         }
         if(request.getProjectId()>0) {
+            if(currentRoomId!=null){
+                RoomInfo tmp = roomMap.get(currentRoomId);
+                tmp.removeUser(user);
+                WebSocketMessage.RoomUserChangeData userChangeData = new WebSocketMessage.RoomUserChangeData();
+                userChangeData.setUsername(user);
+                userChangeData.setAction("quit-room:"+currentRoomId);
+                broadcastToRoom(currentRoomId,"room-user-change",userChangeData);
+                log.info(user+"离开房间:"+currentRoomId);
+            }
             RoomInfo room = roomMap.get("Room"+request.getProjectId());
             if(room==null){
                 initRoom(user,request.getProjectId());
             }
             else {
-                if(currentRoomId!=null){
-                    RoomInfo tmp = roomMap.get(currentRoomId);
-                    tmp.removeUser(user);
-                }
                 currentRoomId = room.roomId;
                 room.addUser(user);
             }
