@@ -89,6 +89,10 @@ export default function ExcalidrawWrapper({
   const client = useWebSocketClient(WEBSOCKET_URL, handles);
 
   useEffect(() => {
+    client.joinRoom(projectId.toString());
+  }, [client, projectId]);
+
+  useEffect(() => {
     if (!roomId) return;
     client.joinRoom(roomId);
   }, [client, roomId]);
