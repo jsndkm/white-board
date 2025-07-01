@@ -133,10 +133,17 @@ export function useWebSocketClient(url: string, handlers: HandlerMap) {
 
   return {
     send,
-    joinRoom: (payload: JoinRoomData) => send("join-room", payload),
-    broadcast: (payload: ClientBroadcastData) =>
-      send("client-broadcast", { ...payload }),
-    pointerBroadcast: (payload: ClientPointerBroadcastData) =>
-      send("client-pointer-broadcast", { ...payload }),
+    joinRoom: (payload: JoinRoomData) => {
+      if (socketRef.current?.readyState !== WebSocket.OPEN) return;
+      send("join-room", payload);
+    },
+    broadcast: (payload: ClientBroadcastData) => {
+      if (socketRef.current?.readyState !== WebSocket.OPEN) return;
+      send("client-broadcast", { ...payload });
+    },
+    pointerBroadcast: (payload: ClientPointerBroadcastData) => {
+      if (socketRef.current?.readyState !== WebSocket.OPEN) return;
+      send("client-pointer-broadcast", { ...payload });
+    },
   };
 }
