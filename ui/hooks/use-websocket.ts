@@ -69,15 +69,12 @@ type HandlerMap = Partial<{
 export function useWebSocketClient(url: string, handlers: HandlerMap) {
   const socketRef = useRef<WebSocket | null>(null);
 
-  let isOpen = false;
-
   useEffect(() => {
     const socket = new WebSocket(url);
     socketRef.current = socket;
 
     socket.onopen = () => {
       console.log("[WebSocket] connected");
-      isOpen = true;
     };
 
     socket.onmessage = (event) => {
@@ -118,8 +115,9 @@ export function useWebSocketClient(url: string, handlers: HandlerMap) {
     };
 
     return () => {
-      if (isOpen) socket.close();
-      else socket.addEventListener("open", () => socket.close());
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.close();
+      }
     };
   }, [handlers, url]);
 

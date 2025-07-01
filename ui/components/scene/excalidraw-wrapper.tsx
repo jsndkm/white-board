@@ -89,14 +89,8 @@ export default function ExcalidrawWrapper({
   const client = useWebSocketClient(WEBSOCKET_URL, handles);
 
   useEffect(() => {
-    setRoomId("1");
-  }, []);
-
-  useEffect(() => {
     if (!roomId) return;
     client.joinRoom(roomId);
-    //   debug
-    setRoomId("1");
   }, [client, roomId]);
 
   useEffect(() => {
@@ -108,10 +102,7 @@ export default function ExcalidrawWrapper({
     appState: AppState,
     files: BinaryFiles,
   ) => {
-    console.log("[Excalidraw] Scene changed:");
-    console.log("roomId:", roomId);
     if (!roomId) return;
-    console.log("[Excalidraw] Scene changed, broadcasting to room:", roomId);
     client.broadcast({ roomId, elements, appState, files });
   };
 
