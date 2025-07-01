@@ -3,22 +3,12 @@
 import AppHeader from "@/components/home/app-header";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { motion, useAnimation } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 export default function HomePage() {
   const router = useRouter();
-  const [scrollY, setScrollY] = useState(0);
-  const controls = useAnimation();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const handleButtonClick = () => {
     router.push("/login");
@@ -34,7 +24,11 @@ export default function HomePage() {
         <h1 className="text-2xl font-bold md:text-4xl">
           欢迎使用 White Board 企业战略分析工具
         </h1>
-        <Button size="lg" onClick={handleButtonClick}>
+        <Button
+          size="lg"
+          className="cursor-pointer"
+          onClick={handleButtonClick}
+        >
           立即开始
         </Button>
       </section>
