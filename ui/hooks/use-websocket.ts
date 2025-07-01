@@ -10,8 +10,12 @@ type MessageType =
   | "client-broadcast"
   | "server-pointer-broadcast"
   | "client-pointer-broadcast"
-  | "disconnecting"
+  | "dis-connecting"
   | "dis-connect";
+
+export type JoinRoomData = {
+  projectId: number;
+};
 
 export type RoomUserChangeData = {
   projectId: string;
@@ -128,12 +132,10 @@ export function useWebSocketClient(url: string, handlers: HandlerMap) {
 
   return {
     send,
-    joinRoom: (projectId: number) => send("join-room", projectId),
-    broadcast: (payload: ClientBroadcastData) => {
-      send("client-broadcast", { ...payload });
-    },
-    pointerBroadcast: (payload: ClientPointerBroadcastData) => {
-      send("client-pointer-broadcast", { ...payload });
-    },
+    joinRoom: (payload: JoinRoomData) => send("join-room", payload),
+    broadcast: (payload: ClientBroadcastData) =>
+      send("client-broadcast", { ...payload }),
+    pointerBroadcast: (payload: ClientPointerBroadcastData) =>
+      send("client-pointer-broadcast", { ...payload }),
   };
 }
