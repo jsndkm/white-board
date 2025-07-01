@@ -11,14 +11,10 @@ type MessageType =
   | "server-pointer-broadcast"
   | "client-pointer-broadcast"
   | "disconnecting"
-  | "disconnect";
-
-export type InitRoomData = {
-  roomId: string;
-};
+  | "dis-connect";
 
 export type RoomUserChangeData = {
-  roomId: string;
+  projectId: string;
   userName: string;
   action: "join" | "leave";
 };
@@ -30,21 +26,21 @@ export type ServerBroadcastData = {
 };
 
 export type ClientBroadcastData = {
-  roomId: string;
+  projectId: number;
   elements: readonly OrderedExcalidrawElement[];
   appState: AppState;
   files: BinaryFiles;
 };
 
 export type ClientPointerBroadcastData = {
-  roomId: string;
+  projectId: number;
   username: string;
   x: number;
   y: number;
 };
 
 export type ServerPointerBroadcast = {
-  roomId: string;
+  projectId: number;
   users: [
     {
       username: string;
@@ -59,7 +55,7 @@ export type DisconnectData = {
 };
 
 type HandlerMap = Partial<{
-  "init-room": (data: InitRoomData) => void;
+  "init-room": () => void;
   "room-user-change": (data: RoomUserChangeData) => void;
   "server-broadcast": (data: ServerBroadcastData) => void;
   "server-pointer-broadcast": (data: ServerPointerBroadcast) => void;
@@ -84,7 +80,7 @@ export function useWebSocketClient(url: string, handlers: HandlerMap) {
 
         switch (type as MessageType) {
           case "init-room":
-            handlers["init-room"]?.(data);
+            handlers["init-room"]?.();
             break;
           case "room-user-change":
             handlers["room-user-change"]?.(data);
@@ -95,7 +91,7 @@ export function useWebSocketClient(url: string, handlers: HandlerMap) {
           case "server-pointer-broadcast":
             handlers["server-pointer-broadcast"]?.(data);
             break;
-          case "disconnect":
+          case "dis-connect":
             handlers["disconnect"]?.(data);
             break;
           default:
@@ -132,13 +128,11 @@ export function useWebSocketClient(url: string, handlers: HandlerMap) {
 
   return {
     send,
-    joinRoom: (roomId: string) => send("join-room", roomId),
+    joinRoom: (projectId: number) => send("join-room", projectId),
     broadcast: (payload: ClientBroadcastData) => {
-      console.log("[WebSocket] Broadcasting to room:", payload.roomId);
       send("client-broadcast", { ...payload });
     },
     pointerBroadcast: (payload: ClientPointerBroadcastData) => {
-      console.log("[WebSocket] Pointer broadcasting to room:", payload.roomId);
       send("client-pointer-broadcast", { ...payload });
     },
   };

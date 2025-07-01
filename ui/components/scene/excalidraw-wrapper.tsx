@@ -4,7 +4,6 @@ import { ProjectDialog } from "@/components/common/project-dialog";
 import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
 import {
   DisconnectData,
-  InitRoomData,
   RoomUserChangeData,
   ServerBroadcastData,
   ServerPointerBroadcast,
@@ -40,16 +39,13 @@ export default function ExcalidrawWrapper({
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
 
-  const [roomId, setRoomId] = useState<string | null>(null);
   const [collaborators, setCollaborators] = useState(
     new Map<SocketId, Collaborator>(),
   );
 
   const handles = useMemo(
     () => ({
-      "init-room": (data: InitRoomData) => {
-        setRoomId(data.roomId);
-      },
+      "init-room": () => {},
       "room-user-change": (data: RoomUserChangeData) => {
         const newCollaborators = new Map(collaborators);
         if (data.action === "join")
@@ -79,7 +75,7 @@ export default function ExcalidrawWrapper({
         });
         setCollaborators(newCollaborators);
       },
-      disconnect: (data: DisconnectData) => {
+      "dis-connect": (data: DisconnectData) => {
         console.log("[WebSocket] Disconnected:", data);
       },
     }),
@@ -89,13 +85,13 @@ export default function ExcalidrawWrapper({
   const client = useWebSocketClient(WEBSOCKET_URL, handles);
 
   useEffect(() => {
-    client.joinRoom(projectId.toString());
+    client.joinRoom(projectId);
   }, [client, projectId]);
 
   useEffect(() => {
-    if (!roomId) return;
-    client.joinRoom(roomId);
-  }, [client, roomId]);
+    if (!projectId) return;
+    client.joinRoom(projectId);
+  }, [client, projectId]);
 
   useEffect(() => {
     excalidrawAPI?.updateScene({ collaborators });
@@ -106,8 +102,8 @@ export default function ExcalidrawWrapper({
     appState: AppState,
     files: BinaryFiles,
   ) => {
-    if (!roomId) return;
-    client.broadcast({ roomId, elements, appState, files });
+    if (!projectId) return;
+    client.broadcast({ projectId, elements, appState, files });
   };
 
   const handlePointerUpdate = (payload: {
@@ -119,9 +115,9 @@ export default function ExcalidrawWrapper({
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => {
-    if (!roomId) return;
+    if (!projectId) return;
     client.pointerBroadcast({
-      roomId,
+      projectId,
       x: payload.pointer.x,
       y: payload.pointer.y,
       username: username ?? "",
