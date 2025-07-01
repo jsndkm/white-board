@@ -26,7 +26,7 @@ export async function fetcher<T>(
   const { message, data } = await resp.json();
   if (!resp.ok) {
     toast.error(message ?? "未知错误，请稍后再试");
-    throw new Error(message ?? "response error");
+    // throw new Error(message ?? "response error");
   }
 
   return data;

@@ -2,6 +2,7 @@
 
 import { ProjectDialog } from "@/components/common/project-dialog";
 import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
+import { useGetProjectScene } from "@/hooks/api/project/use-get-project-scene";
 import {
   DisconnectData,
   RoomUserChangeData,
@@ -27,7 +28,6 @@ import { useSession } from "next-auth/react";
 import { Suspense, useEffect, useMemo, useState } from "react";
 
 export default function ExcalidrawWrapper({
-  mode,
   projectId,
 }: {
   mode: "create" | "open";
@@ -39,10 +39,11 @@ export default function ExcalidrawWrapper({
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
 
+  const { data: scene, isError } = useGetProjectScene(projectId);
+
   const [collaborators, setCollaborators] = useState(
     new Map<SocketId, Collaborator>(),
   );
-
   const handles = useMemo(
     () => ({
       "init-room": () => {},
@@ -81,7 +82,6 @@ export default function ExcalidrawWrapper({
     }),
     [collaborators, excalidrawAPI],
   );
-
   const client = useWebSocketClient(WEBSOCKET_URL, handles);
 
   useEffect(() => {
@@ -132,10 +132,7 @@ export default function ExcalidrawWrapper({
         <Excalidraw
           langCode="zh-CN"
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
-          initialData={() => {
-            if (mode == "create") return null;
-            return null;
-          }}
+          initialData={isError ? null : scene}
           onChange={handleChange}
           onPointerUpdate={handlePointerUpdate}
           isCollaborating={true}

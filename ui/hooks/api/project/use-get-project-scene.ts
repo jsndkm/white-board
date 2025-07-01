@@ -3,7 +3,7 @@ import { fetcher } from "@/lib/utils";
 import { ExcalidrawInitialDataState } from "@excalidraw/excalidraw/types";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export function useGetScene(id: number | undefined) {
+export function useGetProjectScene(id: number | undefined) {
   return useSuspenseQuery({
     queryKey: ["scene", id],
     queryFn: async () => {
