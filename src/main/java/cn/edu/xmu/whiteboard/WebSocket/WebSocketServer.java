@@ -83,10 +83,10 @@ public class WebSocketServer {
                 case "join-room":
                     handleJoinRoom(data);
                     break;
-                case "server-broadcast":
+                case "client-broadcast":
                     handleServerBroadcast(data);
                     break;
-                case "server-pointer-broadcast":
+                case "client-pointer-broadcast":
                     handleServerPointerBroadcast(data);
                     break;
                 case "disconnecting":
@@ -166,7 +166,7 @@ public class WebSocketServer {
             response.setAppState(request.getAppState());
             response.setFile(request.getFile());
 
-            broadcastToRoom(request.getRoomId(), "client-broadcast", response);
+            broadcastToRoom(request.getRoomId(), "server-broadcast", response);
         } else {
             sendError("房间不存在");
         }
@@ -216,7 +216,7 @@ public class WebSocketServer {
             }
             response.setUsers(pointerInfos);
 
-            broadcastToRoom(request.getRoomId(), "client-pointer-broadcast", response);
+            broadcastToRoom(request.getRoomId(), "server-pointer-broadcast", response);
         } else {
             sendError("房间不存在");
         }
