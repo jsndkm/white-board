@@ -265,6 +265,7 @@ public class WebSocketServer {
         this.currentRoomId = roomId;
         RoomInfo roomInfo = new RoomInfo(roomId);
         roomInfo.users.add(username);
+        roomMap.put(roomId,roomInfo);
 
         WebSocketMessage.InitRoomData data = new WebSocketMessage.InitRoomData();
         data.setRoomId(roomId);
@@ -285,13 +286,16 @@ public class WebSocketServer {
                 initRoom(user,request.getProjectId());
                 return;
             }
-            currentRoomId = room.roomId;
-            room.users.add(user);
+            else {
+                currentRoomId = room.roomId;
+                room.users.add(user);
+            }
 
             WebSocketMessage.RoomUserChangeData Data = new WebSocketMessage.RoomUserChangeData();
             Data.setUsername(user);
             Data.setAction("join-in-room:"+currentRoomId);
             broadcastToRoom(currentRoomId,"room-user-change",Data);
+            log.info(user+"加入房间:"+currentRoomId);
         }
         else {
             sendError("项目ID无效");
@@ -322,6 +326,7 @@ public class WebSocketServer {
             userChangeData.setUsername(user);
             userChangeData.setAction("quit-room:"+currentRoomId);
             broadcastToRoom(currentRoomId,"room-user-change",userChangeData);
+            log.info(user+"断开连接");
         } catch (Exception e){
             log.error("quit room error");
             disconnectData.setIsExpected(false);
