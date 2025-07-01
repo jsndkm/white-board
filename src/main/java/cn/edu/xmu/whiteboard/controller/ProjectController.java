@@ -19,11 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api", produces = "application/json;charset=UTF-8")
-//@CrossOrigin(origins = {"http://192.168.137.1:3000", "http://localhost:3000"})
 public class ProjectController {
 
     @Autowired
@@ -154,7 +155,7 @@ public class ProjectController {
             }
             // 验证 Token
             String username = JWTUtil.analyzeToken(authorization);
-            if (username == null) {
+            if (username == null||username.isEmpty()) {
                 throw new GlobalException(CodeMsg.TOKEN_INVALID);
             }
             projectService.modifyProject(username, projectModifyDto,id);
@@ -180,6 +181,49 @@ public class ProjectController {
                         .body(ResultUtil.success(null));
             else
                 throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
+        } catch (Exception e) {
+            GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
+            return exceptionHandle.exceptionHandle(e);
+        }
+    }
+
+    @GetMapping("/template-list")
+    @ResponseBody
+    public ResponseEntity<ResultUtil<Object>> findTemplateList(@RequestHeader("Authorization") String authorization) {
+        try {
+            //解析token
+            JWTUtil.analyzeToken(authorization);
+            // 获取项目根目录下的 `json` 文件夹路径
+            String jsonFolderPath = System.getProperty("user.dir") + File.separator + "json";
+            File jsonFolder = new File(jsonFolderPath);
+
+            // 检查文件夹是否存在
+            if (!jsonFolder.exists() || !jsonFolder.isDirectory()) {
+                throw new RuntimeException("JSON 文件夹不存在或不是目录");
+            }
+
+            // 获取所有 `.json` 文件
+            File[] jsonFiles = jsonFolder.listFiles((dir, name) -> name.endsWith(".json"));
+
+            // 提取文件名列表
+            List<String> fileNames = new ArrayList<>();
+            if (jsonFiles != null) {
+                for (File file : jsonFiles) {
+                    String fileName = file.getName();
+                    // 去掉 `.json` 后缀
+                    String baseName = fileName.replace(".json", "");
+
+                    // 如果文件名不是“空白模板”，则加上“模型”
+                    if (!"空白模板".equals(baseName)) {
+                        baseName += "模型";
+                    }
+
+                    fileNames.add(baseName);
+                }
+            }
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(ResultUtil.success(fileNames));
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);
