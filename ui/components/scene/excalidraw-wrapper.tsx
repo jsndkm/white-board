@@ -22,7 +22,7 @@ import {
 import { debounce, isEqual } from "lodash";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { ReadyState } from "react-use-websocket";
 
 export default function ExcalidrawWrapper({
@@ -37,6 +37,8 @@ export default function ExcalidrawWrapper({
     useState<ExcalidrawImperativeAPI | null>(null);
 
   const { data: scene, isError } = useGetProjectScene(projectId);
+
+  const isUpdatingScene = useRef(false);
 
   const { readyState, sendJsonMessage } = useCustomWebSocket(WEBSOCKET_URL, {
     onRoomUserChange: (data: RoomUserChangeData) => {
@@ -56,6 +58,7 @@ export default function ExcalidrawWrapper({
         !isEqual(currentElements, data.elements) ||
         !isEqual(currentAppState, data.appState);
       if (shouldUpdate) {
+        isUpdatingScene.current = true;
         excalidrawAPI?.updateScene({
           elements: data.elements,
           appState: data.appState,
@@ -97,6 +100,10 @@ export default function ExcalidrawWrapper({
     appState: AppState,
     files: BinaryFiles,
   ) => {
+    if (isUpdatingScene.current) {
+      isUpdatingScene.current = false;
+      return; // 防止重复更新
+    }
     sendJsonMessage({
       type: "client-broadcast",
       data: {
