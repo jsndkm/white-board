@@ -13,6 +13,7 @@ import { Project } from "@/lib/types/project";
 import { useProjectDetailsStore } from "@/stores/project-detail";
 import { useProjectDialogStore } from "@/stores/project-dialog";
 import { motion } from "framer-motion";
+import { Eye, FolderOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function ProjectCard({
@@ -62,6 +63,7 @@ export function ProjectCard({
               router.push(`/project/${project.id}`);
             }}
           >
+            <FolderOpen />
             打开项目
           </Button>
 
@@ -73,6 +75,7 @@ export function ProjectCard({
                 useProjectDetailsStore.getState().openDialog(project)
               }
             >
+              <Eye />
               查看详情
             </Button>
           )}

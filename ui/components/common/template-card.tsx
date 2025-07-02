@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCreateProjectMutation } from "@/hooks/api/project/use-create-project";
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { PlusCircle, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -113,6 +113,7 @@ export function TemplateCard({
               className="cursor-pointer"
               onClick={() => handleCreate(name, description)}
             >
+              <PlusCircle className="mr-2 h-4 w-4" />
               创建
             </Button>
           </div>

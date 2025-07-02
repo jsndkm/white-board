@@ -6,7 +6,7 @@ import { TabNewProject } from "@/components/home/tab-new-project";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHomeTabsStore } from "@/stores/home-tabs";
 import { AnimatePresence, motion } from "framer-motion";
-import { LoaderCircle } from "lucide-react";
+import { FilePlus2, FolderKanban, LoaderCircle } from "lucide-react";
 
 export default function Page() {
   const selectedTab = useHomeTabsStore((state) => state.selectedTab);
@@ -34,12 +34,14 @@ export default function Page() {
               value="new-project"
               className="data-[state=active]:bg-primary cursor-pointer rounded-full px-4 py-1.5 transition-all data-[state=active]:text-white"
             >
+              <FilePlus2 />
               新建项目
             </TabsTrigger>
             <TabsTrigger
               value="my-project"
               className="data-[state=active]:bg-primary cursor-pointer rounded-full px-4 py-1.5 transition-all data-[state=active]:text-white"
             >
+              <FolderKanban />
               我的项目
             </TabsTrigger>
           </TabsList>

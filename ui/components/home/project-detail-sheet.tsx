@@ -10,7 +10,13 @@ import { useExitProjectMutation } from "@/hooks/api/project/use-project-exit";
 import { useProjectInviteMutation } from "@/hooks/api/project/use-project-invite";
 import { useGlobalConfirmDialogStore } from "@/stores/confirm-dialog";
 import { useProjectDetailsStore } from "@/stores/project-detail";
-import { LoaderCircle } from "lucide-react";
+import {
+  DoorOpen,
+  FolderOpen,
+  LoaderCircle,
+  Trash2,
+  UserPlus,
+} from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -110,6 +116,7 @@ export function ProjectDetailSheet() {
                 onClick={handleInvite}
                 disabled={invite.isPending}
               >
+                <UserPlus />
                 邀请
               </Button>
             </div>
@@ -118,6 +125,7 @@ export function ProjectDetailSheet() {
           {/* Action on bottom */}
           <div className="mt-auto flex justify-end gap-2 pt-4">
             <Button className="cursor-pointer" onClick={handleOpenProject}>
+              <FolderOpen />
               打开项目
             </Button>
             {project?.admin ? (
@@ -126,6 +134,7 @@ export function ProjectDetailSheet() {
                 className="cursor-pointer"
                 onClick={handleDelete}
               >
+                <Trash2 />
                 删除
               </Button>
             ) : (
@@ -134,6 +143,7 @@ export function ProjectDetailSheet() {
                 className="cursor-pointer"
                 onClick={handleExit}
               >
+                <DoorOpen />
                 退出项目
               </Button>
             )}
