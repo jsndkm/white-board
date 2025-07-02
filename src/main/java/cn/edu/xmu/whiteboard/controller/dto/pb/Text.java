@@ -10,8 +10,8 @@ public class Text{
     private double width;
     private double height;
     private long angle;
-    private Color strokeColor;
-    private Color backgroundColor;
+    private String strokeColor;
+    private String backgroundColor;
     private Style fillStyle;
     private long strokeWidth;
     private Style strokeStyle;
@@ -38,6 +38,7 @@ public class Text{
     private String originalText;
     private Boolean autoResize;
     private Double lineHeight;
+    private Integer baseline;
 
     public Text() {}
     public Text(ElementDto elementDto) {
@@ -75,6 +76,8 @@ public class Text{
         originalText=elementDto.getOriginalText();
         autoResize=elementDto.getAutoResize();
         lineHeight=elementDto.getLineHeight();
+        if(elementDto.getBaseline()!=null)
+            baseline=elementDto.getBaseline();
     }
 
     @JsonProperty("id")
@@ -113,14 +116,14 @@ public class Text{
     public void setAngle(long value) { this.angle = value; }
 
     @JsonProperty("strokeColor")
-    public Color getStrokeColor() { return strokeColor; }
+    public String getStrokeColor() { return strokeColor; }
     @JsonProperty("strokeColor")
-    public void setStrokeColor(Color value) { this.strokeColor = value; }
+    public void setStrokeColor(String value) { this.strokeColor = value; }
 
     @JsonProperty("backgroundColor")
-    public Color getBackgroundColor() { return backgroundColor; }
+    public String getBackgroundColor() { return backgroundColor; }
     @JsonProperty("backgroundColor")
-    public void setBackgroundColor(Color value) { this.backgroundColor = value; }
+    public void setBackgroundColor(String value) { this.backgroundColor = value; }
 
     @JsonProperty("fillStyle")
     public Style getFillStyle() { return fillStyle; }
@@ -251,4 +254,9 @@ public class Text{
     public Double getLineHeight() { return lineHeight; }
     @JsonProperty("lineHeight")
     public void setLineHeight(Double value) { this.lineHeight = value; }
+
+    @JsonProperty("baseline")
+    public Integer getBaseline() { return baseline; }
+    @JsonProperty("baseline")
+    public void setBaseline(Integer value) { this.baseline = value; }
 }

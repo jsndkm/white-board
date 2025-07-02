@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +101,22 @@ public class ProjectService {
         try {
             // JSON文件在项目的根目录下的json文件夹中
             String filePath = Paths.get("json", jsonFileName).toString();
-            return objectMapper.readValue(new File(filePath), ProjectBoardDto.class);
+            ProjectBoardDto projectBoardDto=objectMapper.readValue(new File(filePath), ProjectBoardDto.class);
+
+            // 3. 将反序列化后的对象保存到指定文件夹（如 "serialized/"）
+            String outputDir = "serialized";
+            String outputPath = Paths.get(outputDir, "serialized_" + jsonFileName).toString();
+
+            // 确保输出目录存在
+            Files.createDirectories(Paths.get(outputDir));
+
+            // 使用Jackson序列化并保存
+            objectMapper.writerWithDefaultPrettyPrinter()
+                    .writeValue(new File(outputPath), projectBoardDto);
+
+            System.out.println("Saved serialized DTO to: " + outputPath);
+
+            return projectBoardDto;
         }catch (Exception e) {
             throw new RuntimeException("Failed to load template: " + jsonFileName, e);
         }
@@ -267,6 +283,9 @@ public class ProjectService {
         if(!projectUserPO.isAdmin()){
             throw new GlobalException(CodeMsg.PROJECT_NOT_ALLOW_TO_DELETE);
         }
+        //删除项目画板
+        projectBoardService.deleteProjectBoard(pid);
+
         Long record=projectUserDao.deleteProjectUser(pid);
         projectDao.deleteProject(pid);
         if(record>0)

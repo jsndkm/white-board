@@ -54,8 +54,17 @@ public class ProjectBoardService {
         return formReturnData(projectBoardDto);
     }
 
-    public boolean deleteDrawBoard(int id) {
-        return redisService.deleteBinary(DrawBoardKey.getById, ""+id);
+    public void deleteProjectBoard(int id) {
+        // 删除 Redis 中的数据
+        redisService.delete(ProjectBoardKey.getById, ""+id);
+
+        // 删除 MongoDB 中的数据
+        try {
+            Query query = new Query(Criteria.where("id").is(id));
+            mongoTemplate.remove(query, ProjectBoardMongo.class, "project_board");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete projectBoard data from MongoDB", e);
+        }
     }
 
     public ProjectBoardReturnData formReturnData(ProjectBoardDto projectBoardDto) {

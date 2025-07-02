@@ -225,6 +225,18 @@ public class ProjectController {
                     templateList.add(templateDto);
                 }
             }
+
+            // 排序：让 "空白模板" 排在第一位，其余保持原顺序
+            templateList.sort((t1, t2) -> {
+                if ("空白模板".equals(t1.getName())) {
+                    return -1;  // t1 是 "空白模板"，排在前面
+                } else if ("空白模板".equals(t2.getName())) {
+                    return 1;   // t2 是 "空白模板"，排在后面
+                } else {
+                    return 0;   // 其他情况保持原顺序
+                }
+            });
+
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(ResultUtil.success(templateList));
