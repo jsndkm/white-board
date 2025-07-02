@@ -22,6 +22,7 @@ export function TabNewProject() {
               key={idx}
               templateName={item.name}
               templateDesc={item.description}
+              base64String={item.image}
             />
           ))}
         </div>

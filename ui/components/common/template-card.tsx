@@ -7,17 +7,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useNewProjectDialogStore } from "@/stores/new-project-dialog";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import Image from "next/image";
 
 export function TemplateCard({
   templateName,
   templateDesc,
+  base64String,
 }: {
   templateName: string;
   templateDesc: string;
+  base64String: string;
 }) {
   return (
     <motion.div whileHover={{ scale: 1.02 }}>
@@ -31,7 +33,15 @@ export function TemplateCard({
           </CardDescription>
         </CardHeader>
         <CardContent className="h-full">
-          <Skeleton className="h-full w-full rounded-md" />
+          {/*<Skeleton className="h-full w-full rounded-md" />*/}
+          <Image
+            src={`data:image/png;base64,${base64String}`}
+            alt="Base64"
+            width={200}
+            height={200}
+            unoptimized
+            className="h-full w-full rounded-md object-cover"
+          />
         </CardContent>
         <CardFooter className="flex-col gap-2">
           <Button

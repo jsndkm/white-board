@@ -62,6 +62,7 @@ export function ProjectDialog() {
                 key={idx}
                 templateName={item.name}
                 templateDesc={item.description}
+                base64String={item.image}
               />
             ))}
           </>
