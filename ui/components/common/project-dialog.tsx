@@ -58,7 +58,11 @@ export function ProjectDialog() {
           <>
             {queryTemplateNameList.isLoading && <LoaderCircle />}
             {queryTemplateNameList.data?.map((item, idx) => (
-              <TemplateCard key={idx} templateName={item} />
+              <TemplateCard
+                key={idx}
+                templateName={item.name}
+                templateDesc={item.description}
+              />
             ))}
           </>
         );

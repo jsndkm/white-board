@@ -2,6 +2,7 @@
 
 import "./globals.css";
 import { GlobalConfirmDialog } from "@/components/common/confirm-dialog";
+import { NewProjectDialog } from "@/components/common/new-project-dialog";
 import { ThemeProvider } from "@/components/common/theme-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
@@ -28,6 +29,7 @@ export default function RootLayout({
             <SessionProvider>{children}</SessionProvider>
             <Toaster position="top-center" richColors />
             <GlobalConfirmDialog />
+            <NewProjectDialog />
           </ThemeProvider>
         </QueryClientProvider>
       </body>

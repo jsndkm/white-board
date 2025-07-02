@@ -1,5 +1,10 @@
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import Form from "next/form";
 import React from "react";
 
@@ -24,16 +29,23 @@ export function AuthForm({
           用户名
         </Label>
 
-        <Input
-          id="username"
-          name="username"
-          className="bg-muted text-md md:text-sm"
-          type="text"
-          placeholder="请输入用户名"
-          autoComplete="username"
-          required
-          autoFocus
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Input
+              id="username"
+              name="username"
+              className="bg-muted text-md md:text-sm"
+              type="text"
+              placeholder="请输入用户名"
+              autoComplete="username"
+              required
+              autoFocus
+            />
+          </TooltipTrigger>
+          <TooltipContent side="right" className="text-xs">
+            6~16 位字符，支持字母、数字和下划线
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -44,14 +56,21 @@ export function AuthForm({
           密码
         </Label>
 
-        <Input
-          id="password"
-          name="password"
-          className="bg-muted text-md md:text-sm"
-          type="password"
-          placeholder="请输入密码"
-          required
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Input
+              id="password"
+              name="password"
+              className="bg-muted text-md md:text-sm"
+              type="password"
+              placeholder="请输入密码"
+              required
+            />
+          </TooltipTrigger>
+          <TooltipContent side="right" className="text-xs">
+            6~16 位字符，支持字母、数字和下划线
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       {isRegister && (

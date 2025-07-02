@@ -5,15 +5,23 @@ import { API } from "@/lib/endpoint";
 import { z } from "zod";
 
 const registerFormSchema = z.object({
-  username: z.string().regex(/^[a-zA-Z0-9]{6,16}$/),
-  password: z.string().min(6).max(16),
+  username: z
+    .string()
+    .regex(/^[a-zA-Z0-9_]{6,16}$/, "用户名需为6-16位字母、数字或下划线"),
+  password: z
+    .string()
+    .regex(/^[a-zA-Z0-9_]{6,16}$/, "密码需为6-16位字母、数字或下划线"),
   email: z.string().email(),
-  phone: z.string().regex(/^1[0-9]{10}$/),
+  phone: z.string().regex(/^1[0-9]{10}$/, "请输入正确的手机号"),
 });
 
 const loginFormSchema = z.object({
-  username: z.string().regex(/^[a-zA-Z0-9]{6,16}$/),
-  password: z.string().min(6).max(16),
+  username: z
+    .string()
+    .regex(/^[a-zA-Z0-9_]{6,16}$/, "用户名需为6-16位字母、数字或下划线"),
+  password: z
+    .string()
+    .regex(/^[a-zA-Z0-9_]{6,16}$/, "密码需为6-16位字母、数字或下划线"),
 });
 
 export interface LoginActionState {
