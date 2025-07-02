@@ -188,11 +188,11 @@ public class WebSocketServer {
 
     // 发送错误消息（包含时间戳）
     private void sendError(String errorMessage, long responseTimestamp) {
-        try {
+        /*try {
             sendMessage("error", errorMessage, responseTimestamp);
         } catch (IOException e) {
             log.error("发送错误消息失败", e);
-        }
+        }*/
     }
 
     // 内部类表示房间信息
@@ -239,7 +239,6 @@ public class WebSocketServer {
     // 处理服务器广播
     private void handleServerBroadcast(JSONObject data,long responseTimestamp) {
         WebSocketMessage.ServerBroadcastData request = data.toJavaObject(WebSocketMessage.ServerBroadcastData.class);
-
         if(request.getProjectId()<0)
         {
             sendError("项目ID无效",responseTimestamp);
@@ -296,11 +295,6 @@ public class WebSocketServer {
             List<WebSocketMessage.PointerInfo> pointerInfos = new ArrayList<>();
             // 获取房间所有用户
             for (String username : roomInfo.getUsers()) {
-                // 跳过请求的发送者
-                if (username.equals(request.getUsername())) {
-                    continue;
-                }
-
                 String userRedisKey = username + ":pointer";
 
                 // 从 Redis 获取该用户的指针信息

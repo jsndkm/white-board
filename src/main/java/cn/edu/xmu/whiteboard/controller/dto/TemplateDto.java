@@ -3,6 +3,7 @@ package cn.edu.xmu.whiteboard.controller.dto;
 public class TemplateDto {
     String name;
     String description;
+    String image;
 
     public String getName() {
         return name;
@@ -16,6 +17,13 @@ public class TemplateDto {
     public void setDescription(String description) {
         this.description = description;
     }
+    public String getImage() {
+        return image;
+    }
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     public void setInformation(String name) {
         this.name = name;
         switch (name){

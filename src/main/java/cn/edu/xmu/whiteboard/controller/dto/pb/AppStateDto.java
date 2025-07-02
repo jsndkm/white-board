@@ -3,8 +3,8 @@ package cn.edu.xmu.whiteboard.controller.dto.pb;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AppStateDto {
-    private long gridSize;
-    private long gridStep;
+    private double gridSize;
+    private double gridStep;
     private boolean gridModeEnabled;
     private String viewBackgroundColor;
     private Object lockedMultiSelections;
@@ -12,14 +12,14 @@ public class AppStateDto {
     public AppStateDto(){}
 
     @JsonProperty("gridSize")
-    public long getGridSize() { return gridSize; }
+    public double getGridSize() { return gridSize; }
     @JsonProperty("gridSize")
-    public void setGridSize(long value) { this.gridSize = value; }
+    public void setGridSize(double value) { this.gridSize = value; }
 
     @JsonProperty("gridStep")
-    public long getGridStep() { return gridStep; }
+    public double getGridStep() { return gridStep; }
     @JsonProperty("gridStep")
-    public void setGridStep(long value) { this.gridStep = value; }
+    public void setGridStep(double value) { this.gridStep = value; }
 
     @JsonProperty("gridModeEnabled")
     public boolean getGridModeEnabled() { return gridModeEnabled; }

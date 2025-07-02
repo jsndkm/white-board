@@ -21,8 +21,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/api", produces = "application/json;charset=UTF-8")
@@ -194,34 +195,64 @@ public class ProjectController {
         try {
             //解析token
             JWTUtil.analyzeToken(authorization);
-            // 获取项目根目录下的 `json` 文件夹路径
-            String jsonFolderPath = System.getProperty("user.dir") + File.separator + "json";
+            // 获取项目根目录
+            String rootPath = System.getProperty("user.dir");
+
+            // 处理JSON模板文件
+            String jsonFolderPath = rootPath + File.separator + "json";
             File jsonFolder = new File(jsonFolderPath);
 
-            // 检查文件夹是否存在
             if (!jsonFolder.exists() || !jsonFolder.isDirectory()) {
                 throw new RuntimeException("JSON 文件夹不存在或不是目录");
             }
 
-            // 获取所有 `.json` 文件
+            // 处理图片目录
+            String imageFolderPath = rootPath + File.separator + "image";
+            File imageFolder = new File(imageFolderPath);
+
+            // 存储图片文件映射（key: 模板名称, value: 图片文件）
+            Map<String, File> imageFileMap = new HashMap<>();
+
+            if (imageFolder.exists() && imageFolder.isDirectory()) {
+                File[] imageFiles = imageFolder.listFiles((dir, name) -> name.endsWith(".png"));
+
+                if (imageFiles != null) {
+                    for (File imgFile : imageFiles) {
+                        String imgName = imgFile.getName().replace(".png", "");
+                        // 如果图片名称不是"空白模板"，则加上"模型"后缀（与模板名称匹配）
+                        if (!"空白模板".equals(imgName)) {
+                            imgName += "模型";
+                        }
+                        imageFileMap.put(imgName, imgFile);
+                    }
+                }
+            }
+
+            // 获取所有JSON文件
             File[] jsonFiles = jsonFolder.listFiles((dir, name) -> name.endsWith(".json"));
 
-            // 构建 TemplateDto 列表
+            // 构建TemplateDto列表
             List<TemplateDto> templateList = new ArrayList<>();
             if (jsonFiles != null) {
                 for (File file : jsonFiles) {
                     String fileName = file.getName();
-                    // 去掉 `.json` 后缀
                     String baseName = fileName.replace(".json", "");
 
-                    // 如果文件名不是“空白模板”，则加上“模型”
                     if (!"空白模板".equals(baseName)) {
                         baseName += "模型";
                     }
 
-                    // 构造 TemplateDto
                     TemplateDto templateDto = new TemplateDto();
                     templateDto.setInformation(baseName);
+
+                    // 3. 设置图片（如果存在匹配的图片）
+                    if (imageFileMap.containsKey(baseName)) {
+                        File imgFile = imageFileMap.get(baseName);
+                        // 返回图片Base64编码
+                        String imageBase64 = encodeFileToBase64(imgFile);
+                        templateDto.setImage(imageBase64);
+                    }
+
                     templateList.add(templateDto);
                 }
             }
@@ -244,5 +275,10 @@ public class ProjectController {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);
         }
+    }
+
+    private String encodeFileToBase64(File file) throws IOException {
+        byte[] fileContent = Files.readAllBytes(file.toPath());
+        return Base64.getEncoder().encodeToString(fileContent);
     }
 }

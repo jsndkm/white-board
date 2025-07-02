@@ -9,24 +9,24 @@ public class FreeDraw{
     private double y;
     private double width;
     private double height;
-    private long angle;
+    private double angle;
     private String strokeColor;
     private String backgroundColor;
     private Style fillStyle;
-    private long strokeWidth;
+    private double strokeWidth;
     private Style strokeStyle;
-    private long roughness;
-    private long opacity;
+    private double roughness;
+    private double opacity;
     private Object[] groupIDS;
     private Object frameID;
     private String index;
     private Roundness roundness;
-    private long seed;
-    private long version;
-    private long versionNonce;
+    private double seed;
+    private double version;
+    private double versionNonce;
     private boolean isDeleted;
     private Object[] boundElements;
-    private long updated;
+    private double updated;
     private String link;
     private boolean locked;
     private double[][] points;
@@ -98,9 +98,9 @@ public class FreeDraw{
     public void setHeight(double value) { this.height = value; }
 
     @JsonProperty("angle")
-    public long getAngle() { return angle; }
+    public double getAngle() { return angle; }
     @JsonProperty("angle")
-    public void setAngle(long value) { this.angle = value; }
+    public void setAngle(double value) { this.angle = value; }
 
     @JsonProperty("strokeColor")
     public String getStrokeColor() { return strokeColor; }
@@ -118,9 +118,9 @@ public class FreeDraw{
     public void setFillStyle(Style value) { this.fillStyle = value; }
 
     @JsonProperty("strokeWidth")
-    public long getStrokeWidth() { return strokeWidth; }
+    public double getStrokeWidth() { return strokeWidth; }
     @JsonProperty("strokeWidth")
-    public void setStrokeWidth(long value) { this.strokeWidth = value; }
+    public void setStrokeWidth(double value) { this.strokeWidth = value; }
 
     @JsonProperty("strokeStyle")
     public Style getStrokeStyle() { return strokeStyle; }
@@ -128,14 +128,14 @@ public class FreeDraw{
     public void setStrokeStyle(Style value) { this.strokeStyle = value; }
 
     @JsonProperty("roughness")
-    public long getRoughness() { return roughness; }
+    public double getRoughness() { return roughness; }
     @JsonProperty("roughness")
-    public void setRoughness(long value) { this.roughness = value; }
+    public void setRoughness(double value) { this.roughness = value; }
 
     @JsonProperty("opacity")
-    public long getOpacity() { return opacity; }
+    public double getOpacity() { return opacity; }
     @JsonProperty("opacity")
-    public void setOpacity(long value) { this.opacity = value; }
+    public void setOpacity(double value) { this.opacity = value; }
 
     @JsonProperty("groupIds")
     public Object[] getGroupIDS() { return groupIDS; }
@@ -158,19 +158,19 @@ public class FreeDraw{
     public void setRoundness(Roundness value) { this.roundness = value; }
 
     @JsonProperty("seed")
-    public long getSeed() { return seed; }
+    public double getSeed() { return seed; }
     @JsonProperty("seed")
-    public void setSeed(long value) { this.seed = value; }
+    public void setSeed(double value) { this.seed = value; }
 
     @JsonProperty("version")
-    public long getVersion() { return version; }
+    public double getVersion() { return version; }
     @JsonProperty("version")
-    public void setVersion(long value) { this.version = value; }
+    public void setVersion(double value) { this.version = value; }
 
     @JsonProperty("versionNonce")
-    public long getVersionNonce() { return versionNonce; }
+    public double getVersionNonce() { return versionNonce; }
     @JsonProperty("versionNonce")
-    public void setVersionNonce(long value) { this.versionNonce = value; }
+    public void setVersionNonce(double value) { this.versionNonce = value; }
 
     @JsonProperty("isDeleted")
     public boolean getIsDeleted() { return isDeleted; }
@@ -183,9 +183,9 @@ public class FreeDraw{
     public void setBoundElements(Object[] value) { this.boundElements = value; }
 
     @JsonProperty("updated")
-    public long getUpdated() { return updated; }
+    public double getUpdated() { return updated; }
     @JsonProperty("updated")
-    public void setUpdated(long value) { this.updated = value; }
+    public void setUpdated(double value) { this.updated = value; }
 
     @JsonProperty("link")
     public String getLink() { return link; }
