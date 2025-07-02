@@ -101,6 +101,7 @@ export default function ExcalidrawWrapper({
       type: "client-broadcast",
       data: {
         projectId,
+        username,
         elements,
         appState,
         files,
@@ -117,9 +118,9 @@ export default function ExcalidrawWrapper({
       type: "client-pointer-broadcast",
       data: {
         projectId: projectId,
+        username,
         x: payload.pointer.x,
         y: payload.pointer.y,
-        username,
       },
     });
   };
