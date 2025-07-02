@@ -19,7 +19,7 @@ import {
   Gesture,
   SocketId,
 } from "@excalidraw/excalidraw/types";
-import { debounce, isEqual } from "lodash";
+import { isEqual } from "lodash";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Suspense, useEffect, useRef, useState } from "react";
@@ -53,6 +53,8 @@ export default function ExcalidrawWrapper({
     onServerBroadcast: (data) => {
       const currentElements = excalidrawAPI?.getSceneElements() ?? [];
       const currentAppState = excalidrawAPI?.getAppState() ?? {};
+
+      if (!data || !data.elements || !data.appState) return;
 
       const shouldUpdate =
         !isEqual(currentElements, data.elements) ||
@@ -104,6 +106,9 @@ export default function ExcalidrawWrapper({
       isUpdatingScene.current = false;
       return; // 防止重复更新
     }
+
+    if (!elements || !appState || !files) return;
+
     sendJsonMessage({
       type: "client-broadcast",
       data: {
@@ -132,8 +137,8 @@ export default function ExcalidrawWrapper({
     });
   };
 
-  const debounceHandleChange = debounce(handleChange, 200);
-  const debounceHandlePointerUpdate = debounce(handlePointerUpdate, 500);
+  // const debounceHandleChange = debounce(handleChange, 200);
+  // const debounceHandlePointerUpdate = debounce(handlePointerUpdate, 500);
 
   return (
     <div className="custom-styles h-screen w-screen">
@@ -157,8 +162,8 @@ export default function ExcalidrawWrapper({
                   scrollToContent: true,
                 }
           }
-          onChange={debounceHandleChange}
-          onPointerUpdate={debounceHandlePointerUpdate}
+          onChange={handleChange}
+          onPointerUpdate={handlePointerUpdate}
           isCollaborating={true}
         >
           <ExcalidrawMenu projectId={projectId} />

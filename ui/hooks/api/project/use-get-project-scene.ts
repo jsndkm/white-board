@@ -3,11 +3,10 @@ import { fetcher } from "@/lib/utils";
 import { ExcalidrawInitialDataState } from "@excalidraw/excalidraw/types";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export function useGetProjectScene(id: number | undefined) {
+export function useGetProjectScene(id: number) {
   return useSuspenseQuery({
     queryKey: ["scene", id],
     queryFn: async () => {
-      if (!id) return null;
       return await fetcher<ExcalidrawInitialDataState>(API.board.getScene(id));
     },
   });
