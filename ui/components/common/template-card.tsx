@@ -18,10 +18,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCreateProjectMutation } from "@/hooks/api/project/use-create-project";
+import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function TemplateCard({ templateName }: { templateName: string }) {
+export function TemplateCard({
+  templateName,
+  templateDesc,
+}: {
+  templateName: string;
+  templateDesc: string;
+}) {
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -45,11 +53,15 @@ export function TemplateCard({ templateName }: { templateName: string }) {
   };
 
   return (
-    <>
+    <motion.div whileHover={{ scale: 1.02 }}>
       <Card className="relative flex aspect-[4/3] flex-col">
-        <CardHeader className="min-h-[72px]">
-          <CardTitle>{templateName}</CardTitle>
-          <CardDescription className="sr-only">{templateName}</CardDescription>
+        <CardHeader className="min-h-[72px] items-center justify-center text-center">
+          <CardTitle className="text-lg font-semibold tracking-wide">
+            {templateName}
+          </CardTitle>
+          <CardDescription className="line-clamp-2">
+            {templateDesc}
+          </CardDescription>
         </CardHeader>
         <CardContent className="h-full">
           <Skeleton className="h-full w-full rounded-md" />
@@ -59,6 +71,7 @@ export function TemplateCard({ templateName }: { templateName: string }) {
             className="w-full cursor-pointer"
             onClick={() => setIsOpen(!isOpen)}
           >
+            <Sparkles className="mr-2 h-4 w-4" />
             使用此模板
           </Button>
         </CardFooter>
@@ -105,6 +118,6 @@ export function TemplateCard({ templateName }: { templateName: string }) {
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </motion.div>
   );
 }

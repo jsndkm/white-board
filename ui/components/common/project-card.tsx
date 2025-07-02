@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Project } from "@/lib/types/project";
 import { useProjectDetailsStore } from "@/stores/project-detail";
 import { useProjectDialogStore } from "@/stores/project-dialog";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
 export function ProjectCard({
@@ -24,51 +25,59 @@ export function ProjectCard({
   const router = useRouter();
 
   return (
-    <Card className="relative flex aspect-[4/3] flex-col">
-      {project.admin ? (
-        <Badge
-          variant="secondary"
-          className="absolute top-4 right-4 bg-blue-500 text-white dark:bg-blue-600"
+    <motion.div whileHover={{ scale: 1.02 }}>
+      <Card className="relative flex aspect-[4/3] flex-col">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="absolute top-4 right-4"
         >
-          所有
-        </Badge>
-      ) : (
-        <Badge variant="destructive" className="absolute top-4 right-4">
-          参与
-        </Badge>
-      )}
-      <CardHeader className="min-h-[72px]">
-        <CardTitle>{project.name}</CardTitle>
-        <CardDescription className="line-clamp-2">
-          {project.description}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="h-full">
-        <Skeleton className="h-full w-full rounded-md" />
-      </CardContent>
-      <CardFooter className="flex-col gap-2">
-        <Button
-          className="w-full cursor-pointer"
-          onClick={() => {
-            useProjectDialogStore.getState().setIsOpen(false);
-            router.push(`/project/${project.id}`);
-          }}
-        >
-          打开项目
-        </Button>
-
-        {showDetailButton && (
-          <Button
-            variant="secondary"
-            className="w-full cursor-pointer"
-            onClick={() =>
-              useProjectDetailsStore.getState().openDialog(project)
-            }
+          <Badge
+            variant={project.admin ? "secondary" : "destructive"}
+            className={`${
+              project.admin
+                ? "bg-blue-500 text-white dark:bg-blue-600"
+                : "bg-red-500 text-white"
+            }`}
           >
-            查看详情
+            {project.admin ? "所有" : "参与"}
+          </Badge>
+        </motion.div>
+
+        <CardHeader className="min-h-[72px] space-y-1">
+          <CardTitle className="text-lg font-bold">{project.name}</CardTitle>
+          <CardDescription className="text-muted-foreground line-clamp-2 text-sm">
+            {project.description}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="h-full">
+          <Skeleton className="h-full w-full rounded-md" />
+        </CardContent>
+        <CardFooter className="flex-col gap-2">
+          <Button
+            className="w-full cursor-pointer"
+            onClick={() => {
+              useProjectDialogStore.getState().setIsOpen(false);
+              router.push(`/project/${project.id}`);
+            }}
+          >
+            打开项目
           </Button>
-        )}
-      </CardFooter>
-    </Card>
+
+          {showDetailButton && (
+            <Button
+              variant="secondary"
+              className="w-full cursor-pointer"
+              onClick={() =>
+                useProjectDetailsStore.getState().openDialog(project)
+              }
+            >
+              查看详情
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
+    </motion.div>
   );
 }
