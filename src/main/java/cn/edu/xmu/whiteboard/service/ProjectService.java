@@ -63,11 +63,29 @@ public class ProjectService {
         // 映射模板名称到JSON文件名
         String jsonFileName;
         switch (templateName) {
+            case "空白模板":
+                jsonFileName = "空白模板.json";
+                break;
             case "STP模型":
                 jsonFileName = "STP.json";
                 break;
             case "SWOT模型":
                 jsonFileName = "SWOT.json";
+                break;
+            case "SMART模型":
+                jsonFileName = "SMART.json";
+                break;
+            case "Potter五力模型":
+                jsonFileName = "Potter.json";
+                break;
+            case "PEST模型":
+                jsonFileName = "PEST.json";
+                break;
+            case "BCG模型":
+                jsonFileName = "BCG.json";
+                break;
+            case "优缺点模型":
+                jsonFileName = "merits-drawbacks.json";
                 break;
             // 添加其他模板 case
             default:
