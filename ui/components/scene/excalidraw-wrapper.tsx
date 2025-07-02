@@ -7,7 +7,7 @@ import { useCustomWebSocket } from "@/hooks/use-custom-websocket";
 import { WEBSOCKET_URL } from "@/lib/endpoint";
 import { RoomUserChangeData } from "@/lib/types/websocket";
 import { useRoomState } from "@/stores/room";
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { CaptureUpdateAction, Excalidraw } from "@excalidraw/excalidraw";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import "@excalidraw/excalidraw/index.css";
 import {
@@ -51,10 +51,9 @@ export default function ExcalidrawWrapper({
       }
     },
     onServerBroadcast: (data) => {
-      const currentElements = excalidrawAPI?.getSceneElements() ?? [];
+      const currentElements =
+        excalidrawAPI?.getSceneElementsIncludingDeleted() ?? [];
       const currentAppState = excalidrawAPI?.getAppState() ?? {};
-
-      if (!data || !data.elements || !data.appState) return;
 
       const shouldUpdate =
         !isEqual(currentElements, data.elements) ||
@@ -62,8 +61,9 @@ export default function ExcalidrawWrapper({
       if (shouldUpdate) {
         skipChangeFrames.current = 2;
         excalidrawAPI?.updateScene({
-          elements: data.elements,
-          appState: data.appState,
+          elements: data.elements ?? [],
+          appState: data.appState ?? {},
+          captureUpdate: CaptureUpdateAction.NEVER,
         });
       }
     },
@@ -155,8 +155,8 @@ export default function ExcalidrawWrapper({
             isError
               ? null
               : {
-                  elements: scene?.elements || [],
-                  appState: scene?.appState || {},
+                  elements: scene?.elements ?? [],
+                  appState: scene?.appState ?? {},
                   scrollToContent: true,
                 }
           }
