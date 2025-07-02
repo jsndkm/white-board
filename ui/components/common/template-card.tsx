@@ -35,6 +35,7 @@ export function TemplateCard({ templateName }: { templateName: string }) {
       {
         name: name,
         description: description,
+        template: templateName,
       },
       {
         onSuccess: () => setIsOpen(false),

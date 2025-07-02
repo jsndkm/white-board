@@ -15,9 +15,11 @@ export function useCreateProjectMutation() {
     mutationFn: async ({
       name,
       description,
+      template,
     }: {
       name: string;
       description: string;
+      template: string;
     }) => {
       const validatedData = createProjectSchema.parse({
         name: name,
@@ -29,6 +31,7 @@ export function useCreateProjectMutation() {
         body: JSON.stringify({
           name: validatedData.name,
           description: validatedData.description,
+          template,
         }),
       });
     },
