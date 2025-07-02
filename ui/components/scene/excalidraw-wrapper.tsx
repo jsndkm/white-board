@@ -19,6 +19,7 @@ import {
   Gesture,
   SocketId,
 } from "@excalidraw/excalidraw/types";
+import { debounce } from "@excalidraw/excalidraw/utils";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Suspense, useEffect, useState } from "react";
@@ -114,6 +115,9 @@ export default function ExcalidrawWrapper({
     });
   };
 
+  const debounceHandleChange = debounce(handleChange, 200);
+  const debounceHandlePointerUpdate = debounce(handlePointerUpdate, 500);
+
   return (
     <div className="custom-styles h-screen w-screen">
       <Suspense
@@ -128,8 +132,8 @@ export default function ExcalidrawWrapper({
           langCode="zh-CN"
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
           initialData={isError ? null : scene}
-          onChange={handleChange}
-          onPointerUpdate={handlePointerUpdate}
+          onChange={debounceHandleChange}
+          onPointerUpdate={debounceHandlePointerUpdate}
           isCollaborating={true}
         >
           <ExcalidrawMenu projectId={projectId} />
