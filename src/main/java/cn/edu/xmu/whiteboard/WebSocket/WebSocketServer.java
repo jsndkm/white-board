@@ -255,7 +255,7 @@ public class WebSocketServer {
             response.setAppState(request.getAppState());
             response.setFile(request.getFile());
 
-            broadcastToRoom(roomId, "server-broadcast", response,responseTimestamp);
+            broadcastToRoomExcludingUser(roomId, "server-broadcast", response, responseTimestamp, request.getUsername());
         } else {
             sendError("房间不存在",responseTimestamp);
         }
@@ -296,6 +296,11 @@ public class WebSocketServer {
             List<WebSocketMessage.PointerInfo> pointerInfos = new ArrayList<>();
             // 获取房间所有用户
             for (String username : roomInfo.getUsers()) {
+                // 跳过请求的发送者
+                if (username.equals(request.getUsername())) {
+                    continue;
+                }
+
                 String userRedisKey = username + ":pointer";
 
                 // 从 Redis 获取该用户的指针信息
@@ -307,7 +312,7 @@ public class WebSocketServer {
             }
             response.setUsers(pointerInfos);
 
-            broadcastToRoom(roomId, "server-pointer-broadcast", response,responseTimestamp);
+            broadcastToRoomExcludingUser(roomId, "server-pointer-broadcast", response, responseTimestamp, request.getUsername());
         } else {
             sendError("房间不存在",responseTimestamp);
         }
@@ -322,6 +327,28 @@ public class WebSocketServer {
                 if (client != null) {
                     try {
                         client.sendMessage(type,data,responseTimestamp);
+                    } catch (IOException e) {
+                        log.error("发送消息给用户 {} 失败", username, e);
+                    }
+                }
+            });
+        }
+    }
+
+    // 向指定房间广播消息（排除指定用户）
+    private void broadcastToRoomExcludingUser(String roomId, String type, Object data, long responseTimestamp, String excludeUsername) {
+        RoomInfo roomInfo = roomMap.get(roomId);
+        if (roomInfo != null) {
+            roomInfo.getUsers().forEach(username -> {
+                // 跳过排除的用户
+                if (username.equals(excludeUsername)) {
+                    return;
+                }
+
+                WebSocketServer client = userSessionMap.get(username);
+                if (client != null) {
+                    try {
+                        client.sendMessage(type, data, responseTimestamp);
                     } catch (IOException e) {
                         log.error("发送消息给用户 {} 失败", username, e);
                     }

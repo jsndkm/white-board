@@ -29,6 +29,7 @@
   "type": "client-broadcast",
   "data": {
     "projectId": 1,
+    “username": "user1",
     "elements": [],
     "appState": {},
         "file": {}

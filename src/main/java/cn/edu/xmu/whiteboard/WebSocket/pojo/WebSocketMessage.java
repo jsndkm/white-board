@@ -97,12 +97,16 @@ public class WebSocketMessage {
     @Data
     public static class ServerBroadcastData {
         private int projectId;
+        private String username;
         private List<ElementDto> elements;
         private AppStateDto appState;
         private FileDto file;
 
         public void setProjectId(int projectId) {
             this.projectId = projectId;
+        }
+        public void setUsername(String username) {
+            this.username = username;
         }
         public void setElements(List<ElementDto> elements) {
             this.elements = elements;
@@ -115,6 +119,9 @@ public class WebSocketMessage {
         }
         public int getProjectId() {
             return projectId;
+        }
+        public String getUsername() {
+            return username;
         }
         public List<ElementDto> getElements() {
             return elements;
