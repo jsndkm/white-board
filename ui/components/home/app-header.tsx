@@ -1,4 +1,5 @@
 import { ModeToggle } from "@/components/common/mode-toggle";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
@@ -28,7 +29,14 @@ export default function AppHeader() {
       </span>
       <div className="order-4 hidden h-fit items-center gap-2 px-2 py-1.5 md:ml-auto md:flex md:h-[34px]">
         {token ? (
-          <h4 className="text-sm leading-none font-medium">{username}</h4>
+          <div className="flex items-center gap-2">
+            <Avatar>
+              <AvatarFallback>
+                {username?.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <h4 className="text-sm font-medium">{username}</h4>
+          </div>
         ) : (
           <Button
             variant="secondary"

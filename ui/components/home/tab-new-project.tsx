@@ -18,7 +18,11 @@ export function TabNewProject() {
       <ScrollArea className="h-[80vh] w-full px-8 py-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {templateNameList?.map((item, idx) => (
-            <TemplateCard key={idx} templateName={item} />
+            <TemplateCard
+              key={idx}
+              templateName={item.name}
+              templateDesc={item.description}
+            />
           ))}
         </div>
       </ScrollArea>
