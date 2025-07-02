@@ -14,10 +14,15 @@ import cn.edu.xmu.whiteboard.dao.UserDao;
 import cn.edu.xmu.whiteboard.mapper.po.ProjectPO;
 import cn.edu.xmu.whiteboard.mapper.po.ProjectUserPO;
 import cn.edu.xmu.whiteboard.result.CodeMsg;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,9 +52,37 @@ public class ProjectService {
         ProjectPO project = projectDao.createProject(username,projectDto);
         projectUserDao.createProjectUser(username,project);
         ProjectReturnData data = new ProjectReturnData(project.getId(),project.getName(),project.getDescription());
-        ProjectBoardDto projectBoardDto=new ProjectBoardDto();
+
+        // 根据template属性选择对应的JSON文件
+        ProjectBoardDto projectBoardDto = createProjectBoardDtoFromTemplate(projectDto.getTemplate());
         projectBoardService.storeProjectBoard(projectBoardDto,project.getId());
         return data;
+    }
+
+    private ProjectBoardDto createProjectBoardDtoFromTemplate(String templateName) {
+        // 映射模板名称到JSON文件名
+        String jsonFileName;
+        switch (templateName) {
+            case "STP模型":
+                jsonFileName = "STP.json";
+                break;
+            case "SWOT模型":
+                jsonFileName = "SWOT.json";
+                break;
+            // 添加其他模板 case
+            default:
+                throw new IllegalArgumentException("Unknown template: " + templateName);
+        }
+
+        // 使用Jackson反序列化JSON文件
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // JSON文件在项目的根目录下的json文件夹中
+            String filePath = Paths.get("json", jsonFileName).toString();
+            return objectMapper.readValue(new File(filePath), ProjectBoardDto.class);
+        }catch (Exception e) {
+            throw new RuntimeException("Failed to load template: " + jsonFileName, e);
+        }
     }
 
     public List<MyProjectReturnData> findMyProject(String username){
