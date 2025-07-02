@@ -19,6 +19,7 @@ public class TemplateDto {
     public void setInformation(String name) {
         this.name = name;
         switch (name){
+            case "Ansoff模型": this.description="Ansoff模型梳理增长路径并直观评估风险，助企业找到清晰的前进方向。";break;
             case "BCG模型": this.description="BCG模型助企业优化资源配置，适用于多业务组合的战略分析与决策。";break;
             case "merits-drawbacks模型": this.description="Merits-drawbacks模型用于权衡利弊，辅助决策优选方案。";break;
             case "PEST模型": this.description="PEST模型分析宏观环境，助企业洞察趋势以制定适配战略。";break;

@@ -75,7 +75,7 @@ public class ProjectService {
             case "SMART模型":
                 jsonFileName = "SMART.json";
                 break;
-            case "Potter五力模型":
+            case "Potter模型":
                 jsonFileName = "Potter.json";
                 break;
             case "PEST模型":
@@ -84,8 +84,11 @@ public class ProjectService {
             case "BCG模型":
                 jsonFileName = "BCG.json";
                 break;
-            case "优缺点模型":
+            case "merits-drawbacks模型":
                 jsonFileName = "merits-drawbacks.json";
+                break;
+            case "Ansoff模型":
+                jsonFileName = "Ansoff.json";
                 break;
             // 添加其他模板 case
             default:
