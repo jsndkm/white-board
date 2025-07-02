@@ -19,7 +19,7 @@ import {
   Gesture,
   SocketId,
 } from "@excalidraw/excalidraw/types";
-import { debounce } from "@excalidraw/excalidraw/utils";
+import { debounce, isEqual } from "lodash";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Suspense, useEffect, useState } from "react";
@@ -49,24 +49,33 @@ export default function ExcalidrawWrapper({
       }
     },
     onServerBroadcast: (data) => {
-      const { elements, appState } = data;
-      excalidrawAPI?.updateScene({
-        elements: elements as readonly OrderedExcalidrawElement[],
-        appState,
-      });
+      const currentElements = excalidrawAPI?.getSceneElements() ?? [];
+      const currentAppState = excalidrawAPI?.getAppState() ?? {};
+
+      const shouldUpdate =
+        !isEqual(currentElements, data.elements) ||
+        !isEqual(currentAppState, data.appState);
+      if (shouldUpdate) {
+        excalidrawAPI?.updateScene({
+          elements: data.elements,
+          appState: data.appState,
+        });
+      }
     },
     onServerPointerBroadcast: (data) => {
       const users = data.users;
       const newMap = new Map<SocketId, Collaborator>();
-      users.forEach((user) => {
-        newMap.set(user.username as SocketId, {
-          pointer: {
-            x: user.x,
-            y: user.y,
-          } as CollaboratorPointer,
-          username: user.username,
+      users
+        .filter((user) => user.username !== username)
+        .forEach((user) => {
+          newMap.set(user.username as SocketId, {
+            pointer: {
+              x: user.x,
+              y: user.y,
+            } as CollaboratorPointer,
+            username: user.username,
+          });
         });
-      });
       excalidrawAPI?.updateScene({ collaborators: newMap });
     },
   });
@@ -131,7 +140,15 @@ export default function ExcalidrawWrapper({
         <Excalidraw
           langCode="zh-CN"
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
-          initialData={isError ? null : scene}
+          initialData={
+            isError
+              ? null
+              : {
+                  elements: scene?.elements || [],
+                  appState: scene?.appState || {},
+                  scrollToContent: true,
+                }
+          }
           onChange={debounceHandleChange}
           onPointerUpdate={debounceHandlePointerUpdate}
           isCollaborating={true}
