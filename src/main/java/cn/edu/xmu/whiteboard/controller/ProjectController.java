@@ -8,6 +8,7 @@ import cn.edu.xmu.whiteboard.ReturnData.ProjectReturnData;
 import cn.edu.xmu.whiteboard.ReturnData.ProjectCompleteData;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectModifyDto;
+import cn.edu.xmu.whiteboard.controller.dto.TemplateDto;
 import cn.edu.xmu.whiteboard.result.CodeMsg;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
 import cn.edu.xmu.whiteboard.service.ProjectService;
@@ -205,8 +206,8 @@ public class ProjectController {
             // 获取所有 `.json` 文件
             File[] jsonFiles = jsonFolder.listFiles((dir, name) -> name.endsWith(".json"));
 
-            // 提取文件名列表
-            List<String> fileNames = new ArrayList<>();
+            // 构建 TemplateDto 列表
+            List<TemplateDto> templateList = new ArrayList<>();
             if (jsonFiles != null) {
                 for (File file : jsonFiles) {
                     String fileName = file.getName();
@@ -218,12 +219,15 @@ public class ProjectController {
                         baseName += "模型";
                     }
 
-                    fileNames.add(baseName);
+                    // 构造 TemplateDto
+                    TemplateDto templateDto = new TemplateDto();
+                    templateDto.setInformation(baseName);
+                    templateList.add(templateDto);
                 }
             }
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(ResultUtil.success(fileNames));
+                    .body(ResultUtil.success(templateList));
         } catch (Exception e) {
             GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
             return exceptionHandle.exceptionHandle(e);
