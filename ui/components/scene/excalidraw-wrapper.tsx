@@ -13,8 +13,11 @@ import "@excalidraw/excalidraw/index.css";
 import {
   AppState,
   BinaryFiles,
+  Collaborator,
+  CollaboratorPointer,
   ExcalidrawImperativeAPI,
   Gesture,
+  SocketId,
 } from "@excalidraw/excalidraw/types";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -33,7 +36,6 @@ export default function ExcalidrawWrapper({
     useState<ExcalidrawImperativeAPI | null>(null);
 
   const { data: scene, isError } = useGetProjectScene(projectId);
-  const { collaborators } = useRoomState();
 
   const { readyState, sendJsonMessage } = useCustomWebSocket(WEBSOCKET_URL, {
     onRoomUserChange: (data: RoomUserChangeData) => {
@@ -52,8 +54,20 @@ export default function ExcalidrawWrapper({
         appState,
       });
     },
-    onServerPointerBroadcast: (data) =>
-      useRoomState.getState().updatePointers(data.users),
+    onServerPointerBroadcast: (data) => {
+      const users = data.users;
+      const newMap = new Map<SocketId, Collaborator>();
+      users.forEach((user) => {
+        newMap.set(user.username as SocketId, {
+          pointer: {
+            x: user.x,
+            y: user.y,
+          } as CollaboratorPointer,
+          username: user.username,
+        });
+      });
+      excalidrawAPI?.updateScene({ collaborators: newMap });
+    },
   });
 
   useEffect(() => {
@@ -99,10 +113,6 @@ export default function ExcalidrawWrapper({
       },
     });
   };
-
-  useEffect(() => {
-    excalidrawAPI?.updateScene({ collaborators });
-  }, [collaborators, excalidrawAPI]);
 
   return (
     <div className="custom-styles h-screen w-screen">
