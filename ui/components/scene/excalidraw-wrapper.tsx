@@ -97,6 +97,33 @@ export default function ExcalidrawWrapper({
     }
   }, [projectId, readyState, sendJsonMessage, username]);
 
+  useEffect(() => {
+    const handleLeave = () => {
+      if (readyState === ReadyState.OPEN && username) {
+        sendJsonMessage({
+          type: "disconnecting",
+          data: {
+            projectId,
+            username,
+          },
+        });
+      }
+    };
+
+    // 浏览器关闭、刷新等
+    window.addEventListener("beforeunload", handleLeave);
+
+    // Next.js 切换路由（返回主页等）
+    const handleRouteChange = () => handleLeave();
+    window.addEventListener("pagehide", handleRouteChange); // 更兼容的方式
+
+    return () => {
+      handleLeave();
+      window.removeEventListener("beforeunload", handleLeave);
+      window.removeEventListener("pagehide", handleRouteChange);
+    };
+  }, [projectId, readyState, sendJsonMessage, username]);
+
   const handleChange = (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
