@@ -211,7 +211,7 @@ export default function ExcalidrawWrapper({
             isError
               ? null
               : {
-                  elements: scene?.elements ?? [],
+                  elements: convertToExcalidrawElements(scene.elements ?? []),
                   appState: scene?.appState ?? {},
                   scrollToContent: true,
                 }

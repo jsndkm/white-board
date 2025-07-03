@@ -1,3 +1,6 @@
+import { ExcalidrawElementSkeleton } from "@excalidraw/excalidraw/data/transform";
+import { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
+
 export type CreateProjectRespData = {
   id: number;
 };
@@ -19,4 +22,10 @@ export type ProjectDetail = {
       admin: boolean;
     },
   ];
+};
+
+export type Scene = {
+  elements: ExcalidrawElementSkeleton[];
+  appState: AppState;
+  files: BinaryFiles;
 };
