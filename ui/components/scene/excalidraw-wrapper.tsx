@@ -5,7 +5,11 @@ import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
 import { useGetProjectScene } from "@/hooks/api/project/use-get-project-scene";
 import { useCustomWebSocket } from "@/hooks/use-custom-websocket";
 import { WEBSOCKET_URL } from "@/lib/endpoint";
-import { RoomUserChangeData } from "@/lib/types/websocket";
+import {
+  RoomUserChangeData,
+  ServerBroadcastData,
+  ServerPointerBroadcast,
+} from "@/lib/types/websocket";
 import { useRoomState } from "@/stores/room";
 import { CaptureUpdateAction, Excalidraw } from "@excalidraw/excalidraw";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
@@ -19,10 +23,10 @@ import {
   Gesture,
   SocketId,
 } from "@excalidraw/excalidraw/types";
-import { isEqual } from "lodash";
+import { debounce, isEqual } from "lodash";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { ReadyState } from "react-use-websocket";
 
 export default function ExcalidrawWrapper({
@@ -40,8 +44,8 @@ export default function ExcalidrawWrapper({
 
   const skipChangeFrames = useRef(false);
 
-  const { readyState, sendJsonMessage } = useCustomWebSocket(WEBSOCKET_URL, {
-    onRoomUserChange: (data: RoomUserChangeData) => {
+  const onRoomUserChange = useCallback(
+    (data: RoomUserChangeData) => {
       if (data.userName === username) {
         if (data.action === "join") {
           useRoomState.getState().addUser(data.userName);
@@ -50,8 +54,13 @@ export default function ExcalidrawWrapper({
         }
       }
     },
-    onServerBroadcast: (data) => {
-      const { elements, appState } = data;
+    [username],
+  );
+
+  const onServerBroadcast = useCallback(
+    (data: ServerBroadcastData) => {
+      const elements = data.elements ?? [];
+      const appState = data.appState ?? {};
       const currentElements =
         excalidrawAPI?.getSceneElementsIncludingDeleted() ?? [];
       const currentAppState = excalidrawAPI?.getAppState() ?? {};
@@ -59,6 +68,7 @@ export default function ExcalidrawWrapper({
       const shouldUpdate =
         !isEqual(currentElements, elements) ||
         !isEqual(currentAppState, appState);
+
       if (shouldUpdate) {
         skipChangeFrames.current = true;
         excalidrawAPI?.updateScene({
@@ -68,7 +78,11 @@ export default function ExcalidrawWrapper({
         });
       }
     },
-    onServerPointerBroadcast: (data) => {
+    [excalidrawAPI],
+  );
+
+  const onServerPointerBroadcast = useCallback(
+    (data: ServerPointerBroadcast) => {
       const users = data.users;
       const newMap = new Map<SocketId, Collaborator>();
       users
@@ -84,6 +98,13 @@ export default function ExcalidrawWrapper({
         });
       excalidrawAPI?.updateScene({ collaborators: newMap });
     },
+    [excalidrawAPI, username],
+  );
+
+  const { readyState, sendJsonMessage } = useCustomWebSocket(WEBSOCKET_URL, {
+    onRoomUserChange: onRoomUserChange,
+    onServerBroadcast: onServerBroadcast,
+    onServerPointerBroadcast: onServerPointerBroadcast,
   });
 
   useEffect(() => {
@@ -130,7 +151,6 @@ export default function ExcalidrawWrapper({
     appState: AppState,
     files: BinaryFiles,
   ) => {
-    console.log("handleChange called", { elements, appState });
     if (skipChangeFrames.current) {
       skipChangeFrames.current = false;
       return; // 防止重复更新
@@ -166,8 +186,8 @@ export default function ExcalidrawWrapper({
     });
   };
 
-  // const debounceHandleChange = debounce(handleChange, 200);
-  // const debounceHandlePointerUpdate = debounce(handlePointerUpdate, 500);
+  const debounceHandleChange = debounce(handleChange, 200);
+  const debounceHandlePointerUpdate = debounce(handlePointerUpdate, 200);
 
   return (
     <div className="custom-styles h-screen w-screen">
@@ -191,8 +211,8 @@ export default function ExcalidrawWrapper({
                   scrollToContent: true,
                 }
           }
-          onChange={handleChange}
-          onPointerUpdate={handlePointerUpdate}
+          onChange={debounceHandleChange}
+          onPointerUpdate={debounceHandlePointerUpdate}
           isCollaborating={true}
         >
           <ExcalidrawMenu projectId={projectId} />
