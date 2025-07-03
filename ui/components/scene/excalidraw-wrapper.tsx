@@ -38,7 +38,7 @@ export default function ExcalidrawWrapper({
 
   const { data: scene, isError } = useGetProjectScene(projectId);
 
-  const skipChangeFrames = useRef(0);
+  const skipChangeFrames = useRef(false);
 
   const { readyState, sendJsonMessage } = useCustomWebSocket(WEBSOCKET_URL, {
     onRoomUserChange: (data: RoomUserChangeData) => {
@@ -59,7 +59,7 @@ export default function ExcalidrawWrapper({
         !isEqual(currentElements, data.elements) ||
         !isEqual(currentAppState, data.appState);
       if (shouldUpdate) {
-        skipChangeFrames.current = 2;
+        skipChangeFrames.current = true;
         excalidrawAPI?.updateScene({
           elements: data.elements ?? [],
           appState: data.appState ?? {},
@@ -102,8 +102,9 @@ export default function ExcalidrawWrapper({
     appState: AppState,
     files: BinaryFiles,
   ) => {
-    if (skipChangeFrames.current > 0) {
-      skipChangeFrames.current -= 1;
+    console.log(appState);
+    if (skipChangeFrames.current) {
+      skipChangeFrames.current = false;
       return; // 防止重复更新
     }
 
