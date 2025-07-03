@@ -98,7 +98,7 @@ public class WebSocketMessage {
     public static class ServerBroadcastData {
         private int projectId;
         private String username;
-        private List<ElementDto> elements;
+        private ElementDto[] elements;
         private AppStateDto appState;
         private FileDto file;
 
@@ -108,7 +108,7 @@ public class WebSocketMessage {
         public void setUsername(String username) {
             this.username = username;
         }
-        public void setElements(List<ElementDto> elements) {
+        public void setElements(ElementDto[] elements) {
             this.elements = elements;
         }
         public void setAppState(AppStateDto appState) {
@@ -123,7 +123,7 @@ public class WebSocketMessage {
         public String getUsername() {
             return username;
         }
-        public List<ElementDto> getElements() {
+        public ElementDto[] getElements() {
             return elements;
         }
         public AppStateDto getAppState() {
@@ -169,11 +169,11 @@ public class WebSocketMessage {
 
     @Data
     public static class ClientBroadcastData {
-        private List<ElementDto> elements;
+        private ElementDto[] elements;
         private AppStateDto appState;
         private FileDto file;
 
-        public void setElements(List<ElementDto> elements) {
+        public void setElements(ElementDto[] elements) {
             this.elements = elements;
         }
         public void setAppState(AppStateDto appState) {
@@ -182,7 +182,7 @@ public class WebSocketMessage {
         public void setFile(FileDto file) {
             this.file = file;
         }
-        public List<ElementDto> getElements() {
+        public ElementDto[] getElements() {
             return elements;
         }
         public AppStateDto getAppState() {

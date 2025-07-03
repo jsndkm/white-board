@@ -1,12 +1,15 @@
 package cn.edu.xmu.whiteboard.WebSocket;
 
 import cn.edu.xmu.whiteboard.WebSocket.pojo.WebSocketMessage;
+import cn.edu.xmu.whiteboard.controller.dto.pb.ElementDto;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardDto;
 import cn.edu.xmu.whiteboard.redis.PointerKey;
 import cn.edu.xmu.whiteboard.redis.ProjectBoardKey;
 import cn.edu.xmu.whiteboard.redis.RedisService;
+import cn.edu.xmu.whiteboard.service.ProjectBoardService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
@@ -31,6 +34,9 @@ public class WebSocketServer {
     private RedisService getRedisService() {
         return SpringContextHolder.getBean(RedisService.class);
     }
+    private ProjectBoardService getProjectBoardService() {
+        return SpringContextHolder.getBean(ProjectBoardService.class);
+    }
     // 用于生成服务器端时间戳
     private static final AtomicLong timestampGenerator = new AtomicLong(System.currentTimeMillis());
     // 消息处理线程池
@@ -47,12 +53,20 @@ public class WebSocketServer {
     // 用户会话：username -> WebSocketServer
     private static final Map<String, WebSocketServer> userSessionMap = new ConcurrentHashMap<>();
 
+    //静态画板
+    private static ProjectBoardDto projectBoardDto = new ProjectBoardDto();
+
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
     // 当前房间ID
     private String currentRoomId;
+    //当前用户名
+    private String currentUsername;
     // 标记是否正在处理消息，防止重复处理
     private volatile boolean isProcessing = false;
+
+    private static final long DEDUPLICATION_WINDOW_MS = 1000; // 1秒的去重窗口
+    private static final ConcurrentHashMap<String, Long> recentMessageCache = new ConcurrentHashMap<>();
     /**
      * 连接建立成功调用的方法
      */
@@ -74,6 +88,20 @@ public class WebSocketServer {
         webSocketSet.remove(this);
         log.info("连接关闭！当前在线人数为" + webSocketSet.size());
         log.info("user disconnect");
+        if(currentRoomId != null&&currentUsername!=null) {
+            RoomInfo room = roomMap.get(currentRoomId);
+            if(room!=null) {
+                room.removeUser(currentUsername);
+                roomMap.put(room.roomId, room);
+            }
+            userSessionMap.remove(currentUsername);
+            WebSocketMessage.RoomUserChangeData userChangeData = new WebSocketMessage.RoomUserChangeData();
+            userChangeData.setUsername(currentUsername);
+            userChangeData.setAction("leave");
+            broadcastToRoom(currentRoomId, "room-user-change", userChangeData, timestampGenerator.getAndIncrement());
+            log.info(currentUsername + "离开房间:" + currentRoomId);
+            log.info(currentUsername + "断开连接");
+        }
     }
 
     /**
@@ -96,6 +124,19 @@ public class WebSocketServer {
                 timestamp = timestampGenerator.getAndIncrement();
             }
 
+            // 短时间内去重：检查是否在最近1秒内处理过相同类型和数据的消息
+            String messageKey = generateMessageKey(type, data);
+            Long lastProcessedTime = recentMessageCache.get(messageKey);
+            long currentTime = System.currentTimeMillis();
+
+            if (lastProcessedTime != null && (currentTime - lastProcessedTime) < DEDUPLICATION_WINDOW_MS) {
+                log.debug("消息被短时间内去重过滤: type={}, data={}", type, data);
+                return;
+            }
+
+            // 更新最近处理时间（即使不处理也要更新，防止频繁重复）
+            recentMessageCache.put(messageKey, currentTime);
+
             // 将消息加入队列
             messageQueue.put(new PendingMessage(type, data, timestamp, this));
 
@@ -106,6 +147,13 @@ public class WebSocketServer {
         } catch (Exception e) {
             log.error("消息处理错误: " + e.getMessage());
         }
+    }
+
+    //生成消息的唯一标识（类型 + 数据，排除时间戳）
+    private String generateMessageKey(String type, JSONObject data) {
+        // 将数据转为标准化的JSON字符串（避免字段顺序不同导致去重失败）
+        String dataStr = JSON.toJSONString(data, SerializerFeature.MapSortField);
+        return type + "|" + dataStr;
     }
 
     // 处理消息队列中的消息
@@ -157,11 +205,9 @@ public class WebSocketServer {
                     break;
                 default:
                     log.error("未知消息类型: " + type);
-                    sendError("未知消息类型: " + type, responseTimestamp);
             }
         } catch (Exception e) {
             log.error("消息处理错误: " + e.getMessage());
-            sendError("消息处理错误: " + e.getMessage(), responseTimestamp);
         }
     }
 
@@ -188,11 +234,8 @@ public class WebSocketServer {
 
     // 发送错误消息（包含时间戳）
     private void sendError(String errorMessage, long responseTimestamp) {
-        /*try {
-            sendMessage("error", errorMessage, responseTimestamp);
-        } catch (IOException e) {
-            log.error("发送错误消息失败", e);
-        }*/
+        System.out.println(errorMessage+":"+responseTimestamp);
+        log.error(errorMessage);
     }
 
     // 内部类表示房间信息
@@ -253,8 +296,17 @@ public class WebSocketServer {
             response.setElements(request.getElements());
             response.setAppState(request.getAppState());
             response.setFile(request.getFile());
+            for(ElementDto elementDto: response.getElements()){
+                System.out.println(elementDto.getType());
+            }
 
             broadcastToRoomExcludingUser(roomId, "server-broadcast", response, responseTimestamp, request.getUsername());
+
+            projectBoardDto.setElements(request.getElements());
+            projectBoardDto.setAppState(request.getAppState());
+            projectBoardDto.setFiles(request.getFile());
+            ProjectBoardService projectBoardService=getProjectBoardService();
+            projectBoardService.storeProjectBoard(projectBoardDto,request.getProjectId());
         } else {
             sendError("房间不存在",responseTimestamp);
         }
@@ -355,6 +407,7 @@ public class WebSocketServer {
         //生成roomId
         String roomId = "Room" + projectId;
         this.currentRoomId = roomId;
+        this.currentUsername=username;
         RoomInfo roomInfo = new RoomInfo(roomId);
         roomInfo.addUser(username);
         roomMap.put(roomId,roomInfo);
@@ -390,6 +443,7 @@ public class WebSocketServer {
             }
             else {
                 currentRoomId = room.roomId;
+                currentUsername=user;
                 room.addUser(user);
                 roomMap.put(room.roomId,room);
             }
