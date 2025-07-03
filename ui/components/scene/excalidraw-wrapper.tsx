@@ -220,7 +220,7 @@ export default function ExcalidrawWrapper({
           onPointerUpdate={debounceHandlePointerUpdate}
           isCollaborating={true}
         >
-          <ExcalidrawMenu projectId={projectId} />
+          <ExcalidrawMenu />
           <ProjectDialog />
         </Excalidraw>
       </Suspense>

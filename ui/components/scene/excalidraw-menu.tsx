@@ -1,16 +1,14 @@
 "use client";
 
-import { useDeleteProjectMutation } from "@/hooks/api/project/use-delete-project";
-import { useGlobalConfirmDialogStore } from "@/stores/confirm-dialog";
 import { useProjectDialogStore } from "@/stores/project-dialog";
 import { MainMenu } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
 import { SiGithub } from "@icons-pack/react-simple-icons";
-import { Folder, House, LogOut, Plus, X } from "lucide-react";
+import { Folder, House, LogOut, Plus } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-export default function ExcalidrawMenu({ projectId }: { projectId: number }) {
+export default function ExcalidrawMenu() {
   const router = useRouter();
 
   const handleNewProject = () => {
@@ -19,23 +17,6 @@ export default function ExcalidrawMenu({ projectId }: { projectId: number }) {
 
   const handleOpenProject = () => {
     useProjectDialogStore.getState().openDialog("openProject");
-  };
-
-  const deleteProject = useDeleteProjectMutation();
-  const handleDeleteProject = () => {
-    useGlobalConfirmDialogStore.getState().openDialog({
-      type: "deleteProject",
-      title: "删除项目",
-      description: "确定要删除当前项目吗？",
-      onConfirm: () => {
-        deleteProject.mutate(
-          { projectId: projectId },
-          {
-            onSuccess: () => router.push("/"),
-          },
-        );
-      },
-    });
   };
 
   return (
@@ -48,11 +29,6 @@ export default function ExcalidrawMenu({ projectId }: { projectId: number }) {
       <MainMenu.Item onSelect={handleOpenProject}>
         <Folder />
         打开项目
-      </MainMenu.Item>
-
-      <MainMenu.Item onSelect={handleDeleteProject}>
-        <X />
-        删除项目
       </MainMenu.Item>
 
       <MainMenu.Item onSelect={() => router.push("/")}>

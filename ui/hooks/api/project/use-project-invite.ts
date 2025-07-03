@@ -24,5 +24,8 @@ export function useProjectInviteMutation() {
         queryKey: ["project", variables.projectId],
       });
     },
+    onError: async () => {
+      toast.error("邀请失败，请稍后再试");
+    },
   });
 }

@@ -1,6 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
 import { getSession } from "next-auth/react";
-import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -25,8 +24,8 @@ export async function fetcher<T>(
 
   const { msg, data } = await resp.json();
   if (!resp.ok) {
-    toast.error(msg ?? "未知错误，请稍后再试");
-    // throw new Error(message ?? "response error");
+    // toast.error(msg ?? "未知错误，请稍后再试");
+    throw new Error(msg ?? "response error");
   }
 
   return data;
