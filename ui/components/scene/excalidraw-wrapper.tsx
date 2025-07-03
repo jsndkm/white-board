@@ -47,7 +47,7 @@ export default function ExcalidrawWrapper({
 
   const { data: scene, isError } = useGetProjectScene(projectId);
 
-  const skipChangeFrames = useRef(false);
+  const skipChangeFrames = useRef(0);
 
   const onRoomUserChange = useCallback(
     (data: RoomUserChangeData) => {
@@ -73,9 +73,12 @@ export default function ExcalidrawWrapper({
         !isEqual(localEls, elements) || !isEqual(localAppState, appState);
 
       if (shouldUpdate) {
-        skipChangeFrames.current = true;
+        skipChangeFrames.current += 1;
         excalidrawAPI?.updateScene({
-          elements: restoreElements(elements, localEls),
+          elements: restoreElements(elements, localEls, {
+            refreshDimensions: false,
+            repairBindings: true,
+          }),
           appState: restoreAppState(appState, localAppState),
           captureUpdate: CaptureUpdateAction.NEVER,
         });
@@ -154,8 +157,8 @@ export default function ExcalidrawWrapper({
     appState: AppState,
     files: BinaryFiles,
   ) => {
-    if (skipChangeFrames.current) {
-      skipChangeFrames.current = false;
+    if (skipChangeFrames.current > 0) {
+      skipChangeFrames.current -= 1;
       return; // 防止重复更新
     }
 
@@ -209,7 +212,10 @@ export default function ExcalidrawWrapper({
             isError
               ? null
               : {
-                  elements: restoreElements(scene.elements, []),
+                  elements: restoreElements(scene.elements, [], {
+                    refreshDimensions: false,
+                    repairBindings: true,
+                  }),
                   appState: restoreAppState(scene.appState, {}),
                   scrollToContent: true,
                 }
