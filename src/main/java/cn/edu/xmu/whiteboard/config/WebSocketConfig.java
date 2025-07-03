@@ -18,8 +18,8 @@ public class WebSocketConfig {
     @Bean
     public ServletServerContainerFactoryBean createWebSocketContainer() {
         ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
-        container.setMaxTextMessageBufferSize(1024 * 1024); // 1MB
-        container.setMaxBinaryMessageBufferSize(1024 * 1024); // 1MB
+        container.setMaxTextMessageBufferSize(64*1024 * 1024); // 64MB
+        container.setMaxBinaryMessageBufferSize(64*1024 * 1024); // 64MB
         container.setMaxSessionIdleTimeout(0L); // 不超时
         return container;
     }

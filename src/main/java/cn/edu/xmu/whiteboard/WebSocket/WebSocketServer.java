@@ -14,6 +14,7 @@ import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import cn.edu.xmu.whiteboard.WebSocket.SpringContextHolder;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 @ServerEndpoint(value = "/ws")
 @Component
@@ -52,9 +54,13 @@ public class WebSocketServer {
     private static final Map<String, RoomInfo> roomMap = new ConcurrentHashMap<>();
     // 用户会话：username -> WebSocketServer
     private static final Map<String, WebSocketServer> userSessionMap = new ConcurrentHashMap<>();
+    // 项目画板：roomId -> ProjectBoard
+    // 使用AtomicReference保证projectBoardDto的原子更新
+    private static final Map<String, AtomicReference<ProjectBoardDto>> projectBoardMap =
+            new ConcurrentHashMap<>();
 
     //静态画板
-    private static ProjectBoardDto projectBoardDto = new ProjectBoardDto();
+    //private static ProjectBoardDto projectBoardDto = new ProjectBoardDto();
 
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
@@ -65,13 +71,9 @@ public class WebSocketServer {
     // 标记是否正在处理消息，防止重复处理
     private volatile boolean isProcessing = false;
 
-    private static final long DEDUPLICATION_WINDOW_MS = 1000; // 1秒的去重窗口
+    private static final long DEDUPLICATION_WINDOW_MS = 500; // 1秒的去重窗口
     private static final ConcurrentHashMap<String, Long> recentMessageCache = new ConcurrentHashMap<>();
 
-    // 防抖相关配置
-    private static final long DEBOUNCE_DELAY_MS = 2000; // 2秒防抖延迟
-    private static final ScheduledExecutorService debounceExecutor = Executors.newScheduledThreadPool(4);
-    private static final ConcurrentHashMap<String, ScheduledFuture<?>> debounceTasks = new ConcurrentHashMap<>();
     /**
      * 连接建立成功调用的方法
      */
@@ -160,7 +162,7 @@ public class WebSocketServer {
     private String generateMessageKey(String type, JSONObject data) {
         // 将数据转为标准化的JSON字符串（避免字段顺序不同导致去重失败）
         String dataStr = JSON.toJSONString(data, SerializerFeature.MapSortField);
-        return type + "|" + dataStr;
+        return type + "|" + dataStr + "|" + Thread.currentThread().getId();
     }
 
     // 处理消息队列中的消息
@@ -295,6 +297,60 @@ public class WebSocketServer {
             return;
         }
         String roomId = "Room" + request.getProjectId();
+        AtomicReference<ProjectBoardDto> boardRef = projectBoardMap.get(roomId);
+
+        if (boardRef == null) {
+            sendError("项目不存在", responseTimestamp);
+            return;
+        }
+        // 使用锁保证原子性
+        synchronized (boardRef) {
+            ProjectBoardDto currentBoard = boardRef.get();
+            ProjectBoardDto projectBoardDto = new ProjectBoardDto();
+            BeanUtils.copyProperties(currentBoard, projectBoardDto); // 深度拷贝
+            // 合并elements
+            Map<String, ElementDto> mergedElements = new HashMap<>();
+
+            // 先将当前存在的elements放入map
+            if (projectBoardDto.getElements() != null) {
+                for (ElementDto existingElement : projectBoardDto.getElements()) {
+                    if (existingElement.getID() != null) {
+                        mergedElements.put(existingElement.getID(), existingElement);
+                    }
+                }
+            }
+
+            // 处理请求中的elements，根据version合并
+            if (request.getElements() != null) {
+                for (ElementDto newElement : request.getElements()) {
+                    if (newElement.getID() == null) {
+                        continue; // 跳过没有ID的元素
+                    }
+
+                    ElementDto existingElement = mergedElements.get(newElement.getID());
+                    if (existingElement != null) {
+                        // 如果新元素的version更高，则覆盖
+                        if (newElement.getVersion() > existingElement.getVersion()) {
+                            mergedElements.put(newElement.getID(), newElement);
+                        }
+                    } else {
+                        // 如果不存在，直接添加
+                        mergedElements.put(newElement.getID(), newElement);
+                    }
+                }
+            }
+
+            // 创建合并后的elements数组
+            ElementDto[] finalElements = mergedElements.values().toArray(new ElementDto[0]);
+
+            projectBoardDto.setElements(finalElements);
+            projectBoardDto.setAppState(request.getAppState());
+            projectBoardDto.setFiles(request.getFile());
+            boardRef.set(projectBoardDto); // 原子更新
+            projectBoardMap.put(roomId, boardRef);
+            ProjectBoardService projectBoardService = getProjectBoardService();
+            projectBoardService.storeProjectBoard(projectBoardDto, request.getProjectId());
+        }
 
         // 广播给房间内所有用户
         RoomInfo roomInfo = roomMap.get(roomId);
@@ -305,12 +361,6 @@ public class WebSocketServer {
             response.setFile(request.getFile());
 
             broadcastToRoomExcludingUser(roomId, "server-broadcast", response, responseTimestamp, request.getUsername());
-
-            projectBoardDto.setElements(request.getElements());
-            projectBoardDto.setAppState(request.getAppState());
-            projectBoardDto.setFiles(request.getFile());
-            ProjectBoardService projectBoardService=getProjectBoardService();
-            projectBoardService.storeProjectBoard(projectBoardDto,request.getProjectId());
         } else {
             sendError("房间不存在",responseTimestamp);
         }
@@ -412,6 +462,7 @@ public class WebSocketServer {
         String roomId = "Room" + projectId;
         this.currentRoomId = roomId;
         this.currentUsername=username;
+        projectBoardMap.put(roomId, new AtomicReference<>(new ProjectBoardDto()));
         RoomInfo roomInfo = new RoomInfo(roomId);
         roomInfo.addUser(username);
         roomMap.put(roomId,roomInfo);
