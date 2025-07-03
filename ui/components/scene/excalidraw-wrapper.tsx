@@ -51,18 +51,19 @@ export default function ExcalidrawWrapper({
       }
     },
     onServerBroadcast: (data) => {
+      const { elements, appState } = data;
       const currentElements =
         excalidrawAPI?.getSceneElementsIncludingDeleted() ?? [];
       const currentAppState = excalidrawAPI?.getAppState() ?? {};
 
       const shouldUpdate =
-        !isEqual(currentElements, data.elements) ||
-        !isEqual(currentAppState, data.appState);
+        !isEqual(currentElements, elements) ||
+        !isEqual(currentAppState, appState);
       if (shouldUpdate) {
         skipChangeFrames.current = true;
         excalidrawAPI?.updateScene({
-          elements: data.elements ?? [],
-          appState: data.appState ?? {},
+          elements,
+          appState,
           captureUpdate: CaptureUpdateAction.NEVER,
         });
       }
@@ -129,7 +130,7 @@ export default function ExcalidrawWrapper({
     appState: AppState,
     files: BinaryFiles,
   ) => {
-    console.log(appState);
+    console.log("handleChange called", { elements, appState });
     if (skipChangeFrames.current) {
       skipChangeFrames.current = false;
       return; // 防止重复更新
