@@ -11,7 +11,11 @@ import {
   ServerPointerBroadcast,
 } from "@/lib/types/websocket";
 import { useRoomState } from "@/stores/room";
-import { CaptureUpdateAction, Excalidraw } from "@excalidraw/excalidraw";
+import {
+  CaptureUpdateAction,
+  convertToExcalidrawElements,
+  Excalidraw,
+} from "@excalidraw/excalidraw";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import "@excalidraw/excalidraw/index.css";
 import {
@@ -71,8 +75,9 @@ export default function ExcalidrawWrapper({
 
       if (shouldUpdate) {
         skipChangeFrames.current = true;
+
         excalidrawAPI?.updateScene({
-          elements,
+          elements: convertToExcalidrawElements(elements),
           appState,
           captureUpdate: CaptureUpdateAction.NEVER,
         });
