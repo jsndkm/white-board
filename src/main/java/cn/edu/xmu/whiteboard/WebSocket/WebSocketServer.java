@@ -67,6 +67,11 @@ public class WebSocketServer {
 
     private static final long DEDUPLICATION_WINDOW_MS = 1000; // 1秒的去重窗口
     private static final ConcurrentHashMap<String, Long> recentMessageCache = new ConcurrentHashMap<>();
+
+    // 防抖相关配置
+    private static final long DEBOUNCE_DELAY_MS = 2000; // 2秒防抖延迟
+    private static final ScheduledExecutorService debounceExecutor = Executors.newScheduledThreadPool(4);
+    private static final ConcurrentHashMap<String, ScheduledFuture<?>> debounceTasks = new ConcurrentHashMap<>();
     /**
      * 连接建立成功调用的方法
      */
@@ -83,11 +88,13 @@ public class WebSocketServer {
      * 连接关闭调用的方法
      */
     @OnClose
-    public void onClose() {
+    public void onClose(Session session, CloseReason reason) {
+        log.info("连接关闭，原因: {}", reason);
         //从set中删除
         webSocketSet.remove(this);
         log.info("连接关闭！当前在线人数为" + webSocketSet.size());
         log.info("user disconnect");
+        messageQueue.removeIf(msg -> msg.sender == this);
         if(currentRoomId != null&&currentUsername!=null) {
             RoomInfo room = roomMap.get(currentRoomId);
             if(room!=null) {
@@ -200,7 +207,7 @@ public class WebSocketServer {
                 case "client-pointer-broadcast":
                     handleServerPointerBroadcast(data, responseTimestamp);
                     break;
-                case "dis-connecting":
+                case "disconnecting":
                     handleDisconnecting(data, responseTimestamp);
                     break;
                 default:
@@ -296,9 +303,6 @@ public class WebSocketServer {
             response.setElements(request.getElements());
             response.setAppState(request.getAppState());
             response.setFile(request.getFile());
-            for(ElementDto elementDto: response.getElements()){
-                System.out.println(elementDto.getType());
-            }
 
             broadcastToRoomExcludingUser(roomId, "server-broadcast", response, responseTimestamp, request.getUsername());
 
@@ -476,12 +480,12 @@ public class WebSocketServer {
         disconnectData.setUsername(user);
         disconnectData.setIsExpected(true);
 
-        try {
-            onClose();
-        } catch (Exception e) {
-            log.error("webSocket disconnect error");
-            disconnectData.setIsExpected(false);
-        }
+//        try {
+//            onClose();
+//        } catch (Exception e) {
+//            log.error("webSocket disconnect error");
+//            disconnectData.setIsExpected(false);
+//        }
         try {
             RoomInfo room = roomMap.get(roomId);
             room.removeUser(user);

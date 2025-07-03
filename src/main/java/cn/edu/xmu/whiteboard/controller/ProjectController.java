@@ -245,7 +245,7 @@ public class ProjectController {
                     TemplateDto templateDto = new TemplateDto();
                     templateDto.setInformation(baseName);
 
-                    // 3. 设置图片（如果存在匹配的图片）
+                    // 设置图片（如果存在匹配的图片）
                     if (imageFileMap.containsKey(baseName)) {
                         File imgFile = imageFileMap.get(baseName);
                         // 返回图片Base64编码
