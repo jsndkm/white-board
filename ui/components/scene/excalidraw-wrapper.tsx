@@ -116,6 +116,7 @@ export default function ExcalidrawWrapper({
         appState,
         files,
       },
+      timestamp: Date.now(),
     });
   };
 
@@ -127,11 +128,12 @@ export default function ExcalidrawWrapper({
     sendJsonMessage({
       type: "client-pointer-broadcast",
       data: {
-        projectId: projectId,
+        projectId,
         username,
         x: payload.pointer.x,
         y: payload.pointer.y,
       },
+      timestamp: Date.now(),
     });
   };
 
