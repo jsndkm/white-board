@@ -13,8 +13,9 @@ import {
 import { useRoomState } from "@/stores/room";
 import {
   CaptureUpdateAction,
-  convertToExcalidrawElements,
   Excalidraw,
+  restoreAppState,
+  restoreElements,
 } from "@excalidraw/excalidraw";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import "@excalidraw/excalidraw/index.css";
@@ -65,20 +66,17 @@ export default function ExcalidrawWrapper({
     (data: ServerBroadcastData) => {
       const elements = data.elements ?? [];
       const appState = data.appState ?? {};
-      const currentElements =
-        excalidrawAPI?.getSceneElementsIncludingDeleted() ?? [];
-      const currentAppState = excalidrawAPI?.getAppState() ?? {};
+      const localEls = excalidrawAPI?.getSceneElementsIncludingDeleted() ?? [];
+      const localAppState = excalidrawAPI?.getAppState() ?? {};
 
       const shouldUpdate =
-        !isEqual(currentElements, elements) ||
-        !isEqual(currentAppState, appState);
+        !isEqual(localEls, elements) || !isEqual(localAppState, appState);
 
       if (shouldUpdate) {
         skipChangeFrames.current = true;
-
         excalidrawAPI?.updateScene({
-          elements: convertToExcalidrawElements(elements),
-          appState,
+          elements: restoreElements(elements, localEls),
+          appState: restoreAppState(appState, localAppState),
           captureUpdate: CaptureUpdateAction.NEVER,
         });
       }
@@ -211,8 +209,8 @@ export default function ExcalidrawWrapper({
             isError
               ? null
               : {
-                  elements: convertToExcalidrawElements(scene.elements ?? []),
-                  appState: scene?.appState ?? {},
+                  elements: restoreElements(scene.elements, []),
+                  appState: restoreAppState(scene.appState, {}),
                   scrollToContent: true,
                 }
           }

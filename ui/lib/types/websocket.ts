@@ -1,4 +1,3 @@
-import { ExcalidrawElementSkeleton } from "@excalidraw/excalidraw/data/transform";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 
@@ -14,8 +13,8 @@ export type RoomUserChangeData = {
 };
 
 export type ServerBroadcastData = {
-  // elements: readonly OrderedExcalidrawElement[];
-  elements: ExcalidrawElementSkeleton[];
+  elements: readonly OrderedExcalidrawElement[];
+  // elements: ExcalidrawElementSkeleton[];
   appState: AppState;
   files: BinaryFiles;
 };
