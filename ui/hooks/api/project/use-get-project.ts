@@ -5,10 +5,10 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 export function useGetProject(projectId: number | undefined) {
   return useSuspenseQuery({
-    queryKey: ["project-simple", projectId],
+    queryKey: ["project", projectId],
     queryFn: async () => {
       if (!projectId) return null;
-      return await fetcher<ProjectDetail>(API.projects.simple(projectId));
+      return await fetcher<ProjectDetail>(API.projects.detail(projectId));
     },
   });
 }

@@ -1,10 +1,8 @@
 "use client";
 
-import { ProjectDetailSheet } from "@/components/common/project-detail-sheet";
 import { ProjectDialog } from "@/components/common/project-dialog";
 import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
 import { useGetProjectScene } from "@/hooks/api/project/use-get-project-scene";
-import { useGetProjectSimple } from "@/hooks/api/project/use-get-project-simple";
 import { useCustomWebSocket } from "@/hooks/use-custom-websocket";
 import { WEBSOCKET_URL } from "@/lib/endpoint";
 import {
@@ -33,13 +31,7 @@ import {
 import { debounce, isEqual } from "lodash";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
-import React, {
-  Suspense,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ReadyState } from "react-use-websocket";
 
 export default function ExcalidrawWrapper({
@@ -53,8 +45,7 @@ export default function ExcalidrawWrapper({
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
 
-  const { data: scene, isError } = useGetProjectScene(projectId);
-  const { data: project } = useGetProjectSimple(projectId);
+  const { data: scene, isError, isPending } = useGetProjectScene(projectId);
 
   const skipChangeFrames = useRef(0);
 
@@ -232,45 +223,43 @@ export default function ExcalidrawWrapper({
   const debounceHandleChange = debounce(handleChange, 0);
   const debounceHandlePointerUpdate = debounce(handlePointerUpdate, 0);
 
+  if (isPending)
+    return (
+      <div className="flex h-screen w-screen flex-col items-center justify-center gap-4">
+        <LoaderCircle className="animate-spin" />
+        <span className="text-lg">首次加载需要较长时间...</span>
+      </div>
+    );
+
   return (
     <div className="custom-styles h-screen w-screen">
-      <Suspense
-        fallback={
-          <div className="flex h-screen w-screen flex-col items-center justify-center gap-4">
-            <LoaderCircle className="animate-spin" />
-            <span className="text-lg">首次加载需要较长时间...</span>
-          </div>
+      <Excalidraw
+        langCode="zh-CN"
+        excalidrawAPI={(api) => setExcalidrawAPI(api)}
+        UIOptions={{
+          tools: {
+            image: false,
+          },
+        }}
+        initialData={
+          isError
+            ? null
+            : {
+                elements: restoreElements(scene.elements, [], {
+                  refreshDimensions: false,
+                  repairBindings: true,
+                }),
+                // elements: scene.elements ?? [],
+                scrollToContent: true,
+              }
         }
+        onChange={debounceHandleChange}
+        onPointerUpdate={debounceHandlePointerUpdate}
+        isCollaborating={true}
       >
-        <Excalidraw
-          langCode="zh-CN"
-          excalidrawAPI={(api) => setExcalidrawAPI(api)}
-          UIOptions={{
-            tools: {
-              image: false,
-            },
-          }}
-          initialData={
-            isError
-              ? null
-              : {
-                  elements: restoreElements(scene.elements, [], {
-                    refreshDimensions: false,
-                    repairBindings: true,
-                  }),
-                  // elements: scene.elements ?? [],
-                  scrollToContent: true,
-                }
-          }
-          onChange={debounceHandleChange}
-          onPointerUpdate={debounceHandlePointerUpdate}
-          isCollaborating={true}
-        >
-          <ExcalidrawMenu project={project} />
-          <ProjectDialog />
-        </Excalidraw>
-      </Suspense>
-      <ProjectDetailSheet />
+        <ExcalidrawMenu projectId={projectId} />
+        <ProjectDialog />
+      </Excalidraw>
     </div>
   );
 }

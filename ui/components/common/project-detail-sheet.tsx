@@ -21,7 +21,11 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 
-export function ProjectDetailSheet() {
+export function ProjectDetailSheet({
+  showOpenProjectButton = true,
+}: {
+  showOpenProjectButton?: boolean;
+}) {
   const router = useRouter();
   const { data: session } = useSession();
   const username = session?.user?.username || "";
@@ -124,10 +128,13 @@ export function ProjectDetailSheet() {
 
           {/* Action on bottom */}
           <div className="mt-auto flex justify-end gap-2 pt-4">
-            <Button className="cursor-pointer" onClick={handleOpenProject}>
-              <FolderOpen />
-              打开项目
-            </Button>
+            {showOpenProjectButton && (
+              <Button className="cursor-pointer" onClick={handleOpenProject}>
+                <FolderOpen />
+                打开项目
+              </Button>
+            )}
+
             {project?.admin ? (
               <Button
                 variant="destructive"
