@@ -7,19 +7,22 @@ public class MyProjectReturnData {
     private String name;
     private String description;
     private boolean admin;
+    private String image;
 
     public MyProjectReturnData() {
         id=-1;
         name=null;
         description=null;
         admin=false;
+        image=null;
     }
 
-    public MyProjectReturnData(int id, String name, String description, boolean is_admin) {
+    public MyProjectReturnData(int id, String name, String description, boolean is_admin, String image) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.admin = is_admin;
+        this.image = image;
     }
 
     public int getId() {return id;}
@@ -32,4 +35,8 @@ public class MyProjectReturnData {
     public boolean isIs_admin() {return admin;}
     @JsonProperty("admin")
     public void setIs_admin(boolean is_admin) {this.admin = is_admin;}
+    @JsonProperty("image")
+    public String getImage() {return image;}
+    @JsonProperty("image")
+    public void setImage(String image) {this.image = image;}
 }

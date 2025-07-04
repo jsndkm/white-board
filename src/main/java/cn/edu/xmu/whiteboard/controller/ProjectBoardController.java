@@ -3,6 +3,7 @@ package cn.edu.xmu.whiteboard.controller;
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
 import cn.edu.xmu.whiteboard.ReturnData.ProjectBoardReturnData;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardDto;
+import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardScreenShotDto;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
 import cn.edu.xmu.whiteboard.service.ProjectBoardService;
 import cn.edu.xmu.whiteboard.utils.JWTUtil;
@@ -28,6 +29,28 @@ public class ProjectBoardController {
 
             // 存储画板数据
             projectBoardService.storeProjectBoard(projectBoardDto,id);
+
+            // 返回响应
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(ResultUtil.success(null));
+        } catch (Exception e) {
+            GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
+            return exceptionHandle.exceptionHandle(e);
+        }
+    }
+
+    @PutMapping("/project-board/{id}")
+    public ResponseEntity<ResultUtil<Object>> modifyProjectBoard(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("id") Integer id,
+            @RequestBody ProjectBoardScreenShotDto projectBoardScreenShotDto) {
+        try {
+            //解析token
+            JWTUtil.analyzeToken(authorization);
+
+            // 存储画板数据
+            projectBoardService.modifyProjectBoard(projectBoardScreenShotDto,id);
 
             // 返回响应
             return ResponseEntity

@@ -284,10 +284,6 @@ public class WebSocketServer {
     // 处理服务器广播
     private void handleServerBroadcast(JSONObject data,long responseTimestamp) {
         WebSocketMessage.ServerBroadcastData request = data.toJavaObject(WebSocketMessage.ServerBroadcastData.class);
-        for(ElementDto elementDto:request.getElements())
-        {
-            System.out.println("id: "+elementDto.getId()+" type: "+elementDto.getType()+" isD: "+elementDto.getIsDeleted());
-        }
         if(request.getProjectId()<0)
         {
             sendError("项目ID无效",responseTimestamp);
@@ -310,6 +306,7 @@ public class WebSocketServer {
 
             // 合并逻辑
             Map<String, ElementDto> mergedElements = new HashMap<>();
+            List<ElementDto> mergedList = new ArrayList<>();
 
             // 先将当前存在的elements放入map
             if (currentBoard.getElements() != null) {
@@ -332,28 +329,28 @@ public class WebSocketServer {
                         // 如果新元素的version更高，则覆盖
                         if (newElement.getVersion() > existingElement.getVersion()) {
                             // 创建一个新元素，复制新元素的所有属性（除了 index）
-                            ElementDto mergedElement = new ElementDto();
-                            BeanUtils.copyProperties(newElement, mergedElement); // 复制新元素的所有属性
-                            mergedElement.setIndex(existingElement.getIndex()); // 强制保留原有 index
-                            mergedElements.put(newElement.getId(), mergedElement);
+                            mergedList.add(newElement);
+                        }
+                        else {
+                            mergedList.add(existingElement);
                         }
                     } else {
                         // 如果不存在，直接添加
-                        mergedElements.put(newElement.getId(), newElement);
+                        mergedList.add(newElement);
                     }
                 }
             }
 
             // 创建合并后的elements数组
-            ElementDto[] finalElements = mergedElements.values().toArray(new ElementDto[0]);
+            ElementDto[] finalElements = mergedList.toArray(new ElementDto[mergedList.size()]);
 
             newBoard.setElements(finalElements);
             newBoard.setAppState(currentBoard.getAppState());
             newBoard.setFiles(request.getFile());
             boardRef.set(newBoard); // 原子更新
             projectBoardMap.put(roomId, boardRef);
-            ProjectBoardService projectBoardService = getProjectBoardService();
-            projectBoardService.storeProjectBoard(newBoard, request.getProjectId());
+//            ProjectBoardService projectBoardService = getProjectBoardService();
+//            projectBoardService.storeProjectBoard(newBoard, request.getProjectId());
         }
 
         // 广播给房间内所有用户

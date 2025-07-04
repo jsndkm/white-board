@@ -3,6 +3,7 @@ package cn.edu.xmu.whiteboard.service;
 import cn.edu.xmu.whiteboard.controller.dto.pb.*;
 import cn.edu.xmu.whiteboard.ReturnData.ProjectBoardReturnData;
 import cn.edu.xmu.whiteboard.redis.DrawBoardKey;
+import cn.edu.xmu.whiteboard.redis.ImageKey;
 import cn.edu.xmu.whiteboard.redis.ProjectBoardKey;
 import cn.edu.xmu.whiteboard.redis.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,29 @@ public class ProjectBoardService {
         }
     }
 
+    public void modifyProjectBoard(ProjectBoardScreenShotDto projectBoardScreenShotDto,int id) {
+        //存项目画板
+        ProjectBoardDto projectBoardDto=new ProjectBoardDto();
+        projectBoardDto.setElements(projectBoardScreenShotDto.getElements());
+        projectBoardDto.setAppState(projectBoardScreenShotDto.getAppState());
+        projectBoardDto.setFiles(projectBoardScreenShotDto.getFiles());
+        storeProjectBoard(projectBoardDto,id);
+        //存项目截图
+        String image=projectBoardScreenShotDto.getImage();
+        // 存储到 Redis
+        boolean result = redisService.set(ImageKey.getById, ""+id, image);
+        if (!result) {
+            throw new RuntimeException("Failed to store projectBoard image data");
+        }
+        // 存储到 MongoDB
+        try {
+            ImageMongo imageMongo=new ImageMongo(id, image);
+            mongoTemplate.save(imageMongo, "project_image");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to store projectBoard image data in MongoDB", e);
+        }
+    }
+
     public ProjectBoardReturnData getProjectBoard(int id) {
         // 先尝试从Redis获取
         ProjectBoardDto projectBoardDto=redisService.get(ProjectBoardKey.getById, ""+id,ProjectBoardDto.class);
@@ -57,11 +81,13 @@ public class ProjectBoardService {
     public void deleteProjectBoard(int id) {
         // 删除 Redis 中的数据
         redisService.delete(ProjectBoardKey.getById, ""+id);
+        redisService.delete(ImageKey.getById, ""+id);
 
         // 删除 MongoDB 中的数据
         try {
             Query query = new Query(Criteria.where("id").is(id));
             mongoTemplate.remove(query, ProjectBoardMongo.class, "project_board");
+            mongoTemplate.remove(query, ImageMongo.class, "project_image");
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete projectBoard data from MongoDB", e);
         }

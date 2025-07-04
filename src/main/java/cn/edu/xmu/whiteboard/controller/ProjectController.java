@@ -142,6 +142,23 @@ public class ProjectController {
         }
     }
 
+    @GetMapping("/projects-simple/{id}")
+    @ResponseBody
+    public ResponseEntity<ResultUtil<Object>> getProject(@RequestHeader("Authorization") String authorization, @PathVariable("id") Integer id){
+        try {
+            //解析token
+            String username=JWTUtil.analyzeToken(authorization);
+            MyProjectReturnData data=projectService.getProject(username,id);
+            if(data==null) throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(ResultUtil.success(data));
+        } catch (Exception e) {
+            GlobalExceptionHandle exceptionHandle = new GlobalExceptionHandle();
+            return exceptionHandle.exceptionHandle(e);
+        }
+    }
+
     @PutMapping("/projects/{id}")
     @ResponseBody
     public ResponseEntity<ResultUtil<Object>> modifyProject(@RequestHeader("Authorization") String authorization, @PathVariable("id") Integer id,@RequestBody ProjectModifyDto projectModifyDto){

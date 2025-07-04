@@ -7,16 +7,24 @@ import cn.edu.xmu.whiteboard.ReturnData.ProjectCompleteData;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectModifyDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectUserDto;
+import cn.edu.xmu.whiteboard.controller.dto.pb.ImageMongo;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardDto;
+import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardMongo;
 import cn.edu.xmu.whiteboard.dao.ProjectDao;
 import cn.edu.xmu.whiteboard.dao.ProjectUserDao;
 import cn.edu.xmu.whiteboard.dao.UserDao;
 import cn.edu.xmu.whiteboard.mapper.po.ProjectPO;
 import cn.edu.xmu.whiteboard.mapper.po.ProjectUserPO;
+import cn.edu.xmu.whiteboard.redis.ImageKey;
+import cn.edu.xmu.whiteboard.redis.ProjectBoardKey;
+import cn.edu.xmu.whiteboard.redis.RedisService;
 import cn.edu.xmu.whiteboard.result.CodeMsg;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +49,13 @@ public class ProjectService {
 
     @Autowired
     private ProjectBoardService projectBoardService;
+
+    @Autowired
+    private RedisService redisService;
+
+    // 添加MongoTemplate依赖
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     public ProjectReturnData newProject(String username, ProjectDto projectDto){
         if(projectDto == null){
@@ -134,6 +149,9 @@ public class ProjectService {
             returnData.setName(projectPO.getName());
             returnData.setDescription(projectPO.getDescription());
             returnData.setIs_admin(projectUserPO.isAdmin());
+
+            String image=getImage(projectPO.getId());
+            returnData.setImage(image);
 
             data.add(returnData);
         }
@@ -250,6 +268,24 @@ public class ProjectService {
         return null;
     }
 
+    public MyProjectReturnData getProject(String username, Integer id){
+        // 检查用户名是否存在
+        if (!userDao.existsByUsername(username)) {
+            throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
+        }
+        ProjectPO projectPO = projectDao.getProject(id);
+        if(projectPO==null){
+            throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
+        }
+        //根据id和username查ProjectUser关联表
+        ProjectUserPO projectUserPO = projectUserDao.findByPidAndUname(id,username);
+        if(projectUserPO==null){
+            throw new GlobalException(CodeMsg.PROJECT_USER_NOT_EXIST);
+        }
+        String image=getImage(id);
+        return new MyProjectReturnData(projectPO.getId(), projectPO.getName(),projectPO.getDescription(),projectUserPO.isAdmin(),image);
+    }
+
     public boolean deleteProject(String username, Integer pid){
         if(username==null) {
             throw new IllegalArgumentException("username is null");
@@ -277,5 +313,25 @@ public class ProjectService {
             return true;
         else
             return false;
+    }
+
+    //获取项目画板截图
+    public String getImage(int id){
+        // 先尝试从Redis获取
+        String image=redisService.get(ImageKey.getById, ""+id,String.class);
+        // 如果Redis中没有，则从MongoDB获取
+        if (image == null) {
+            Query query = new Query(Criteria.where("id").is(id));
+            ImageMongo imageMongo = mongoTemplate.findOne(query, ImageMongo.class, "project_image");
+
+            // 如果MongoDB中有，写到Redis
+            if (imageMongo != null) {
+                image=imageMongo.getImage();
+                redisService.set(ImageKey.getById, ""+id, image);
+            }
+            else
+                throw new RuntimeException("Failed to find projectBoard Image");
+        }
+        return image;
     }
 }
