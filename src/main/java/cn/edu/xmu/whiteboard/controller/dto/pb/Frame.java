@@ -21,19 +21,19 @@ public class Frame{
     private Object frameID;
     private String index;
     private Roundness roundness;
-    private double seed;
-    private double version;
-    private double versionNonce;
+    private long seed;
+    private long version;
+    private long versionNonce;
     private boolean isDeleted;
-    private Object[] boundElements;
-    private double updated;
+    private BoundElement[] boundElements;
+    private long updated;
     private String link;
     private boolean locked;
     private String name;
 
     public Frame() {}
     public Frame(ElementDto elementDto) {
-        id=elementDto.getID();
+        id=elementDto.getId();
         type=elementDto.getType();
         x=elementDto.getX();
         y=elementDto.getY();
@@ -47,14 +47,15 @@ public class Frame{
         strokeStyle=elementDto.getStrokeStyle();
         roughness=elementDto.getRoughness();
         opacity=elementDto.getOpacity();
-        groupIDS=elementDto.getGroupIDS();
-        frameID=elementDto.getFrameID();
+        groupIDS=elementDto.getGroupIds();
+        frameID=elementDto.getFrameId();
         index=elementDto.getIndex();
         roundness=elementDto.getRoundness();
         seed=elementDto.getSeed();
         version=elementDto.getVersion();
         versionNonce=elementDto.getVersionNonce();
         isDeleted=elementDto.getIsDeleted();
+        boundElements=elementDto.getBoundElements();
         updated=elementDto.getUpdated();
         link=elementDto.getLink();
         locked=elementDto.getLocked();
@@ -62,9 +63,9 @@ public class Frame{
     }
 
     @JsonProperty("id")
-    public String getID() { return id; }
+    public String getId() { return id; }
     @JsonProperty("id")
-    public void setID(String value) { this.id = value; }
+    public void setId(String value) { this.id = value; }
 
     @JsonProperty("type")
     public String getType() { return type; }
@@ -132,14 +133,14 @@ public class Frame{
     public void setOpacity(double value) { this.opacity = value; }
 
     @JsonProperty("groupIds")
-    public Object[] getGroupIDS() { return groupIDS; }
+    public Object[] getGroupIds() { return groupIDS; }
     @JsonProperty("groupIds")
-    public void setGroupIDS(Object[] value) { this.groupIDS = value; }
+    public void setGroupIds(Object[] value) { this.groupIDS = value; }
 
     @JsonProperty("frameId")
-    public Object getFrameID() { return frameID; }
+    public Object getFrameId() { return frameID; }
     @JsonProperty("frameId")
-    public void setFrameID(Object value) { this.frameID = value; }
+    public void setFrameId(Object value) { this.frameID = value; }
 
     @JsonProperty("index")
     public String getIndex() { return index; }
@@ -152,19 +153,19 @@ public class Frame{
     public void setRoundness(Roundness value) { this.roundness = value; }
 
     @JsonProperty("seed")
-    public double getSeed() { return seed; }
+    public long getSeed() { return seed; }
     @JsonProperty("seed")
-    public void setSeed(double value) { this.seed = value; }
+    public void setSeed(long value) { this.seed = value; }
 
     @JsonProperty("version")
-    public double getVersion() { return version; }
+    public long getVersion() { return version; }
     @JsonProperty("version")
-    public void setVersion(double value) { this.version = value; }
+    public void setVersion(long value) { this.version = value; }
 
     @JsonProperty("versionNonce")
-    public double getVersionNonce() { return versionNonce; }
+    public long getVersionNonce() { return versionNonce; }
     @JsonProperty("versionNonce")
-    public void setVersionNonce(double value) { this.versionNonce = value; }
+    public void setVersionNonce(long value) { this.versionNonce = value; }
 
     @JsonProperty("isDeleted")
     public boolean getIsDeleted() { return isDeleted; }
@@ -172,14 +173,14 @@ public class Frame{
     public void setIsDeleted(boolean value) { this.isDeleted = value; }
 
     @JsonProperty("boundElements")
-    public Object[] getBoundElements() { return boundElements; }
+    public BoundElement[] getBoundElements() { return boundElements; }
     @JsonProperty("boundElements")
-    public void setBoundElements(Object[] value) { this.boundElements = value; }
+    public void setBoundElements(BoundElement[] value) { this.boundElements = value; }
 
     @JsonProperty("updated")
-    public double getUpdated() { return updated; }
+    public long getUpdated() { return updated; }
     @JsonProperty("updated")
-    public void setUpdated(double value) { this.updated = value; }
+    public void setUpdated(long value) { this.updated = value; }
 
     @JsonProperty("link")
     public String getLink() { return link; }

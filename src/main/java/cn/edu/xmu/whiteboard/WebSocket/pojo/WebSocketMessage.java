@@ -99,7 +99,6 @@ public class WebSocketMessage {
         private int projectId;
         private String username;
         private ElementDto[] elements;
-        private AppStateDto appState;
         private FileDto file;
 
         public void setProjectId(int projectId) {
@@ -110,9 +109,6 @@ public class WebSocketMessage {
         }
         public void setElements(ElementDto[] elements) {
             this.elements = elements;
-        }
-        public void setAppState(AppStateDto appState) {
-            this.appState = appState;
         }
         public void setFile(FileDto file) {
             this.file = file;
@@ -125,9 +121,6 @@ public class WebSocketMessage {
         }
         public ElementDto[] getElements() {
             return elements;
-        }
-        public AppStateDto getAppState() {
-            return appState;
         }
         public FileDto getFile() {
             return file;
@@ -170,23 +163,16 @@ public class WebSocketMessage {
     @Data
     public static class ClientBroadcastData {
         private ElementDto[] elements;
-        private AppStateDto appState;
         private FileDto file;
 
         public void setElements(ElementDto[] elements) {
             this.elements = elements;
-        }
-        public void setAppState(AppStateDto appState) {
-            this.appState = appState;
         }
         public void setFile(FileDto file) {
             this.file = file;
         }
         public ElementDto[] getElements() {
             return elements;
-        }
-        public AppStateDto getAppState() {
-            return appState;
         }
         public FileDto getFile() {
             return file;

@@ -4,7 +4,6 @@ import cn.edu.xmu.whiteboard.WebSocket.pojo.WebSocketMessage;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ElementDto;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardDto;
 import cn.edu.xmu.whiteboard.redis.PointerKey;
-import cn.edu.xmu.whiteboard.redis.ProjectBoardKey;
 import cn.edu.xmu.whiteboard.redis.RedisService;
 import cn.edu.xmu.whiteboard.service.ProjectBoardService;
 import com.alibaba.fastjson.JSON;
@@ -15,7 +14,6 @@ import jakarta.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -23,7 +21,6 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import java.util.concurrent.CopyOnWriteArraySet;
-import cn.edu.xmu.whiteboard.WebSocket.SpringContextHolder;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -45,7 +42,7 @@ public class WebSocketServer {
     private static final ExecutorService messageExecutor = Executors.newFixedThreadPool(10);
 
     // 待处理消息队列（按timestamp排序）
-    private static final PriorityBlockingQueue<PendingMessage> messageQueue = new PriorityBlockingQueue<>(11,
+    private final PriorityBlockingQueue<PendingMessage> messageQueue = new PriorityBlockingQueue<>(11,
             Comparator.comparingLong(msg -> msg.timestamp));
 
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
@@ -56,11 +53,8 @@ public class WebSocketServer {
     private static final Map<String, WebSocketServer> userSessionMap = new ConcurrentHashMap<>();
     // 项目画板：roomId -> ProjectBoard
     // 使用AtomicReference保证projectBoardDto的原子更新
-    private static final Map<String, AtomicReference<ProjectBoardDto>> projectBoardMap =
+    private static volatile Map<String, AtomicReference<ProjectBoardDto>> projectBoardMap =
             new ConcurrentHashMap<>();
-
-    //静态画板
-    //private static ProjectBoardDto projectBoardDto = new ProjectBoardDto();
 
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
@@ -91,11 +85,6 @@ public class WebSocketServer {
      */
     @OnClose
     public void onClose(Session session, CloseReason reason) {
-        log.info("连接关闭，原因: {}", reason);
-        //从set中删除
-        webSocketSet.remove(this);
-        log.info("连接关闭！当前在线人数为" + webSocketSet.size());
-        log.info("user disconnect");
         messageQueue.removeIf(msg -> msg.sender == this);
         if(currentRoomId != null&&currentUsername!=null) {
             RoomInfo room = roomMap.get(currentRoomId);
@@ -109,6 +98,10 @@ public class WebSocketServer {
             userChangeData.setAction("leave");
             broadcastToRoom(currentRoomId, "room-user-change", userChangeData, timestampGenerator.getAndIncrement());
             log.info(currentUsername + "离开房间:" + currentRoomId);
+            log.info("连接关闭，原因: {}", reason);
+            //从set中删除
+            webSocketSet.remove(this);
+            log.info("连接关闭！当前在线人数为" + webSocketSet.size());
             log.info(currentUsername + "断开连接");
         }
     }
@@ -120,7 +113,7 @@ public class WebSocketServer {
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-        log.info("来自客户端的消息:" + message);
+        //log.info("来自客户端的消息:" + message);
 
         try {
             JSONObject json = JSON.parseObject(message);
@@ -291,31 +284,38 @@ public class WebSocketServer {
     // 处理服务器广播
     private void handleServerBroadcast(JSONObject data,long responseTimestamp) {
         WebSocketMessage.ServerBroadcastData request = data.toJavaObject(WebSocketMessage.ServerBroadcastData.class);
+        for(ElementDto elementDto:request.getElements())
+        {
+            System.out.println("id: "+elementDto.getId()+" type: "+elementDto.getType()+" isD: "+elementDto.getIsDeleted());
+        }
         if(request.getProjectId()<0)
         {
             sendError("项目ID无效",responseTimestamp);
             return;
         }
         String roomId = "Room" + request.getProjectId();
+
         AtomicReference<ProjectBoardDto> boardRef = projectBoardMap.get(roomId);
 
         if (boardRef == null) {
             sendError("项目不存在", responseTimestamp);
             return;
         }
+
         // 使用锁保证原子性
         synchronized (boardRef) {
             ProjectBoardDto currentBoard = boardRef.get();
-            ProjectBoardDto projectBoardDto = new ProjectBoardDto();
-            BeanUtils.copyProperties(currentBoard, projectBoardDto); // 深度拷贝
-            // 合并elements
+            ProjectBoardDto newBoard = new ProjectBoardDto();
+            BeanUtils.copyProperties(currentBoard, newBoard); // 深度拷贝
+
+            // 合并逻辑
             Map<String, ElementDto> mergedElements = new HashMap<>();
 
             // 先将当前存在的elements放入map
-            if (projectBoardDto.getElements() != null) {
-                for (ElementDto existingElement : projectBoardDto.getElements()) {
-                    if (existingElement.getID() != null) {
-                        mergedElements.put(existingElement.getID(), existingElement);
+            if (currentBoard.getElements() != null) {
+                for (ElementDto existingElement : currentBoard.getElements()) {
+                    if (existingElement.getId() != null) {
+                        mergedElements.put(existingElement.getId(), existingElement);
                     }
                 }
             }
@@ -323,19 +323,23 @@ public class WebSocketServer {
             // 处理请求中的elements，根据version合并
             if (request.getElements() != null) {
                 for (ElementDto newElement : request.getElements()) {
-                    if (newElement.getID() == null) {
+                    if (newElement.getId() == null) {
                         continue; // 跳过没有ID的元素
                     }
 
-                    ElementDto existingElement = mergedElements.get(newElement.getID());
+                    ElementDto existingElement = mergedElements.get(newElement.getId());
                     if (existingElement != null) {
                         // 如果新元素的version更高，则覆盖
                         if (newElement.getVersion() > existingElement.getVersion()) {
-                            mergedElements.put(newElement.getID(), newElement);
+                            // 创建一个新元素，复制新元素的所有属性（除了 index）
+                            ElementDto mergedElement = new ElementDto();
+                            BeanUtils.copyProperties(newElement, mergedElement); // 复制新元素的所有属性
+                            mergedElement.setIndex(existingElement.getIndex()); // 强制保留原有 index
+                            mergedElements.put(newElement.getId(), mergedElement);
                         }
                     } else {
                         // 如果不存在，直接添加
-                        mergedElements.put(newElement.getID(), newElement);
+                        mergedElements.put(newElement.getId(), newElement);
                     }
                 }
             }
@@ -343,21 +347,20 @@ public class WebSocketServer {
             // 创建合并后的elements数组
             ElementDto[] finalElements = mergedElements.values().toArray(new ElementDto[0]);
 
-            projectBoardDto.setElements(finalElements);
-            projectBoardDto.setAppState(request.getAppState());
-            projectBoardDto.setFiles(request.getFile());
-            boardRef.set(projectBoardDto); // 原子更新
+            newBoard.setElements(finalElements);
+            newBoard.setAppState(currentBoard.getAppState());
+            newBoard.setFiles(request.getFile());
+            boardRef.set(newBoard); // 原子更新
             projectBoardMap.put(roomId, boardRef);
             ProjectBoardService projectBoardService = getProjectBoardService();
-            projectBoardService.storeProjectBoard(projectBoardDto, request.getProjectId());
+            projectBoardService.storeProjectBoard(newBoard, request.getProjectId());
         }
 
         // 广播给房间内所有用户
         RoomInfo roomInfo = roomMap.get(roomId);
         if (roomInfo != null) {
             WebSocketMessage.ClientBroadcastData response = new WebSocketMessage.ClientBroadcastData();
-            response.setElements(request.getElements());
-            response.setAppState(request.getAppState());
+            response.setElements(projectBoardMap.get(roomId).get().getElements());
             response.setFile(request.getFile());
 
             broadcastToRoomExcludingUser(roomId, "server-broadcast", response, responseTimestamp, request.getUsername());
