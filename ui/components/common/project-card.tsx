@@ -47,7 +47,9 @@ export function ProjectCard({
         </motion.div>
 
         <CardHeader className="min-h-[72px] space-y-1">
-          <CardTitle className="text-lg font-bold">{project.name}</CardTitle>
+          <CardTitle className="line-clamp-1 text-lg font-bold">
+            {project.name}
+          </CardTitle>
           <CardDescription className="text-muted-foreground line-clamp-2 text-sm">
             {project.description}
           </CardDescription>

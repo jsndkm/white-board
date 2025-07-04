@@ -1,4 +1,4 @@
-import { EditableSheetHeader } from "@/components/home/editable-sheet-header";
+import { EditableSheetHeader } from "@/components/common/editable-sheet-header";
 import { MemberList } from "@/components/home/member-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

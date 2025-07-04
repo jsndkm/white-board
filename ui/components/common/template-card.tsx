@@ -25,7 +25,7 @@ export function TemplateCard({
     <motion.div whileHover={{ scale: 1.02 }}>
       <Card className="relative flex aspect-[4/3] flex-col">
         <CardHeader className="min-h-[72px] items-center justify-center text-center">
-          <CardTitle className="text-lg font-semibold tracking-wide">
+          <CardTitle className="line-clamp-1 text-lg font-semibold tracking-wide">
             {templateName}
           </CardTitle>
           <CardDescription className="line-clamp-2">

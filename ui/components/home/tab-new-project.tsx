@@ -2,6 +2,7 @@ import { TemplateCard } from "@/components/common/template-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGetTemplateList } from "@/hooks/api/template/use-get-template-list";
 import { LoaderCircle } from "lucide-react";
+import React from "react";
 
 export function TabNewProject() {
   const { data: templateNameList, isPending } = useGetTemplateList(true);

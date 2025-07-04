@@ -1,8 +1,10 @@
 "use client";
 
+import { ProjectDetailSheet } from "@/components/common/project-detail-sheet";
 import { ProjectDialog } from "@/components/common/project-dialog";
 import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
 import { useGetProjectScene } from "@/hooks/api/project/use-get-project-scene";
+import { useGetProjectSimple } from "@/hooks/api/project/use-get-project-simple";
 import { useCustomWebSocket } from "@/hooks/use-custom-websocket";
 import { WEBSOCKET_URL } from "@/lib/endpoint";
 import {
@@ -15,7 +17,6 @@ import { useRoomState } from "@/stores/room";
 import {
   CaptureUpdateAction,
   Excalidraw,
-  restoreAppState,
   restoreElements,
 } from "@excalidraw/excalidraw";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
@@ -32,7 +33,13 @@ import {
 import { debounce, isEqual } from "lodash";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { ReadyState } from "react-use-websocket";
 
 export default function ExcalidrawWrapper({
@@ -47,6 +54,7 @@ export default function ExcalidrawWrapper({
     useState<ExcalidrawImperativeAPI | null>(null);
 
   const { data: scene, isError } = useGetProjectScene(projectId);
+  const { data: project } = useGetProjectSimple(projectId);
 
   const skipChangeFrames = useRef(0);
 
@@ -237,6 +245,11 @@ export default function ExcalidrawWrapper({
         <Excalidraw
           langCode="zh-CN"
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
+          UIOptions={{
+            tools: {
+              image: false,
+            },
+          }}
           initialData={
             isError
               ? null
@@ -245,7 +258,7 @@ export default function ExcalidrawWrapper({
                     refreshDimensions: false,
                     repairBindings: true,
                   }),
-                  appState: restoreAppState(scene.appState, {}),
+                  // elements: scene.elements ?? [],
                   scrollToContent: true,
                 }
           }
@@ -253,10 +266,11 @@ export default function ExcalidrawWrapper({
           onPointerUpdate={debounceHandlePointerUpdate}
           isCollaborating={true}
         >
-          <ExcalidrawMenu />
+          <ExcalidrawMenu project={project} />
           <ProjectDialog />
         </Excalidraw>
       </Suspense>
+      <ProjectDetailSheet />
     </div>
   );
 }

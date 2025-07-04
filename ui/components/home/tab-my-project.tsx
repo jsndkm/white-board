@@ -1,8 +1,9 @@
 import { ProjectCard } from "@/components/common/project-card";
-import { ProjectDetailSheet } from "@/components/home/project-detail-sheet";
+import { ProjectDetailSheet } from "@/components/common/project-detail-sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGetProjectList } from "@/hooks/api/project/use-get-project-list";
 import { LoaderCircle } from "lucide-react";
+import React from "react";
 
 export function TabMyProject() {
   const { data: projects, isPending } = useGetProjectList(true);

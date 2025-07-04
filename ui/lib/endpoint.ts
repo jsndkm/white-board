@@ -15,6 +15,7 @@ export const API = {
 
   projects: {
     list: `${BASE_URL}/api/project-list`,
+    simple: (id: number) => `${BASE_URL}/api/project-simple/${id}`,
     detail: (id: number) => `${BASE_URL}/api/projects/${id}`,
     create: `${BASE_URL}/api/projects`,
     update: (id: number) => `${BASE_URL}/api/projects/${id}`,
