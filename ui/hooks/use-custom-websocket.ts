@@ -48,7 +48,7 @@ export function useCustomWebSocket(
         case "server-pointer-broadcast":
           options.onServerPointerBroadcast?.(data as ServerPointerBroadcast);
           break;
-        case "dis-connect":
+        case "disconnect":
           options.onDisconnect?.(data as DisconnectData);
           break;
         default:

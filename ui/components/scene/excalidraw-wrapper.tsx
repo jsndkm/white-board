@@ -6,6 +6,7 @@ import { useGetProjectScene } from "@/hooks/api/project/use-get-project-scene";
 import { useCustomWebSocket } from "@/hooks/use-custom-websocket";
 import { WEBSOCKET_URL } from "@/lib/endpoint";
 import {
+  DisconnectData,
   RoomUserChangeData,
   ServerBroadcastData,
   ServerPointerBroadcast,
@@ -64,22 +65,46 @@ export default function ExcalidrawWrapper({
 
   const onServerBroadcast = useCallback(
     (data: ServerBroadcastData) => {
-      const elements = data.elements ?? [];
-      const appState = data.appState ?? {};
-      const localEls = excalidrawAPI?.getSceneElementsIncludingDeleted() ?? [];
-      const localAppState = excalidrawAPI?.getAppState() ?? {};
+      const remoteElements = data.elements ?? [];
+      const remoteAppState = data.appState ?? {};
+      const localElements =
+        excalidrawAPI?.getSceneElementsIncludingDeleted() ?? [];
+      const localAppState = excalidrawAPI?.getAppState();
+
+      if (
+        localAppState?.newElement !== null ||
+        localAppState?.multiElement !== null ||
+        localAppState?.resizingElement !== null ||
+        localAppState?.selectionElement !== null ||
+        localAppState?.startBoundElement !== null
+      ) {
+        return;
+      }
+
+      // index Map
+      const localMap = new Map(localElements.map((el) => [el.id, el]));
+
+      // merge
+      const mergedElements = remoteElements.map((remoteEl) => {
+        const localEl = localMap.get(remoteEl.id);
+
+        if (!localEl) return remoteEl;
+        if (remoteEl.version > localEl.version) return remoteEl;
+
+        return localEl;
+      });
 
       const shouldUpdate =
-        !isEqual(localEls, elements) || !isEqual(localAppState, appState);
+        !isEqual(localElements, remoteElements) ||
+        !isEqual(localAppState, remoteAppState);
 
       if (shouldUpdate) {
         skipChangeFrames.current += 1;
         excalidrawAPI?.updateScene({
-          elements: restoreElements(elements, localEls, {
+          elements: restoreElements(mergedElements, localElements, {
             refreshDimensions: false,
             repairBindings: true,
           }),
-          appState: restoreAppState(appState, localAppState),
           captureUpdate: CaptureUpdateAction.NEVER,
         });
       }
@@ -107,10 +132,15 @@ export default function ExcalidrawWrapper({
     [excalidrawAPI, username],
   );
 
+  const onDisconnect = useCallback((data: DisconnectData) => {
+    console.log("disconnected:", data.username);
+  }, []);
+
   const { readyState, sendJsonMessage } = useCustomWebSocket(WEBSOCKET_URL, {
     onRoomUserChange: onRoomUserChange,
     onServerBroadcast: onServerBroadcast,
     onServerPointerBroadcast: onServerPointerBroadcast,
+    onDisconnect: onDisconnect,
   });
 
   useEffect(() => {
@@ -154,12 +184,12 @@ export default function ExcalidrawWrapper({
 
   const handleChange = (
     elements: readonly OrderedExcalidrawElement[],
-    appState: AppState,
+    _: AppState,
     files: BinaryFiles,
   ) => {
     if (skipChangeFrames.current > 0) {
       skipChangeFrames.current -= 1;
-      return; // 防止重复更新
+      return;
     }
 
     sendJsonMessage({
@@ -168,7 +198,6 @@ export default function ExcalidrawWrapper({
         projectId,
         username,
         elements,
-        appState,
         files,
       },
       timestamp: Date.now(),
@@ -192,8 +221,8 @@ export default function ExcalidrawWrapper({
     });
   };
 
-  const debounceHandleChange = debounce(handleChange, 200);
-  const debounceHandlePointerUpdate = debounce(handlePointerUpdate, 200);
+  const debounceHandleChange = debounce(handleChange, 0);
+  const debounceHandlePointerUpdate = debounce(handlePointerUpdate, 0);
 
   return (
     <div className="custom-styles h-screen w-screen">
