@@ -59,7 +59,7 @@ export function ProjectCard({
         <CardContent className="h-full">
           {/*<Skeleton className="h-full w-full rounded-md" />*/}
           <Image
-            src={`data:image/png;base64,${base64String}`}
+            src={`${base64String}`}
             alt="Base64"
             width={200}
             height={200}

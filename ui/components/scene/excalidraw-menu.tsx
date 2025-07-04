@@ -1,6 +1,5 @@
 "use client";
 
-import { ProjectDetailSheet } from "@/components/common/project-detail-sheet";
 import { useProjectDetailsStore } from "@/stores/project-detail";
 import { useProjectDialogStore } from "@/stores/project-dialog";
 import { MainMenu } from "@excalidraw/excalidraw";
@@ -10,7 +9,7 @@ import { Eye, Folder, House, LogOut, Plus } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-export default function ExcalidrawMenu({ projectId }: { projectId: number }) {
+export default function ExcalidrawMenu() {
   const router = useRouter();
 
   const handleNewProject = () => {
@@ -66,7 +65,6 @@ export default function ExcalidrawMenu({ projectId }: { projectId: number }) {
           退出登录
         </MainMenu.Item>
       </MainMenu>
-      <ProjectDetailSheet showOpenProjectButton={false} />
     </>
   );
 }

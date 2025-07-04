@@ -29,6 +29,7 @@ export const API = {
   },
 
   board: {
+    store: (projectId: number) => `${BASE_URL}/api/project-board/${projectId}`,
     getScene: (projectId: number) =>
       `${BASE_URL}/api/project-board/${projectId}`,
     updateScene: (projectId: number) =>

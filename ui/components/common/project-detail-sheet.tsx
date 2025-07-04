@@ -3,7 +3,6 @@ import { MemberList } from "@/components/home/member-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useDeleteProjectMutation } from "@/hooks/api/project/use-delete-project";
 import { useGetProject } from "@/hooks/api/project/use-get-project";
 import { useExitProjectMutation } from "@/hooks/api/project/use-project-exit";
@@ -18,6 +17,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 
@@ -93,8 +93,15 @@ export function ProjectDetailSheet({
             description={project?.description ?? ""}
           />
 
-          <Skeleton className="h-40 w-full rounded-md" />
-
+          {/*<Skeleton className="h-40 w-full rounded-md" />*/}
+          <Image
+            src={`${project?.image}`}
+            alt="Base64"
+            width={200}
+            height={200}
+            unoptimized
+            className="h-40 w-full rounded-4xl object-cover"
+          />
           <MemberList
             members={members}
             currentUser={username}

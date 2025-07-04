@@ -1,7 +1,9 @@
 "use client";
 
+import { ProjectDetailSheet } from "@/components/common/project-detail-sheet";
 import { ProjectDialog } from "@/components/common/project-dialog";
 import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
+import { useSaveBoardMutation } from "@/hooks/api/board/use-save-board";
 import { useGetProjectScene } from "@/hooks/api/project/use-get-project-scene";
 import { useAutoSave } from "@/hooks/use-autosave";
 import { useCustomWebSocket } from "@/hooks/use-custom-websocket";
@@ -46,6 +48,7 @@ export default function ExcalidrawWrapper({
   const excalidrawAPIRef = useRef<ExcalidrawImperativeAPI>(null);
 
   const { data: scene, isError, isPending } = useGetProjectScene(projectId);
+  const saveBoard = useSaveBoardMutation();
 
   const skipChangeFrames = useRef(0);
 
@@ -153,6 +156,7 @@ export default function ExcalidrawWrapper({
 
   useEffect(() => {
     const handleLeave = () => {
+      const api = excalidrawAPIRef.current;
       if (readyState === ReadyState.OPEN && username) {
         sendJsonMessage({
           type: "disconnecting",
@@ -161,6 +165,9 @@ export default function ExcalidrawWrapper({
             username,
           },
         });
+      }
+      if (api) {
+        saveBoard.mutate({ api, projectId });
       }
     };
 
@@ -176,7 +183,7 @@ export default function ExcalidrawWrapper({
       window.removeEventListener("beforeunload", handleLeave);
       window.removeEventListener("pagehide", handleRouteChange);
     };
-  }, [projectId, readyState, sendJsonMessage, username]);
+  }, [projectId, readyState, saveBoard, sendJsonMessage, username]);
 
   const handleChange = (
     elements: readonly OrderedExcalidrawElement[],
@@ -257,8 +264,9 @@ export default function ExcalidrawWrapper({
         onPointerUpdate={debounceHandlePointerUpdate}
         isCollaborating={true}
       >
-        <ExcalidrawMenu projectId={projectId} />
+        <ExcalidrawMenu />
         <ProjectDialog />
+        <ProjectDetailSheet showOpenProjectButton={false} />
       </Excalidraw>
     </div>
   );
