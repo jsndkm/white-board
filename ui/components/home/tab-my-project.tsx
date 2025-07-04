@@ -20,7 +20,12 @@ export function TabMyProject() {
       <ScrollArea className="h-[80vh] w-full px-8 py-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {projects?.map((item, idx) => (
-            <ProjectCard key={idx} project={item} showDetailButton={true} />
+            <ProjectCard
+              key={idx}
+              project={item}
+              showDetailButton={true}
+              base64String={item.image}
+            />
           ))}
         </div>
       </ScrollArea>

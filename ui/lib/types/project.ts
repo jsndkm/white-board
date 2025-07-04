@@ -10,6 +10,7 @@ export type Project = {
   name: string;
   description: string;
   admin: boolean;
+  image: string;
 };
 
 export type ProjectDetail = {

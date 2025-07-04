@@ -73,7 +73,12 @@ export function ProjectDialog() {
           <>
             {queryProjectList.isLoading && <LoaderCircle />}
             {queryProjectList.data?.map((item, idx) => (
-              <ProjectCard key={idx} project={item} showDetailButton={false} />
+              <ProjectCard
+                key={idx}
+                project={item}
+                showDetailButton={false}
+                base64String={item.image}
+              />
             ))}
           </>
         );

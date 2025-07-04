@@ -8,20 +8,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Project } from "@/lib/types/project";
 import { useProjectDetailsStore } from "@/stores/project-detail";
 import { useProjectDialogStore } from "@/stores/project-dialog";
 import { motion } from "framer-motion";
 import { Eye, FolderOpen } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export function ProjectCard({
   project,
   showDetailButton,
+  base64String,
 }: {
   project: Project;
   showDetailButton?: boolean;
+  base64String: string;
 }) {
   const router = useRouter();
 
@@ -55,7 +57,15 @@ export function ProjectCard({
           </CardDescription>
         </CardHeader>
         <CardContent className="h-full">
-          <Skeleton className="h-full w-full rounded-md" />
+          {/*<Skeleton className="h-full w-full rounded-md" />*/}
+          <Image
+            src={`data:image/png;base64,${base64String}`}
+            alt="Base64"
+            width={200}
+            height={200}
+            unoptimized
+            className="h-full w-full rounded-md object-cover"
+          />
         </CardContent>
         <CardFooter className="flex-col gap-2">
           <Button

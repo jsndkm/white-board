@@ -3,6 +3,7 @@
 import { ProjectDialog } from "@/components/common/project-dialog";
 import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
 import { useGetProjectScene } from "@/hooks/api/project/use-get-project-scene";
+import { useAutoSave } from "@/hooks/use-autosave";
 import { useCustomWebSocket } from "@/hooks/use-custom-websocket";
 import { WEBSOCKET_URL } from "@/lib/endpoint";
 import {
@@ -31,7 +32,7 @@ import {
 import { debounce, isEqual } from "lodash";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { ReadyState } from "react-use-websocket";
 
 export default function ExcalidrawWrapper({
@@ -42,8 +43,7 @@ export default function ExcalidrawWrapper({
   const { data: session } = useSession();
   const username = session?.user.username;
 
-  const [excalidrawAPI, setExcalidrawAPI] =
-    useState<ExcalidrawImperativeAPI | null>(null);
+  const excalidrawAPIRef = useRef<ExcalidrawImperativeAPI>(null);
 
   const { data: scene, isError, isPending } = useGetProjectScene(projectId);
 
@@ -62,54 +62,51 @@ export default function ExcalidrawWrapper({
     [username],
   );
 
-  const onServerBroadcast = useCallback(
-    (data: ServerBroadcastData) => {
-      const remoteElements = data.elements ?? [];
-      const remoteAppState = data.appState ?? {};
-      const localElements =
-        excalidrawAPI?.getSceneElementsIncludingDeleted() ?? [];
-      const localAppState = excalidrawAPI?.getAppState();
+  const onServerBroadcast = useCallback((data: ServerBroadcastData) => {
+    const remoteElements = data.elements ?? [];
+    const remoteAppState = data.appState ?? {};
+    const localElements =
+      excalidrawAPIRef.current?.getSceneElementsIncludingDeleted() ?? [];
+    const localAppState = excalidrawAPIRef.current?.getAppState();
 
-      if (
-        localAppState?.newElement !== null ||
-        localAppState?.multiElement !== null ||
-        localAppState?.resizingElement !== null ||
-        localAppState?.selectionElement !== null ||
-        localAppState?.startBoundElement !== null
-      ) {
-        return;
-      }
+    if (
+      localAppState?.newElement !== null ||
+      localAppState?.multiElement !== null ||
+      localAppState?.resizingElement !== null ||
+      localAppState?.selectionElement !== null ||
+      localAppState?.startBoundElement !== null
+    ) {
+      return;
+    }
 
-      // index Map
-      const localMap = new Map(localElements.map((el) => [el.id, el]));
+    // index Map
+    const localMap = new Map(localElements.map((el) => [el.id, el]));
 
-      // merge
-      const mergedElements = remoteElements.map((remoteEl) => {
-        const localEl = localMap.get(remoteEl.id);
+    // merge
+    const mergedElements = remoteElements.map((remoteEl) => {
+      const localEl = localMap.get(remoteEl.id);
 
-        if (!localEl) return remoteEl;
-        if (remoteEl.version > localEl.version) return remoteEl;
+      if (!localEl) return remoteEl;
+      if (remoteEl.version > localEl.version) return remoteEl;
 
-        return localEl;
+      return localEl;
+    });
+
+    const shouldUpdate =
+      !isEqual(localElements, remoteElements) ||
+      !isEqual(localAppState, remoteAppState);
+
+    if (shouldUpdate) {
+      skipChangeFrames.current += 1;
+      excalidrawAPIRef.current?.updateScene({
+        elements: restoreElements(mergedElements, localElements, {
+          refreshDimensions: false,
+          repairBindings: true,
+        }),
+        captureUpdate: CaptureUpdateAction.NEVER,
       });
-
-      const shouldUpdate =
-        !isEqual(localElements, remoteElements) ||
-        !isEqual(localAppState, remoteAppState);
-
-      if (shouldUpdate) {
-        skipChangeFrames.current += 1;
-        excalidrawAPI?.updateScene({
-          elements: restoreElements(mergedElements, localElements, {
-            refreshDimensions: false,
-            repairBindings: true,
-          }),
-          captureUpdate: CaptureUpdateAction.NEVER,
-        });
-      }
-    },
-    [excalidrawAPI],
-  );
+    }
+  }, []);
 
   const onServerPointerBroadcast = useCallback(
     (data: ServerPointerBroadcast) => {
@@ -126,9 +123,9 @@ export default function ExcalidrawWrapper({
             username: user.username,
           });
         });
-      excalidrawAPI?.updateScene({ collaborators: newMap });
+      excalidrawAPIRef.current?.updateScene({ collaborators: newMap });
     },
-    [excalidrawAPI, username],
+    [username],
   );
 
   const onDisconnect = useCallback((data: DisconnectData) => {
@@ -223,6 +220,8 @@ export default function ExcalidrawWrapper({
   const debounceHandleChange = debounce(handleChange, 0);
   const debounceHandlePointerUpdate = debounce(handlePointerUpdate, 0);
 
+  useAutoSave(excalidrawAPIRef, projectId);
+
   if (isPending)
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center gap-4">
@@ -235,7 +234,8 @@ export default function ExcalidrawWrapper({
     <div className="custom-styles h-screen w-screen">
       <Excalidraw
         langCode="zh-CN"
-        excalidrawAPI={(api) => setExcalidrawAPI(api)}
+        // excalidrawAPI={(api) => setExcalidrawAPI(api)}
+        excalidrawAPI={(api) => (excalidrawAPIRef.current = api)}
         UIOptions={{
           tools: {
             image: false,
