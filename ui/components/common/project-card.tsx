@@ -72,7 +72,6 @@ export function ProjectCard({
             className="w-full cursor-pointer"
             onClick={() => {
               useProjectDialogStore.getState().setIsOpen(false);
-              useProjectDetailsStore.getState().setProject(project);
               router.push(`/project/${project.id}`);
             }}
           >
@@ -85,7 +84,7 @@ export function ProjectCard({
               variant="secondary"
               className="w-full cursor-pointer"
               onClick={() =>
-                useProjectDetailsStore.getState().openDialog(project)
+                useProjectDetailsStore.getState().openDialog(project.id)
               }
             >
               <Eye />

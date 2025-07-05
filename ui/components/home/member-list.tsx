@@ -16,7 +16,7 @@ interface MemberListProps {
   members: Member[];
   currentUser: string;
   isProjectOwner: boolean;
-  projectId: number;
+  projectId?: number;
 }
 
 export function MemberList({
@@ -70,7 +70,10 @@ export function MemberList({
                   size="icon"
                   variant="ghost"
                   className="cursor-pointer rounded-full text-sm font-medium"
-                  onClick={() => handleDeleteMember(projectId, member.username)}
+                  onClick={() => {
+                    if (!projectId) return;
+                    handleDeleteMember(projectId, member.username);
+                  }}
                 >
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>

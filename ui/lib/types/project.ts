@@ -17,6 +17,7 @@ export type ProjectDetail = {
   id: number;
   name: string;
   description: string;
+  image: string;
   user: [
     {
       username: string;

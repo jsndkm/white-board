@@ -4,7 +4,8 @@ import { ProjectDetailSheet } from "@/components/common/project-detail-sheet";
 import { ProjectDialog } from "@/components/common/project-dialog";
 import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
 import { useSaveBoardMutation } from "@/hooks/api/board/use-save-board";
-import { useGetProjectScene } from "@/hooks/api/project/use-get-project-scene";
+import { useGetProjectBoard } from "@/hooks/api/project/use-get-project-board";
+import { useGetProjectSimple } from "@/hooks/api/project/use-get-project-simple";
 import { useAutoSave } from "@/hooks/use-autosave";
 import { useCustomWebSocket } from "@/hooks/use-custom-websocket";
 import { WEBSOCKET_URL } from "@/lib/endpoint";
@@ -20,7 +21,10 @@ import {
   Excalidraw,
   restoreElements,
 } from "@excalidraw/excalidraw";
-import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
+import type {
+  OrderedExcalidrawElement,
+  Theme,
+} from "@excalidraw/excalidraw/element/types";
 import "@excalidraw/excalidraw/index.css";
 import {
   AppState,
@@ -34,7 +38,7 @@ import {
 import { debounce, isEqual } from "lodash";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import React, { useCallback, useEffect, useRef } from "react";
 import { ReadyState } from "react-use-websocket";
 
@@ -46,9 +50,10 @@ export default function ExcalidrawWrapper({
   const { data: session } = useSession();
   const username = session?.user.username;
   const excalidrawAPIRef = useRef<ExcalidrawImperativeAPI>(null);
-  const pathname = usePathname();
+  const { theme } = useTheme();
 
-  const { data: scene, isError, isPending } = useGetProjectScene(projectId);
+  const { data: project } = useGetProjectSimple(projectId);
+  const { data: board, isError, isPending } = useGetProjectBoard(projectId);
   const saveBoard = useSaveBoardMutation();
 
   const skipChangeFrames = useRef(0);
@@ -153,7 +158,7 @@ export default function ExcalidrawWrapper({
         },
       });
     }
-  }, [projectId, readyState, sendJsonMessage, username]);
+  }, [project, projectId, readyState, sendJsonMessage, username]);
   useEffect(() => {
     const handleLeave = (event?: BeforeUnloadEvent) => {
       if (event && isDirty) {
@@ -177,17 +182,6 @@ export default function ExcalidrawWrapper({
       window.removeEventListener("beforeunload", handleLeave);
     };
   }, [isDirty, projectId, saveBoard]);
-  useEffect(() => {
-    if (readyState === ReadyState.OPEN && username) {
-      sendJsonMessage({
-        type: "disconnecting",
-        data: {
-          projectId,
-          username,
-        },
-      });
-    }
-  }, [pathname, projectId, readyState, sendJsonMessage, username]);
 
   // ==================== Handler Change ====================
   const handleChange = (
@@ -253,6 +247,7 @@ export default function ExcalidrawWrapper({
     <div className="custom-styles h-screen w-screen">
       <Excalidraw
         langCode="zh-CN"
+        theme={theme as Theme}
         // excalidrawAPI={(api) => setExcalidrawAPI(api)}
         excalidrawAPI={(api) => (excalidrawAPIRef.current = api)}
         UIOptions={{
@@ -264,7 +259,7 @@ export default function ExcalidrawWrapper({
           isError
             ? null
             : {
-                elements: restoreElements(scene.elements, [], {
+                elements: restoreElements(board.elements, [], {
                   refreshDimensions: false,
                   repairBindings: true,
                 }),

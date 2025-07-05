@@ -5,7 +5,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useUpdateProjectMutation } from "@/hooks/api/project/use-update-project";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function EditableSheetHeader({
   id,
@@ -21,6 +21,11 @@ export function EditableSheetHeader({
 
   const [title, setTitle] = useState(name);
   const [desc, setDesc] = useState(description);
+
+  useEffect(() => {
+    setTitle(name);
+    setDesc(description);
+  }, [name, description]);
 
   const update = useUpdateProjectMutation();
 

@@ -30,7 +30,8 @@ export default function AppHeader() {
         alt="logo"
         width={200}
         height={64}
-        className="object-cover"
+        className="cursor-pointer object-cover"
+        onClick={() => router.push("/home")}
       />
       <div className="order-4 hidden h-fit items-center gap-2 px-2 py-1.5 md:ml-auto md:flex md:h-[34px]">
         {token ? (

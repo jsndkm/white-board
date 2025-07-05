@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 
 export function ProjectDetailSheet({
@@ -29,13 +29,19 @@ export function ProjectDetailSheet({
   const router = useRouter();
   const { data: session } = useSession();
   const username = session?.user?.username || "";
+  const params = useParams();
 
-  const project = useProjectDetailsStore((state) => state.project);
+  const projectId = useProjectDetailsStore((state) => state.projectId);
   const isOpen = useProjectDetailsStore((state) => state.isOpen);
   const setIsOpen = useProjectDetailsStore((state) => state.setIsOpen);
 
-  const { data: projectDetail } = useGetProject(project?.id);
+  const { data: projectDetail } = useGetProject(
+    projectId ?? Number(params.id),
+    isOpen,
+  );
   const members = projectDetail?.user || [];
+
+  console.log("Project Detail:", projectDetail);
 
   const [inviteUsername, setInviteUsername] = useState("");
 
@@ -43,14 +49,18 @@ export function ProjectDetailSheet({
   const exitProject = useExitProjectMutation();
   const deleteProject = useDeleteProjectMutation();
 
+  const isProjectOwner = projectDetail?.user.some(
+    (el) => el.username === username && el.admin,
+  );
+
   const handleInvite = () => {
-    if (!project?.id || !inviteUsername) return;
-    invite.mutate({ projectId: project.id, username: inviteUsername });
+    if (!projectId || !inviteUsername) return;
+    invite.mutate({ projectId, username: inviteUsername });
     setInviteUsername("");
   };
 
   const handleOpenProject = () => {
-    router.replace(`/project/${project?.id}`);
+    router.replace(`/project/${[projectId]}`);
     setIsOpen(false);
   };
 
@@ -59,11 +69,18 @@ export function ProjectDetailSheet({
       type: "exitProject",
       title: "删除项目",
       description: "您确定要删除此项目吗？",
-      onConfirm: () =>
+      onConfirm: () => {
+        if (!projectId) return;
         deleteProject.mutate(
-          { projectId: project?.id || 0 },
-          { onSuccess: () => setIsOpen(false) },
-        ),
+          { projectId },
+          {
+            onSuccess: () => {
+              setIsOpen(false);
+              router.replace("/");
+            },
+          },
+        );
+      },
     });
   };
 
@@ -74,7 +91,7 @@ export function ProjectDetailSheet({
       description: "您确定要退出此项目吗？",
       onConfirm: () =>
         exitProject.mutate(
-          { projectId: project?.id || 0 },
+          { projectId: projectId || 0 },
           { onSuccess: () => setIsOpen(false) },
         ),
     });
@@ -88,14 +105,13 @@ export function ProjectDetailSheet({
           className="flex w-full max-w-lg flex-col space-y-6 overflow-y-auto px-6"
         >
           <EditableSheetHeader
-            id={project?.id}
-            name={project?.name ?? ""}
-            description={project?.description ?? ""}
+            id={projectId}
+            name={projectDetail?.name ?? ""}
+            description={projectDetail?.description ?? ""}
           />
 
-          {/*<Skeleton className="h-40 w-full rounded-md" />*/}
           <Image
-            src={`${project?.image}`}
+            src={`${projectDetail?.image}`}
             alt="Base64"
             width={200}
             height={200}
@@ -105,8 +121,8 @@ export function ProjectDetailSheet({
           <MemberList
             members={members}
             currentUser={username}
-            isProjectOwner={project?.admin || false}
-            projectId={project?.id || 0}
+            isProjectOwner={isProjectOwner ?? false}
+            projectId={projectId}
           />
 
           {/* Invite Action */}
@@ -142,7 +158,7 @@ export function ProjectDetailSheet({
               </Button>
             )}
 
-            {project?.admin ? (
+            {isProjectOwner ? (
               <Button
                 variant="destructive"
                 className="cursor-pointer"

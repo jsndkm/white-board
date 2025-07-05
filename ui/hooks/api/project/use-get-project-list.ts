@@ -10,5 +10,7 @@ export function useGetProjectList(enabled: boolean) {
       return await fetcher<Project[]>(API.projects.list);
     },
     enabled,
+    staleTime: 0,
+    gcTime: 0,
   });
 }
