@@ -142,7 +142,7 @@ public class ProjectController {
         }
     }
 
-    @GetMapping("/projects-simple/{id}")
+    @GetMapping("/project-simple/{id}")
     @ResponseBody
     public ResponseEntity<ResultUtil<Object>> getProject(@RequestHeader("Authorization") String authorization, @PathVariable("id") Integer id){
         try {
@@ -266,7 +266,7 @@ public class ProjectController {
                     if (imageFileMap.containsKey(baseName)) {
                         File imgFile = imageFileMap.get(baseName);
                         // 返回图片Base64编码
-                        String imageBase64 = encodeFileToBase64(imgFile);
+                        String imageBase64 = "data:image/png;base64,"+encodeFileToBase64(imgFile);
                         templateDto.setImage(imageBase64);
                     }
 

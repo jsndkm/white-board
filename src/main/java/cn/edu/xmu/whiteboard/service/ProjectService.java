@@ -20,7 +20,6 @@ import cn.edu.xmu.whiteboard.redis.ProjectBoardKey;
 import cn.edu.xmu.whiteboard.redis.RedisService;
 import cn.edu.xmu.whiteboard.result.CodeMsg;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -30,10 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ProjectService {
@@ -72,7 +71,57 @@ public class ProjectService {
         // 根据template属性选择对应的JSON文件
         ProjectBoardDto projectBoardDto = createProjectBoardDtoFromTemplate(projectDto.getTemplate());
         projectBoardService.storeProjectBoard(projectBoardDto,project.getId());
+
+        // 获取项目根目录
+        String rootPath = System.getProperty("user.dir");
+        // 处理图片目录
+        String imageFolderPath = rootPath + File.separator + "image";
+        File imageFolder = new File(imageFolderPath);
+        // 存储图片文件映射（key: 模板名称, value: 图片文件）
+        Map<String, File> imageFileMap = new HashMap<>();
+
+        if (imageFolder.exists() && imageFolder.isDirectory()) {
+            File[] imageFiles = imageFolder.listFiles((dir, name) -> name.endsWith(".png"));
+
+            if (imageFiles != null) {
+                for (File imgFile : imageFiles) {
+                    String imgName = imgFile.getName().replace(".png", "");
+                    // 如果图片名称不是"空白模板"，则加上"模型"后缀（与模板名称匹配）
+                    if (!"空白模板".equals(imgName)) {
+                        imgName += "模型";
+                    }
+                    imageFileMap.put(imgName, imgFile);
+                }
+            }
+            // 设置图片（如果存在匹配的图片）
+            if (imageFileMap.containsKey(projectDto.getTemplate())) {
+                try {
+                    File imgFile = imageFileMap.get(projectDto.getTemplate());
+                    // 返回图片Base64编码
+                    String image = "data:image/png;base64,"+encodeFileToBase64(imgFile);
+                    // 存储到 Redis
+                    boolean result = redisService.set(ImageKey.getById, ""+project.getId(), image);
+                    if (!result) {
+                        throw new RuntimeException("Failed to store projectBoard image data");
+                    }
+                    // 存储到 MongoDB
+                    try {
+                        ImageMongo imageMongo=new ImageMongo(project.getId(), image);
+                        mongoTemplate.save(imageMongo, "project_image");
+                    } catch (Exception e) {
+                        throw new RuntimeException("Failed to store projectBoard image data in MongoDB", e);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
         return data;
+    }
+
+    private String encodeFileToBase64(File file) throws IOException {
+        byte[] fileContent = Files.readAllBytes(file.toPath());
+        return Base64.getEncoder().encodeToString(fileContent);
     }
 
     private ProjectBoardDto createProjectBoardDtoFromTemplate(String templateName) {
