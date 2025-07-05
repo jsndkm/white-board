@@ -179,11 +179,10 @@ export default function ExcalidrawWrapper({
     window.addEventListener("pagehide", handleRouteChange); // 更兼容的方式
 
     return () => {
-      handleLeave();
       window.removeEventListener("beforeunload", handleLeave);
       window.removeEventListener("pagehide", handleRouteChange);
     };
-  }, [projectId, readyState, saveBoard, sendJsonMessage, username]);
+  }, [projectId, readyState, sendJsonMessage, username]);
 
   const handleChange = (
     elements: readonly OrderedExcalidrawElement[],

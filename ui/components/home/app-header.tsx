@@ -25,14 +25,11 @@ export default function AppHeader() {
 
   return (
     <header className="bg-background sticky top-0 flex items-center gap-2 px-2 py-1.5 md:px-2">
-      {/*<span className="pl-2 font-sans text-4xl leading-none font-medium italic">*/}
-      {/*  White Board*/}
-      {/*</span>*/}
       <Image
         src="/logo.png"
         alt="logo"
         width={200}
-        height={200}
+        height={64}
         className="object-cover"
       />
       <div className="order-4 hidden h-fit items-center gap-2 px-2 py-1.5 md:ml-auto md:flex md:h-[34px]">
