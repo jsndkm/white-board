@@ -84,7 +84,7 @@ public class WebSocketServer {
      * 连接关闭调用的方法
      */
     @OnClose
-    public void onClose(Session session, CloseReason reason) {
+    public void onClose() {
         messageQueue.removeIf(msg -> msg.sender == this);
         if(currentRoomId != null&&currentUsername!=null) {
             RoomInfo room = roomMap.get(currentRoomId);
@@ -98,7 +98,6 @@ public class WebSocketServer {
             userChangeData.setAction("leave");
             broadcastToRoom(currentRoomId, "room-user-change", userChangeData, timestampGenerator.getAndIncrement());
             log.info(currentUsername + "离开房间:" + currentRoomId);
-            log.info("连接关闭，原因: {}", reason);
             //从set中删除
             webSocketSet.remove(this);
             log.info("连接关闭！当前在线人数为" + webSocketSet.size());
@@ -299,7 +298,7 @@ public class WebSocketServer {
         }
 
         // 使用锁保证原子性
-        synchronized (boardRef) {
+        //synchronized (boardRef) {
             ProjectBoardDto currentBoard = boardRef.get();
             ProjectBoardDto newBoard = new ProjectBoardDto();
             BeanUtils.copyProperties(currentBoard, newBoard); // 深度拷贝
@@ -349,9 +348,9 @@ public class WebSocketServer {
             newBoard.setFiles(request.getFile());
             boardRef.set(newBoard); // 原子更新
             projectBoardMap.put(roomId, boardRef);
-//            ProjectBoardService projectBoardService = getProjectBoardService();
-//            projectBoardService.storeProjectBoard(newBoard, request.getProjectId());
-        }
+            ProjectBoardService projectBoardService = getProjectBoardService();
+            projectBoardService.storeProjectBoard(newBoard, request.getProjectId());
+        //}
 
         // 广播给房间内所有用户
         RoomInfo roomInfo = roomMap.get(roomId);
@@ -531,25 +530,25 @@ public class WebSocketServer {
         disconnectData.setUsername(user);
         disconnectData.setIsExpected(true);
 
-//        try {
-//            onClose();
-//        } catch (Exception e) {
-//            log.error("webSocket disconnect error");
-//            disconnectData.setIsExpected(false);
-//        }
         try {
-            RoomInfo room = roomMap.get(roomId);
-            room.removeUser(user);
-            roomMap.put(room.roomId,room);
-            WebSocketMessage.RoomUserChangeData userChangeData = new WebSocketMessage.RoomUserChangeData();
-            userChangeData.setUsername(user);
-            userChangeData.setAction("leave");
-            broadcastToRoom(roomId,"room-user-change",userChangeData,responseTimestamp);
-            log.info(user+"断开连接");
-        } catch (Exception e){
-            log.error("quit room error");
+            onClose();
+        } catch (Exception e) {
+            log.error("webSocket disconnect error");
             disconnectData.setIsExpected(false);
         }
+//        try {
+//            RoomInfo room = roomMap.get(roomId);
+//            room.removeUser(user);
+//            roomMap.put(room.roomId,room);
+//            WebSocketMessage.RoomUserChangeData userChangeData = new WebSocketMessage.RoomUserChangeData();
+//            userChangeData.setUsername(user);
+//            userChangeData.setAction("leave");
+//            broadcastToRoom(roomId,"room-user-change",userChangeData,responseTimestamp);
+//            log.info(user+"断开连接");
+//        } catch (Exception e){
+//            log.error("quit room error");
+//            disconnectData.setIsExpected(false);
+//        }
 
         broadcastToRoom(roomId,"disconnect",disconnectData,responseTimestamp);
     }

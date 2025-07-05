@@ -20,6 +20,10 @@ public class GlobalExceptionHandle {
     public ResponseEntity<ResultUtil<Object>> exceptionHandle(Exception e) {
         if (e instanceof GlobalException) {
             GlobalException ex = (GlobalException) e;
+            if(ex.getCm().getCode()==500501)
+                return ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED)
+                        .body(ResultUtil.error(ex.getCm()));
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ResultUtil.error(ex.getCm()));

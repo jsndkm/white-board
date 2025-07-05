@@ -311,7 +311,8 @@ public class ProjectService {
                 ProjectPO projectPO = projectDao.getProject(id);
                 ProjectReturnData projectReturnData = new ProjectReturnData(projectPO.getId(),projectPO.getName(),projectPO.getDescription());
                 List<ProjectUserDto> projectUserDtos = projectUserDao.getProjectUser(id);
-                return new ProjectCompleteData(projectReturnData, projectUserDtos);
+                String image=getImage(id);
+                return new ProjectCompleteData(projectReturnData, projectUserDtos,image);
             }
         }
         return null;

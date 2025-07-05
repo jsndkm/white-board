@@ -12,9 +12,9 @@ public class ElementDto {
     private double angle;
     private String strokeColor;
     private String backgroundColor;
-    private Style fillStyle;
+    private String fillStyle;
     private double strokeWidth;
-    private Style strokeStyle;
+    private String strokeStyle;
     private double roughness;
     private double opacity;
     private Object[] groupIDS;
@@ -103,9 +103,9 @@ public class ElementDto {
     public void setBackgroundColor(String value) { this.backgroundColor = value; }
 
     @JsonProperty("fillStyle")
-    public Style getFillStyle() { return fillStyle; }
+    public String getFillStyle() { return fillStyle; }
     @JsonProperty("fillStyle")
-    public void setFillStyle(Style value) { this.fillStyle = value; }
+    public void setFillStyle(String value) { this.fillStyle = value; }
 
     @JsonProperty("strokeWidth")
     public double getStrokeWidth() { return strokeWidth; }
@@ -113,9 +113,9 @@ public class ElementDto {
     public void setStrokeWidth(double value) { this.strokeWidth = value; }
 
     @JsonProperty("strokeStyle")
-    public Style getStrokeStyle() { return strokeStyle; }
+    public String getStrokeStyle() { return strokeStyle; }
     @JsonProperty("strokeStyle")
-    public void setStrokeStyle(Style value) { this.strokeStyle = value; }
+    public void setStrokeStyle(String value) { this.strokeStyle = value; }
 
     @JsonProperty("roughness")
     public double getRoughness() { return roughness; }

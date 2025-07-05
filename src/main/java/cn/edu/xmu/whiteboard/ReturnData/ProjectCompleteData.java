@@ -9,12 +9,14 @@ public class ProjectCompleteData {
     private String name;
     private String description;
     private List<ProjectUserDto> user;
+    private String image;
 
-    public ProjectCompleteData(ProjectReturnData projectReturnData, List<ProjectUserDto> projectUserDtos) {
+    public ProjectCompleteData(ProjectReturnData projectReturnData, List<ProjectUserDto> projectUserDtos,String image) {
         this.id = projectReturnData.getId();
         this.name = projectReturnData.getName();
         this.description = projectReturnData.getDescription();
         this.user = projectUserDtos;
+        this.image = image;
     }
 
     public int getId() {return id;}
@@ -28,4 +30,7 @@ public class ProjectCompleteData {
 
     public List<ProjectUserDto> getUser() {return user;}
     public void setUser(List<ProjectUserDto> projectUserDtos) {this.user = projectUserDtos;}
+
+    public String getImage() {return image;}
+    public void setImage(String image) {this.image = image;}
 }
