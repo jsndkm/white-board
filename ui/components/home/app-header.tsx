@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function AppHeader() {
@@ -24,9 +25,16 @@ export default function AppHeader() {
 
   return (
     <header className="bg-background sticky top-0 flex items-center gap-2 px-2 py-1.5 md:px-2">
-      <span className="pl-2 font-sans text-4xl leading-none font-medium italic">
-        White Board
-      </span>
+      {/*<span className="pl-2 font-sans text-4xl leading-none font-medium italic">*/}
+      {/*  White Board*/}
+      {/*</span>*/}
+      <Image
+        src="/logo.png"
+        alt="logo"
+        width={200}
+        height={200}
+        className="object-cover"
+      />
       <div className="order-4 hidden h-fit items-center gap-2 px-2 py-1.5 md:ml-auto md:flex md:h-[34px]">
         {token ? (
           <div className="flex items-center gap-2">
