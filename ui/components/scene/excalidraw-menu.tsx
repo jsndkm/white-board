@@ -1,16 +1,26 @@
 "use client";
 
+import { useSaveBoardMutation } from "@/hooks/api/board/use-save-board";
 import { useProjectDetailsStore } from "@/stores/project-detail";
 import { useProjectDialogStore } from "@/stores/project-dialog";
 import { MainMenu } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
+import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { SiGithub } from "@icons-pack/react-simple-icons";
-import { Eye, Folder, House, LogOut, Plus } from "lucide-react";
+import { Eye, Folder, House, LogOut, Plus, Save } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-export default function ExcalidrawMenu() {
+export default function ExcalidrawMenu({
+  api,
+  projectId,
+}: {
+  api: ExcalidrawImperativeAPI | null;
+  projectId: number;
+}) {
   const router = useRouter();
+  const saveBoard = useSaveBoardMutation();
 
   const handleNewProject = () => {
     useProjectDialogStore.getState().openDialog("newProject");
@@ -20,8 +30,22 @@ export default function ExcalidrawMenu() {
     useProjectDialogStore.getState().openDialog("openProject");
   };
 
+  const handleSaveProject = () => {
+    if (!api) return;
+    saveBoard.mutate(
+      { api, projectId },
+      {
+        onSuccess: () => toast.success("项目保存成功"),
+      },
+    );
+  };
+
   const handleViewProjectDetails = () => {
     useProjectDetailsStore.getState().openDialog();
+  };
+
+  const handleReturnToHome = () => {
+    router.push("/");
   };
 
   return (
@@ -37,12 +61,17 @@ export default function ExcalidrawMenu() {
           打开项目
         </MainMenu.Item>
 
+        <MainMenu.Item onSelect={handleSaveProject}>
+          <Save />
+          保存项目
+        </MainMenu.Item>
+
         <MainMenu.Item onSelect={handleViewProjectDetails}>
           <Eye />
           查看项目详情
         </MainMenu.Item>
 
-        <MainMenu.Item onSelect={() => router.push("/")}>
+        <MainMenu.Item onSelect={handleReturnToHome}>
           <House />
           回到主页
         </MainMenu.Item>

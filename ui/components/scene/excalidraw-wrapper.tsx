@@ -51,6 +51,7 @@ export default function ExcalidrawWrapper({
   const saveBoard = useSaveBoardMutation();
 
   const skipChangeFrames = useRef(0);
+  const dirtyRef = useRef(false);
 
   const onRoomUserChange = useCallback(
     (data: RoomUserChangeData) => {
@@ -155,7 +156,12 @@ export default function ExcalidrawWrapper({
   }, [projectId, readyState, sendJsonMessage, username]);
 
   useEffect(() => {
-    const handleLeave = () => {
+    const handleLeave = (event?: BeforeUnloadEvent) => {
+      if (event && dirtyRef.current) {
+        event.preventDefault();
+        event.returnValue = "尚未保存，确定离开吗？";
+      }
+
       const api = excalidrawAPIRef.current;
       if (readyState === ReadyState.OPEN && username) {
         sendJsonMessage({
@@ -166,29 +172,36 @@ export default function ExcalidrawWrapper({
           },
         });
       }
-      if (api) {
-        saveBoard.mutate({ api, projectId });
+      if (api && dirtyRef.current) {
+        saveBoard.mutate(
+          { api, projectId },
+          {
+            onSettled: () => (dirtyRef.current = false),
+          },
+        );
       }
     };
 
-    // 浏览器关闭、刷新等
     window.addEventListener("beforeunload", handleLeave);
-
-    // Next.js 切换路由（返回主页等）
-    const handleRouteChange = () => handleLeave();
-    window.addEventListener("pagehide", handleRouteChange); // 更兼容的方式
-
     return () => {
       window.removeEventListener("beforeunload", handleLeave);
-      window.removeEventListener("pagehide", handleRouteChange);
     };
-  }, [projectId, readyState, sendJsonMessage, username]);
+  }, [projectId, readyState, saveBoard, sendJsonMessage, username]);
 
   const handleChange = (
     elements: readonly OrderedExcalidrawElement[],
-    _: AppState,
+    appState: AppState,
     files: BinaryFiles,
   ) => {
+    if (
+      appState?.newElement !== null ||
+      appState?.multiElement !== null ||
+      appState?.resizingElement !== null ||
+      appState?.selectionElement !== null ||
+      appState?.startBoundElement !== null
+    )
+      dirtyRef.current = true;
+
     if (skipChangeFrames.current > 0) {
       skipChangeFrames.current -= 1;
       return;
@@ -263,7 +276,7 @@ export default function ExcalidrawWrapper({
         onPointerUpdate={debounceHandlePointerUpdate}
         isCollaborating={true}
       >
-        <ExcalidrawMenu />
+        <ExcalidrawMenu api={excalidrawAPIRef.current} projectId={projectId} />
         <ProjectDialog />
         <ProjectDetailSheet showOpenProjectButton={false} />
       </Excalidraw>
