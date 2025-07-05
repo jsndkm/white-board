@@ -14,7 +14,7 @@ import {
   ServerBroadcastData,
   ServerPointerBroadcast,
 } from "@/lib/types/websocket";
-import { useRoomState } from "@/stores/room";
+import { useBoardStore } from "@/stores/board";
 import {
   CaptureUpdateAction,
   Excalidraw,
@@ -34,6 +34,7 @@ import {
 import { debounce, isEqual } from "lodash";
 import { LoaderCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import React, { useCallback, useEffect, useRef } from "react";
 import { ReadyState } from "react-use-websocket";
 
@@ -44,28 +45,28 @@ export default function ExcalidrawWrapper({
 }) {
   const { data: session } = useSession();
   const username = session?.user.username;
-
   const excalidrawAPIRef = useRef<ExcalidrawImperativeAPI>(null);
+  const pathname = usePathname();
 
   const { data: scene, isError, isPending } = useGetProjectScene(projectId);
   const saveBoard = useSaveBoardMutation();
 
   const skipChangeFrames = useRef(0);
-  const dirtyRef = useRef(false);
+  const isDirty = useBoardStore((state) => state.isDirty);
 
+  // ==================== WebSocket Handlers ====================
   const onRoomUserChange = useCallback(
     (data: RoomUserChangeData) => {
       if (data.userName === username) {
         if (data.action === "join") {
-          useRoomState.getState().addUser(data.userName);
+          useBoardStore.getState().addUser(data.userName);
         } else {
-          useRoomState.getState().removeUser(data.userName);
+          useBoardStore.getState().removeUser(data.userName);
         }
       }
     },
     [username],
   );
-
   const onServerBroadcast = useCallback((data: ServerBroadcastData) => {
     const remoteElements = data.elements ?? [];
     const remoteAppState = data.appState ?? {};
@@ -111,7 +112,6 @@ export default function ExcalidrawWrapper({
       });
     }
   }, []);
-
   const onServerPointerBroadcast = useCallback(
     (data: ServerPointerBroadcast) => {
       const users = data.users;
@@ -131,7 +131,6 @@ export default function ExcalidrawWrapper({
     },
     [username],
   );
-
   const onDisconnect = useCallback((data: DisconnectData) => {
     console.log("disconnected:", data.username);
   }, []);
@@ -143,6 +142,7 @@ export default function ExcalidrawWrapper({
     onDisconnect: onDisconnect,
   });
 
+  // ==================== Join && Leave ====================
   useEffect(() => {
     if (readyState === ReadyState.OPEN && username) {
       sendJsonMessage({
@@ -154,29 +154,19 @@ export default function ExcalidrawWrapper({
       });
     }
   }, [projectId, readyState, sendJsonMessage, username]);
-
   useEffect(() => {
     const handleLeave = (event?: BeforeUnloadEvent) => {
-      if (event && dirtyRef.current) {
+      if (event && isDirty) {
         event.preventDefault();
         event.returnValue = "尚未保存，确定离开吗？";
       }
 
       const api = excalidrawAPIRef.current;
-      if (readyState === ReadyState.OPEN && username) {
-        sendJsonMessage({
-          type: "disconnecting",
-          data: {
-            projectId,
-            username,
-          },
-        });
-      }
-      if (api && dirtyRef.current) {
+      if (api && isDirty) {
         saveBoard.mutate(
           { api, projectId },
           {
-            onSettled: () => (dirtyRef.current = false),
+            onSettled: () => useBoardStore.getState().setIsDirty(false),
           },
         );
       }
@@ -186,8 +176,20 @@ export default function ExcalidrawWrapper({
     return () => {
       window.removeEventListener("beforeunload", handleLeave);
     };
-  }, [projectId, readyState, saveBoard, sendJsonMessage, username]);
+  }, [isDirty, projectId, saveBoard]);
+  useEffect(() => {
+    if (readyState === ReadyState.OPEN && username) {
+      sendJsonMessage({
+        type: "disconnecting",
+        data: {
+          projectId,
+          username,
+        },
+      });
+    }
+  }, [pathname, projectId, readyState, sendJsonMessage, username]);
 
+  // ==================== Handler Change ====================
   const handleChange = (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
@@ -200,7 +202,7 @@ export default function ExcalidrawWrapper({
       appState?.selectionElement !== null ||
       appState?.startBoundElement !== null
     )
-      dirtyRef.current = true;
+      useBoardStore.getState().setIsDirty(true);
 
     if (skipChangeFrames.current > 0) {
       skipChangeFrames.current -= 1;
@@ -218,7 +220,6 @@ export default function ExcalidrawWrapper({
       timestamp: Date.now(),
     });
   };
-
   const handlePointerUpdate = (payload: {
     pointer: { x: number; y: number; tool: "pointer" | "laser" };
     button: "down" | "up";
@@ -235,7 +236,6 @@ export default function ExcalidrawWrapper({
       timestamp: Date.now(),
     });
   };
-
   const debounceHandleChange = debounce(handleChange, 0);
   const debounceHandlePointerUpdate = debounce(handlePointerUpdate, 0);
 

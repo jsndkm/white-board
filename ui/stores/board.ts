@@ -6,24 +6,28 @@ import {
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface RoomState {
+interface BoardState {
   isHydrated: boolean;
   setIsHydrated: (isHydrated: boolean) => void;
   roomId?: string;
   setRoomId: (roomId: string | undefined) => void;
+  isDirty: boolean;
+  setIsDirty: (dirty: boolean) => void;
   collaborators: Map<SocketId, Collaborator>;
   addUser: (username: string) => void;
   removeUser: (username: string) => void;
   updatePointers: (users: { username: string; x: number; y: number }[]) => void;
 }
 
-export const useRoomState = create<RoomState>()(
+export const useBoardStore = create<BoardState>()(
   persist(
     (set) => ({
       isHydrated: false,
       setIsHydrated: (isHydrated: boolean) => set({ isHydrated: isHydrated }),
       roomId: undefined,
       setRoomId: (roomId: string | undefined) => set({ roomId: roomId }),
+      isDirty: false,
+      setIsDirty: (dirty: boolean) => set({ isDirty: dirty }),
       collaborators: new Map<SocketId, Collaborator>(),
       addUser: (username: string) =>
         set((state) => {
