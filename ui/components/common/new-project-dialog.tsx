@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
@@ -18,13 +17,14 @@ import { useCreateProjectMutation } from "@/hooks/api/project/use-create-project
 import { useNewProjectDialogStore } from "@/stores/new-project-dialog";
 import { useProjectDialogStore } from "@/stores/project-dialog";
 import { PlusCircle } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function NewProjectDialog() {
   const router = useRouter();
 
-  const { isOpen, templateName, templateDesc, setIsOpen } =
+  const { isOpen, templateName, templateDesc, base64String, setIsOpen } =
     useNewProjectDialogStore();
 
   const [projectName, setProjectName] = useState("");
@@ -62,9 +62,15 @@ export function NewProjectDialog() {
           <DialogDescription>基于以下模板创建你的项目</DialogDescription>
         </DialogHeader>
 
-        {/*  封面 Skeleton */}
         <div className="mb-2 h-[160px] w-full">
-          <Skeleton className="h-full w-full rounded-md" />
+          <Image
+            src={`${base64String}`}
+            alt="Base64"
+            width={200}
+            height={200}
+            unoptimized
+            className="h-full w-full rounded-md object-cover"
+          />
         </div>
 
         {/*  模板信息 */}

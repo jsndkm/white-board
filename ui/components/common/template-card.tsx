@@ -49,7 +49,7 @@ export function TemplateCard({
             onClick={() =>
               useNewProjectDialogStore
                 .getState()
-                .openDialog(templateName, templateDesc)
+                .openDialog(templateName, templateDesc, base64String)
             }
           >
             <Sparkles className="mr-2 h-4 w-4" />
