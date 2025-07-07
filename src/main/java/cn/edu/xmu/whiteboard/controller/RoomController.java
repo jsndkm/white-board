@@ -1,7 +1,7 @@
 package cn.edu.xmu.whiteboard.controller;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
-import cn.edu.xmu.whiteboard.ReturnData.DrawBoardReturnData;
+import cn.edu.xmu.whiteboard.controller.vo.DrawBoardVO;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
 import cn.edu.xmu.whiteboard.service.RoomService;
 import cn.edu.xmu.whiteboard.utils.JWTUtil;
@@ -54,7 +54,7 @@ public class RoomController {
 
             String ID = roomService.modifyRoom(roomData, id);
 
-            DrawBoardReturnData data=new DrawBoardReturnData(ID);
+            DrawBoardVO data=new DrawBoardVO(ID);
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(ResultUtil.success(data));

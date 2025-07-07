@@ -1,4 +1,4 @@
-package cn.edu.xmu.whiteboard.ReturnData;
+package cn.edu.xmu.whiteboard.controller.vo;
 
 import cn.edu.xmu.whiteboard.controller.dto.pb.AppStateDto;
 import cn.edu.xmu.whiteboard.controller.dto.pb.FileDto;
@@ -6,12 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 
-public class ProjectBoardReturnData {
+public class ProjectBoardVO {
     private ArrayList<Object> elements=new ArrayList<>();
     private AppStateDto appState;
     private FileDto files;
 
-    public ProjectBoardReturnData() {}
+    public ProjectBoardVO() {}
 
     @JsonProperty("elements")
     public ArrayList<Object> getElements() { return elements; }

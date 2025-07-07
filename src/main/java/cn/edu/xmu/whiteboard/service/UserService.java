@@ -2,7 +2,7 @@ package cn.edu.xmu.whiteboard.service;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalException;
 import cn.edu.xmu.whiteboard.controller.dto.LoginDto;
-import cn.edu.xmu.whiteboard.ReturnData.LoginReturnData;
+import cn.edu.xmu.whiteboard.controller.vo.LoginVO;
 import cn.edu.xmu.whiteboard.controller.dto.UserDto;
 import cn.edu.xmu.whiteboard.dao.UserDao;
 import cn.edu.xmu.whiteboard.mapper.po.UserPO;
@@ -46,7 +46,7 @@ public class UserService {
         return true;
     }
 
-    public LoginReturnData login(HttpServletResponse response, LoginDto loginDTO) {
+    public LoginVO login(HttpServletResponse response, LoginDto loginDTO) {
         if (null == loginDTO) {
             throw new IllegalArgumentException("loginDTO is null");
         }
@@ -68,7 +68,7 @@ public class UserService {
         // 生成 cookie
         String token = JWTUtil.generateToken(user.getUsername());
         //addCookie(response, token, user);
-        LoginReturnData data=new LoginReturnData(user.getId(),token,user.getUsername());
+        LoginVO data=new LoginVO(user.getId(),token,user.getUsername());
         return data;
     }
 

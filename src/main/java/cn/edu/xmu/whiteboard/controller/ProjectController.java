@@ -2,10 +2,10 @@ package cn.edu.xmu.whiteboard.controller;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalException;
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
-import cn.edu.xmu.whiteboard.ReturnData.MyProjectReturnData;
-import cn.edu.xmu.whiteboard.ReturnData.NewProjectReturnData;
-import cn.edu.xmu.whiteboard.ReturnData.ProjectReturnData;
-import cn.edu.xmu.whiteboard.ReturnData.ProjectCompleteData;
+import cn.edu.xmu.whiteboard.controller.vo.MyProjectVO;
+import cn.edu.xmu.whiteboard.controller.vo.NewProjectVO;
+import cn.edu.xmu.whiteboard.controller.vo.ProjectVO;
+import cn.edu.xmu.whiteboard.controller.vo.ProjectCompleteVO;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectModifyDto;
 import cn.edu.xmu.whiteboard.controller.dto.TemplateDto;
@@ -44,8 +44,8 @@ public class ProjectController {
             }
             //解析token
             String username=JWTUtil.analyzeToken(authorization);
-            ProjectReturnData data = projectService.newProject(username, projectDto);
-            NewProjectReturnData newProjectReturnData = new NewProjectReturnData(data.getId());
+            ProjectVO data = projectService.newProject(username, projectDto);
+            NewProjectVO newProjectReturnData = new NewProjectVO(data.getId());
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(ResultUtil.success(newProjectReturnData));
@@ -61,7 +61,7 @@ public class ProjectController {
         try {
             //解析token
             String username=JWTUtil.analyzeToken(authorization);
-            List<MyProjectReturnData> data=projectService.findMyProject(username);
+            List<MyProjectVO> data=projectService.findMyProject(username);
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(ResultUtil.success(data));
@@ -131,7 +131,7 @@ public class ProjectController {
         try {
             //解析token
             String username=JWTUtil.analyzeToken(authorization);
-            ProjectCompleteData data=projectService.openProject(username,id);
+            ProjectCompleteVO data=projectService.openProject(username,id);
             if(data==null) throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
             return ResponseEntity
                     .status(HttpStatus.OK)
@@ -148,7 +148,7 @@ public class ProjectController {
         try {
             //解析token
             String username=JWTUtil.analyzeToken(authorization);
-            MyProjectReturnData data=projectService.getProject(username,id);
+            MyProjectVO data=projectService.getProject(username,id);
             if(data==null) throw new GlobalException(CodeMsg.PROJECT_NOT_EXIST);
             return ResponseEntity
                     .status(HttpStatus.OK)

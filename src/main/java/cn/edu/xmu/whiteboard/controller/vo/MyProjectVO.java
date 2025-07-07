@@ -1,15 +1,15 @@
-package cn.edu.xmu.whiteboard.ReturnData;
+package cn.edu.xmu.whiteboard.controller.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MyProjectReturnData {
+public class MyProjectVO {
     private int id;
     private String name;
     private String description;
     private boolean admin;
     private String image;
 
-    public MyProjectReturnData() {
+    public MyProjectVO() {
         id=-1;
         name=null;
         description=null;
@@ -17,7 +17,7 @@ public class MyProjectReturnData {
         image=null;
     }
 
-    public MyProjectReturnData(int id, String name, String description, boolean is_admin, String image) {
+    public MyProjectVO(int id, String name, String description, boolean is_admin, String image) {
         this.id = id;
         this.name = name;
         this.description = description;

@@ -1,7 +1,7 @@
 package cn.edu.xmu.whiteboard.controller;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
-import cn.edu.xmu.whiteboard.ReturnData.DrawBoardReturnData;
+import cn.edu.xmu.whiteboard.controller.vo.DrawBoardVO;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
 import cn.edu.xmu.whiteboard.service.DrawBoardService;
 import cn.edu.xmu.whiteboard.utils.JWTUtil;
@@ -30,7 +30,7 @@ public class DrawBoardController {
             String sceneId = drawBoardService.storeDrawBoard(sceneData);
 
             // 返回响应
-            DrawBoardReturnData data=new DrawBoardReturnData(sceneId);
+            DrawBoardVO data=new DrawBoardVO(sceneId);
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(ResultUtil.success(data));

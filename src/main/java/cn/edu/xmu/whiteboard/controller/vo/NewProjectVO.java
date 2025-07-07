@@ -1,9 +1,9 @@
-package cn.edu.xmu.whiteboard.ReturnData;
+package cn.edu.xmu.whiteboard.controller.vo;
 
-public class NewProjectReturnData {
+public class NewProjectVO {
     private int id;
 
-    public NewProjectReturnData(int id) {
+    public NewProjectVO(int id) {
         this.id = id;
     }
     public int getId() {

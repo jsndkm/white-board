@@ -1,7 +1,7 @@
 package cn.edu.xmu.whiteboard.controller;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
-import cn.edu.xmu.whiteboard.ReturnData.ProjectBoardReturnData;
+import cn.edu.xmu.whiteboard.controller.vo.ProjectBoardVO;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardDto;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardScreenShotDto;
 import cn.edu.xmu.whiteboard.result.ResultUtil;
@@ -71,7 +71,7 @@ public class ProjectBoardController {
             JWTUtil.analyzeToken(authorization);
 
             // 获取画板数据
-            ProjectBoardReturnData resourceData = projectBoardService.getProjectBoard(id);
+            ProjectBoardVO resourceData = projectBoardService.getProjectBoard(id);
 
             return ResponseEntity
                     .status(HttpStatus.OK)

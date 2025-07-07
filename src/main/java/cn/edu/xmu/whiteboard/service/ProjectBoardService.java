@@ -1,8 +1,7 @@
 package cn.edu.xmu.whiteboard.service;
 
 import cn.edu.xmu.whiteboard.controller.dto.pb.*;
-import cn.edu.xmu.whiteboard.ReturnData.ProjectBoardReturnData;
-import cn.edu.xmu.whiteboard.redis.DrawBoardKey;
+import cn.edu.xmu.whiteboard.controller.vo.ProjectBoardVO;
 import cn.edu.xmu.whiteboard.redis.ImageKey;
 import cn.edu.xmu.whiteboard.redis.ProjectBoardKey;
 import cn.edu.xmu.whiteboard.redis.RedisService;
@@ -59,7 +58,7 @@ public class ProjectBoardService {
         }
     }
 
-    public ProjectBoardReturnData getProjectBoard(int id) {
+    public ProjectBoardVO getProjectBoard(int id) {
         // 先尝试从Redis获取
         ProjectBoardDto projectBoardDto=redisService.get(ProjectBoardKey.getById, ""+id,ProjectBoardDto.class);
         // 如果Redis中没有，则从MongoDB获取
@@ -93,45 +92,45 @@ public class ProjectBoardService {
         }
     }
 
-    public ProjectBoardReturnData formReturnData(ProjectBoardDto projectBoardDto) {
+    public ProjectBoardVO formReturnData(ProjectBoardDto projectBoardDto) {
         // 创建 ProjectBoardReturnData 对象
-        ProjectBoardReturnData projectBoardReturnData = new ProjectBoardReturnData();
+        ProjectBoardVO projectBoardVO = new ProjectBoardVO();
 
         // 设置 appState 和 files
-        projectBoardReturnData.setAppState(projectBoardDto.getAppState());
-        projectBoardReturnData.setFiles(projectBoardDto.getFiles());
+        projectBoardVO.setAppState(projectBoardDto.getAppState());
+        projectBoardVO.setFiles(projectBoardDto.getFiles());
 
         if(projectBoardDto.getElements()==null)
-            return projectBoardReturnData;
+            return projectBoardVO;
         // 遍历 elements 数组
         for (ElementDto elementDto : projectBoardDto.getElements()) {
             if ("rectangle".equals(elementDto.getType())||"diamond".equals(elementDto.getType())||"ellipse".equals(elementDto.getType())||"embeddable".equals(elementDto.getType())) {
                 Rectangle rectangle = new Rectangle(elementDto);
-                projectBoardReturnData.getElements().add(rectangle);
+                projectBoardVO.getElements().add(rectangle);
             }else if("arrow".equals(elementDto.getType())) {
                 Arrow arrow = new Arrow(elementDto);
-                projectBoardReturnData.getElements().add(arrow);
+                projectBoardVO.getElements().add(arrow);
             }else if("line".equals(elementDto.getType())) {
                 Line line = new Line(elementDto);
-                projectBoardReturnData.getElements().add(line);
+                projectBoardVO.getElements().add(line);
             }else if("freedraw".equals(elementDto.getType())) {
                 FreeDraw freeDraw = new FreeDraw(elementDto);
-                projectBoardReturnData.getElements().add(freeDraw);
+                projectBoardVO.getElements().add(freeDraw);
             }else if("text".equals(elementDto.getType())) {
                 Text text = new Text(elementDto);
-                projectBoardReturnData.getElements().add(text);
+                projectBoardVO.getElements().add(text);
             }else if("image".equals(elementDto.getType())) {
                 Image image = new Image(elementDto);
-                projectBoardReturnData.getElements().add(image);
+                projectBoardVO.getElements().add(image);
             }else if("frame".equals(elementDto.getType())) {
                 Frame frame = new Frame(elementDto);
-                projectBoardReturnData.getElements().add(frame);
+                projectBoardVO.getElements().add(frame);
             }
             else {
                 // 直接将 ElementDto 对象添加到 elements 列表中
-                projectBoardReturnData.getElements().add(elementDto);
+                projectBoardVO.getElements().add(elementDto);
             }
         }
-        return projectBoardReturnData;
+        return projectBoardVO;
     }
 }

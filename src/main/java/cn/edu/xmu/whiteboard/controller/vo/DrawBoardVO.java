@@ -1,8 +1,8 @@
-package cn.edu.xmu.whiteboard.ReturnData;
+package cn.edu.xmu.whiteboard.controller.vo;
 
-public class DrawBoardReturnData {
+public class DrawBoardVO {
     private String id;
-    public DrawBoardReturnData(String id) {
+    public DrawBoardVO(String id) {
         this.id = id;
     }
     public String getId() {

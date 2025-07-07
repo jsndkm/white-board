@@ -1,11 +1,11 @@
-package cn.edu.xmu.whiteboard.ReturnData;
+package cn.edu.xmu.whiteboard.controller.vo;
 
-public class LoginReturnData {
+public class LoginVO {
     private int id;
     private String token;
     private String username;
 
-    public LoginReturnData(int id, String token, String username) {
+    public LoginVO(int id, String token, String username) {
         this.id = id;
         this.token = token;
         this.username = username;

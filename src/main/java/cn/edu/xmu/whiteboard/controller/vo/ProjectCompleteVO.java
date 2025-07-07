@@ -1,20 +1,20 @@
-package cn.edu.xmu.whiteboard.ReturnData;
+package cn.edu.xmu.whiteboard.controller.vo;
 
 import cn.edu.xmu.whiteboard.controller.dto.ProjectUserDto;
 
 import java.util.List;
 
-public class ProjectCompleteData {
+public class ProjectCompleteVO {
     private int id;
     private String name;
     private String description;
     private List<ProjectUserDto> user;
     private String image;
 
-    public ProjectCompleteData(ProjectReturnData projectReturnData, List<ProjectUserDto> projectUserDtos,String image) {
-        this.id = projectReturnData.getId();
-        this.name = projectReturnData.getName();
-        this.description = projectReturnData.getDescription();
+    public ProjectCompleteVO(ProjectVO projectVO, List<ProjectUserDto> projectUserDtos, String image) {
+        this.id = projectVO.getId();
+        this.name = projectVO.getName();
+        this.description = projectVO.getDescription();
         this.user = projectUserDtos;
         this.image = image;
     }

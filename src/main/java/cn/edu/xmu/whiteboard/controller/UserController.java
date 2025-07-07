@@ -3,7 +3,7 @@ package cn.edu.xmu.whiteboard.controller;
 import cn.edu.xmu.whiteboard.Exception.GlobalException;
 import cn.edu.xmu.whiteboard.Exception.GlobalExceptionHandle;
 import cn.edu.xmu.whiteboard.controller.dto.LoginDto;
-import cn.edu.xmu.whiteboard.ReturnData.LoginReturnData;
+import cn.edu.xmu.whiteboard.controller.vo.LoginVO;
 import cn.edu.xmu.whiteboard.controller.dto.UserDto;
 import cn.edu.xmu.whiteboard.result.*;
 import cn.edu.xmu.whiteboard.service.UserService;
@@ -75,7 +75,7 @@ public class UserController {
                 throw new GlobalException(CodeMsg.PASSWORD_EMPTY);
             }
 
-            LoginReturnData data = userService.login(response,loginDTO);
+            LoginVO data = userService.login(response,loginDTO);
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(ResultUtil.success(data));

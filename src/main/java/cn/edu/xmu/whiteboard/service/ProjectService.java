@@ -1,22 +1,20 @@
 package cn.edu.xmu.whiteboard.service;
 
 import cn.edu.xmu.whiteboard.Exception.GlobalException;
-import cn.edu.xmu.whiteboard.ReturnData.MyProjectReturnData;
-import cn.edu.xmu.whiteboard.ReturnData.ProjectReturnData;
-import cn.edu.xmu.whiteboard.ReturnData.ProjectCompleteData;
+import cn.edu.xmu.whiteboard.controller.vo.MyProjectVO;
+import cn.edu.xmu.whiteboard.controller.vo.ProjectVO;
+import cn.edu.xmu.whiteboard.controller.vo.ProjectCompleteVO;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectModifyDto;
 import cn.edu.xmu.whiteboard.controller.dto.ProjectUserDto;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ImageMongo;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardDto;
-import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardMongo;
 import cn.edu.xmu.whiteboard.dao.ProjectDao;
 import cn.edu.xmu.whiteboard.dao.ProjectUserDao;
 import cn.edu.xmu.whiteboard.dao.UserDao;
 import cn.edu.xmu.whiteboard.mapper.po.ProjectPO;
 import cn.edu.xmu.whiteboard.mapper.po.ProjectUserPO;
 import cn.edu.xmu.whiteboard.redis.ImageKey;
-import cn.edu.xmu.whiteboard.redis.ProjectBoardKey;
 import cn.edu.xmu.whiteboard.redis.RedisService;
 import cn.edu.xmu.whiteboard.result.CodeMsg;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +23,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 import java.io.File;
@@ -56,7 +53,7 @@ public class ProjectService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public ProjectReturnData newProject(String username, ProjectDto projectDto){
+    public ProjectVO newProject(String username, ProjectDto projectDto){
         if(projectDto == null){
             throw new IllegalArgumentException("projectDTO is null");
         }
@@ -66,7 +63,7 @@ public class ProjectService {
         }
         ProjectPO project = projectDao.createProject(username,projectDto);
         projectUserDao.createProjectUser(username,project);
-        ProjectReturnData data = new ProjectReturnData(project.getId(),project.getName(),project.getDescription());
+        ProjectVO data = new ProjectVO(project.getId(),project.getName(),project.getDescription());
 
         // 根据template属性选择对应的JSON文件
         ProjectBoardDto projectBoardDto = createProjectBoardDtoFromTemplate(projectDto.getTemplate());
@@ -171,7 +168,7 @@ public class ProjectService {
         }
     }
 
-    public List<MyProjectReturnData> findMyProject(String username){
+    public List<MyProjectVO> findMyProject(String username){
         // 检查用户名是否存在
         if (!userDao.existsByUsername(username)) {
             throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
@@ -188,12 +185,12 @@ public class ProjectService {
                 projectPOList.add(projectPO);
         }
 
-        List<MyProjectReturnData> data = new ArrayList<>();
+        List<MyProjectVO> data = new ArrayList<>();
         for (int i = 0; i < projectUserPOList.size() && i < projectPOList.size(); i++) {
             ProjectUserPO projectUserPO = projectUserPOList.get(i);
             ProjectPO projectPO = projectPOList.get(i);
 
-            MyProjectReturnData returnData = new MyProjectReturnData();
+            MyProjectVO returnData = new MyProjectVO();
             returnData.setId(projectPO.getId());
             returnData.setName(projectPO.getName());
             returnData.setDescription(projectPO.getDescription());
@@ -298,7 +295,7 @@ public class ProjectService {
         throw new GlobalException(CodeMsg.PROJECT_USER_NOT_EXIST);
     }
 
-    public ProjectCompleteData openProject(String username, Integer id){
+    public ProjectCompleteVO openProject(String username, Integer id){
         // 检查用户名是否存在
         if (!userDao.existsByUsername(username)) {
             throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
@@ -309,16 +306,16 @@ public class ProjectService {
             ProjectUserPO projectUserPO = projectUserPOList.get(i);
             if(projectUserPO.getProjectId()==id){
                 ProjectPO projectPO = projectDao.getProject(id);
-                ProjectReturnData projectReturnData = new ProjectReturnData(projectPO.getId(),projectPO.getName(),projectPO.getDescription());
+                ProjectVO projectVO = new ProjectVO(projectPO.getId(),projectPO.getName(),projectPO.getDescription());
                 List<ProjectUserDto> projectUserDtos = projectUserDao.getProjectUser(id);
                 String image=getImage(id);
-                return new ProjectCompleteData(projectReturnData, projectUserDtos,image);
+                return new ProjectCompleteVO(projectVO, projectUserDtos,image);
             }
         }
         return null;
     }
 
-    public MyProjectReturnData getProject(String username, Integer id){
+    public MyProjectVO getProject(String username, Integer id){
         // 检查用户名是否存在
         if (!userDao.existsByUsername(username)) {
             throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
@@ -333,7 +330,7 @@ public class ProjectService {
             throw new GlobalException(CodeMsg.PROJECT_USER_NOT_EXIST);
         }
         String image=getImage(id);
-        return new MyProjectReturnData(projectPO.getId(), projectPO.getName(),projectPO.getDescription(),projectUserPO.isAdmin(),image);
+        return new MyProjectVO(projectPO.getId(), projectPO.getName(),projectPO.getDescription(),projectUserPO.isAdmin(),image);
     }
 
     public boolean deleteProject(String username, Integer pid){
