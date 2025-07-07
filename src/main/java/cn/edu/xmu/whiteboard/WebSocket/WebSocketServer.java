@@ -272,29 +272,33 @@ public class WebSocketServer {
 
         // 使用computeIfAbsent和乐观锁
         ProjectBoardDto newBoard = projectBoardMap.compute(roomId, (k, existing) -> {
-                    ProjectBoardDto current = existing != null ? existing : new ProjectBoardDto();
-                    ProjectBoardDto updated = new ProjectBoardDto();
-                    BeanUtils.copyProperties(current, updated);
+            ProjectBoardDto current = existing != null ? existing : new ProjectBoardDto();
+            ProjectBoardDto updated = new ProjectBoardDto();
+            BeanUtils.copyProperties(current, updated);
 
-                    // 高效合并元素
-                    Map<String, ElementDto> elementMap = new ConcurrentHashMap<>();
-                    if (current.getElements() != null) {
-                        Arrays.stream(current.getElements())
-                                .filter(e -> e.getId() != null)
-                                .forEach(e -> elementMap.put(e.getId(), e));
-                    }
+            // 高效合并元素
+            Map<String, ElementDto> elementMap = new ConcurrentHashMap<>();
+            List<ElementDto> mergedList = new ArrayList<>();
+            if (current.getElements() != null) {
+                Arrays.stream(current.getElements())
+                        .filter(e -> e.getId() != null)
+                        .forEach(e -> elementMap.put(e.getId(), e));
+            }
             if (request.getElements() != null) {
                 Arrays.stream(request.getElements())
                         .filter(e -> e.getId() != null)
                         .forEach(newElement -> {
                             ElementDto existingElement = elementMap.get(newElement.getId());
                             if (existingElement == null || newElement.getVersion() > existingElement.getVersion()) {
-                                elementMap.put(newElement.getId(), newElement);
+                                mergedList.add(newElement);
+                            }
+                            else{
+                                mergedList.add(existingElement);
                             }
                         });
             }
 
-            updated.setElements(elementMap.values().toArray(new ElementDto[0]));
+            updated.setElements(mergedList.toArray(new ElementDto[0]));
             updated.setAppState(current.getAppState());
             updated.setFiles(request.getFile());
             return updated;
