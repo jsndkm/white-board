@@ -31,17 +31,13 @@ export function ProjectDetailSheet({
   const username = session?.user?.username || "";
   const params = useParams();
 
-  const projectId = useProjectDetailsStore((state) => state.projectId);
+  const projectIdFromStore = useProjectDetailsStore((state) => state.projectId);
   const isOpen = useProjectDetailsStore((state) => state.isOpen);
   const setIsOpen = useProjectDetailsStore((state) => state.setIsOpen);
 
-  const { data: projectDetail } = useGetProject(
-    projectId ?? Number(params.id),
-    isOpen,
-  );
+  const projectId = projectIdFromStore ?? Number(params.id);
+  const { data: projectDetail } = useGetProject(projectId, isOpen);
   const members = projectDetail?.user || [];
-
-  console.log("Project Detail:", projectDetail);
 
   const [inviteUsername, setInviteUsername] = useState("");
 
@@ -55,7 +51,7 @@ export function ProjectDetailSheet({
 
   const handleInvite = () => {
     if (!projectId || !inviteUsername) return;
-    invite.mutate({ projectId, username: inviteUsername });
+    invite.mutate({ projectId: projectId, username: inviteUsername });
     setInviteUsername("");
   };
 
@@ -72,7 +68,7 @@ export function ProjectDetailSheet({
       onConfirm: () => {
         if (!projectId) return;
         deleteProject.mutate(
-          { projectId },
+          { projectId: projectId },
           {
             onSuccess: () => {
               setIsOpen(false);

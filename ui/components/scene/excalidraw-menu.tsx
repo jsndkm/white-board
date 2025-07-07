@@ -41,7 +41,7 @@ export default function ExcalidrawMenu({
   };
 
   const handleViewProjectDetails = () => {
-    useProjectDetailsStore.getState().openDialog();
+    useProjectDetailsStore.getState().openDialog(projectId);
   };
 
   const handleReturnToHome = () => {

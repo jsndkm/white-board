@@ -4,6 +4,7 @@ import AppHeader from "@/components/home/app-header";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -19,8 +20,15 @@ export default function HomePage() {
       <AppHeader />
 
       {/* Hero Section */}
-      <section className="bg-background flex h-screen flex-col items-center justify-center gap-6 px-4 text-center">
-        <Skeleton className="h-[50vh] w-full" />
+      <section className="bg-background mt-20 flex h-screen flex-col items-center justify-start gap-6 px-4 text-center">
+        {/*<Skeleton className="h-[50vh] w-full" />*/}
+        <Image
+          src="/img/cover.png"
+          alt="Cover Image"
+          width={900}
+          height={800}
+          className="rounded-lg shadow-lg"
+        />
         <h1 className="text-2xl font-bold md:text-4xl">
           欢迎使用 White Board 企业战略分析工具
         </h1>
