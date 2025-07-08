@@ -7,8 +7,18 @@ import { MainMenu } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { SiGithub } from "@icons-pack/react-simple-icons";
-import { Eye, Folder, House, LogOut, Plus, Save } from "lucide-react";
+import {
+  Eye,
+  Folder,
+  House,
+  LogOut,
+  Moon,
+  Plus,
+  Save,
+  Sun,
+} from "lucide-react";
 import { signOut } from "next-auth/react";
+import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -21,6 +31,7 @@ export default function ExcalidrawMenu({
 }) {
   const router = useRouter();
   const saveBoard = useSaveBoardMutation();
+  const { theme, setTheme } = useTheme();
 
   const handleNewProject = () => {
     useProjectDialogStore.getState().openDialog("newProject");
@@ -42,6 +53,14 @@ export default function ExcalidrawMenu({
 
   const handleViewProjectDetails = () => {
     useProjectDetailsStore.getState().openDialog(projectId);
+  };
+
+  const toggleTheme = () => {
+    if (theme === "dark") {
+      setTheme("light");
+    } else {
+      setTheme("dark");
+    }
   };
 
   const handleReturnToHome = () => {
@@ -69,6 +88,12 @@ export default function ExcalidrawMenu({
         <MainMenu.Item onSelect={handleViewProjectDetails}>
           <Eye />
           查看项目详情
+        </MainMenu.Item>
+
+        {/* 新增主题切换菜单项 */}
+        <MainMenu.Item onSelect={toggleTheme}>
+          {theme === "dark" ? <Sun /> : <Moon />}
+          {theme === "dark" ? "浅色模式" : "深色模式"}
         </MainMenu.Item>
 
         <MainMenu.Item onSelect={handleReturnToHome}>
