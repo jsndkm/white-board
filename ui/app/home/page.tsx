@@ -1,9 +1,9 @@
 "use client";
 
-import AppHeader from "@/components/home/app-header";
+import AppHeader from "@/components/dashboard/app-header";
+import { FeatureSection } from "@/components/home/feature-section";
+import { InfoSection } from "@/components/home/info-section";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -16,16 +16,15 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex min-h-screen w-screen flex-col overflow-x-hidden">
+    <div className="h-screen w-screen snap-y snap-mandatory overflow-y-scroll">
       <AppHeader />
 
       {/* Hero Section */}
-      <section className="bg-background mt-20 flex h-screen flex-col items-center justify-start gap-6 px-4 text-center">
-        {/*<Skeleton className="h-[50vh] w-full" />*/}
+      <section className="bg-background flex h-screen snap-start flex-col items-center justify-center gap-6 px-4 text-center">
         <Image
-          src="/img/cover.png"
+          src="/images/cover.png"
           alt="Cover Image"
-          width={900}
+          width={1000}
           height={800}
           className="rounded-lg shadow-lg"
         />
@@ -41,47 +40,65 @@ export default function HomePage() {
         </Button>
       </section>
 
-      {/* Feature Sections */}
-      <Section title="简易的操作">
-        <Skeleton className="h-64 w-full rounded-xl" />
-      </Section>
+      <FeatureSection
+        title="简易的操作"
+        description={["拖拽即可使用", "无需复杂配置", "上手快"]}
+        image={
+          <Image
+            src="/images/operation.gif"
+            alt="操作演示"
+            width={1000}
+            height={800}
+            className="rounded-xl shadow-xl"
+          />
+        }
+      />
 
-      <Section title="丰富的模板">
-        <Skeleton className="h-64 w-full rounded-xl" />
-      </Section>
+      <FeatureSection
+        title="丰富的模板"
+        description={["内置战略分析模板", "一键生成", "自动布局"]}
+        image={
+          <Image
+            src="/images/operation.gif"
+            alt="操作演示"
+            width={1000}
+            height={800}
+            className="rounded-xl shadow-xl"
+          />
+        }
+        reverse
+      />
 
-      <Section title="多人协作">
-        <Skeleton className="h-64 w-full rounded-xl" />
-      </Section>
+      <FeatureSection
+        title="多人协作"
+        description={["支持实时共享", "多人同步编辑", "权限管理"]}
+        image={
+          <Image
+            src="/images/operation.gif"
+            alt="操作演示"
+            width={1000}
+            height={800}
+            className="rounded-xl shadow-xl"
+          />
+        }
+      />
 
-      <Section title="AI辅助策略">
-        <Skeleton className="h-64 w-full rounded-xl" />
-      </Section>
+      <FeatureSection
+        title="AI辅助策略"
+        description={["分析逻辑链条", "提出策略建议", "提升决策质量"]}
+        image={
+          <Image
+            src="/images/operation.gif"
+            alt="操作演示"
+            width={1000}
+            height={800}
+            className="rounded-xl shadow-xl"
+          />
+        }
+        reverse
+      />
 
-      <footer className="text-muted-foreground mt-10 flex h-20 items-center justify-center border-t text-sm">
-        © 2025 White Board. All rights reserved.
-      </footer>
+      <InfoSection />
     </div>
-  );
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <motion.section
-      className="container mx-auto my-16 px-4 text-center"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      viewport={{ once: true }}
-    >
-      <h2 className="mb-6 text-2xl font-semibold md:text-3xl">{title}</h2>
-      <div className="flex items-center justify-center">{children}</div>
-    </motion.section>
   );
 }

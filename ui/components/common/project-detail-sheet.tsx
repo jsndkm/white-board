@@ -1,5 +1,5 @@
 import { EditableSheetHeader } from "@/components/common/editable-sheet-header";
-import { MemberList } from "@/components/home/member-list";
+import { MemberList } from "@/components/dashboard/member-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent } from "@/components/ui/sheet";

@@ -1,8 +1,8 @@
 "use client";
 
-import AppHeader from "@/components/home/app-header";
-import { TabMyProject } from "@/components/home/tab-my-project";
-import { TabNewProject } from "@/components/home/tab-new-project";
+import AppHeader from "@/components/dashboard/app-header";
+import { TabMyProject } from "@/components/dashboard/tab-my-project";
+import { TabNewProject } from "@/components/dashboard/tab-new-project";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHomeTabsStore } from "@/stores/home-tabs";
 import { AnimatePresence, motion } from "framer-motion";
