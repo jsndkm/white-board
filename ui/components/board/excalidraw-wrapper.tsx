@@ -1,5 +1,6 @@
 "use client";
 
+import { AISuggestionBox } from "@/components/board/ai-suggestion-box";
 import ExcalidrawMenu from "@/components/board/excalidraw-menu";
 import { ProjectDetailSheet } from "@/components/common/project-detail-sheet";
 import { ProjectDialog } from "@/components/common/project-dialog";
@@ -268,6 +269,7 @@ export default function ExcalidrawWrapper({
         onChange={debounceHandleChange}
         onPointerUpdate={debounceHandlePointerUpdate}
         isCollaborating={true}
+        renderTopRightUI={() => <AISuggestionBox />}
       >
         <ExcalidrawMenu api={excalidrawAPIRef.current} projectId={projectId} />
         <ProjectDialog />
