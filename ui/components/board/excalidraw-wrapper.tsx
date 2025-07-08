@@ -1,10 +1,10 @@
 "use client";
 
+import ExcalidrawMenu from "@/components/board/excalidraw-menu";
 import { ProjectDetailSheet } from "@/components/common/project-detail-sheet";
 import { ProjectDialog } from "@/components/common/project-dialog";
-import ExcalidrawMenu from "@/components/scene/excalidraw-menu";
+import { useGetProjectBoard } from "@/hooks/api/board/use-get-project-board";
 import { useSaveBoardMutation } from "@/hooks/api/board/use-save-board";
-import { useGetProjectBoard } from "@/hooks/api/project/use-get-project-board";
 import { useGetProjectSimple } from "@/hooks/api/project/use-get-project-simple";
 import { useAutoSave } from "@/hooks/use-autosave";
 import { useCustomWebSocket } from "@/hooks/use-custom-websocket";
@@ -248,7 +248,6 @@ export default function ExcalidrawWrapper({
       <Excalidraw
         langCode="zh-CN"
         theme={theme as Theme}
-        // excalidrawAPI={(api) => setExcalidrawAPI(api)}
         excalidrawAPI={(api) => (excalidrawAPIRef.current = api)}
         UIOptions={{
           tools: {
@@ -263,7 +262,6 @@ export default function ExcalidrawWrapper({
                   refreshDimensions: false,
                   repairBindings: true,
                 }),
-                // elements: scene.elements ?? [],
                 scrollToContent: true,
               }
         }
