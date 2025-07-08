@@ -59,7 +59,7 @@ export default function HomePage() {
         description={["内置战略分析模板", "一键生成", "自动布局"]}
         image={
           <Image
-            src="/images/operation.gif"
+            src="/images/template.gif"
             alt="操作演示"
             width={1000}
             height={800}
