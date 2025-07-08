@@ -1,6 +1,6 @@
 import { API } from "@/lib/endpoint";
-import { Project } from "@/lib/types/project";
 import { fetcher } from "@/lib/utils";
+import { Project } from "@/types/project";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 export function useGetProjectSimple(projectId: number | undefined) {

@@ -8,9 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Project } from "@/lib/types/project";
 import { useProjectDetailsStore } from "@/stores/project-detail";
 import { useProjectDialogStore } from "@/stores/project-dialog";
+import { Project } from "@/types/project";
 import { motion } from "framer-motion";
 import { Eye, FolderOpen } from "lucide-react";
 import Image from "next/image";

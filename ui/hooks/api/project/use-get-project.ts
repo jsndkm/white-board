@@ -1,6 +1,6 @@
 import { API } from "@/lib/endpoint";
-import { ProjectDetail } from "@/lib/types/project";
 import { fetcher } from "@/lib/utils";
+import { ProjectDetail } from "@/types/project";
 import { useQuery } from "@tanstack/react-query";
 
 export function useGetProject(

@@ -1,6 +1,6 @@
 import { API } from "@/lib/endpoint";
-import { Template } from "@/lib/types/template";
 import { fetcher } from "@/lib/utils";
+import { Template } from "@/types/template";
 import { useQuery } from "@tanstack/react-query";
 
 export function useGetTemplateList(enabled: boolean) {

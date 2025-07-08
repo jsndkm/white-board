@@ -3,7 +3,7 @@ import {
   RoomUserChangeData,
   ServerBroadcastData,
   ServerPointerBroadcast,
-} from "@/lib/types/websocket";
+} from "@/types/websocket";
 import { useEffect } from "react";
 import useWebSocket from "react-use-websocket";
 

@@ -1,6 +1,6 @@
 import { API } from "@/lib/endpoint";
-import { CreateProjectRespData } from "@/lib/types/project";
 import { fetcher } from "@/lib/utils";
+import { CreateProjectRespData } from "@/types/project";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

@@ -9,13 +9,13 @@ import { useGetProjectSimple } from "@/hooks/api/project/use-get-project-simple"
 import { useAutoSave } from "@/hooks/use-autosave";
 import { useCustomWebSocket } from "@/hooks/use-custom-websocket";
 import { WEBSOCKET_URL } from "@/lib/endpoint";
+import { useBoardStore } from "@/stores/board";
 import {
   DisconnectData,
   RoomUserChangeData,
   ServerBroadcastData,
   ServerPointerBroadcast,
-} from "@/lib/types/websocket";
-import { useBoardStore } from "@/stores/board";
+} from "@/types/websocket";
 import {
   CaptureUpdateAction,
   Excalidraw,
