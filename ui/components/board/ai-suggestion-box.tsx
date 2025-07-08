@@ -2,8 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
+import { API } from "@/lib/endpoint";
 import { Bot } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function AISuggestionBox() {
   const [messages, setMessages] = useState<string[]>([]);
@@ -28,25 +29,30 @@ export function AISuggestionBox() {
     };
   }, [hasNew, isOpen]);
 
-  // 模拟消息流式到达
   useEffect(() => {
-    const chunks = [
-      "正在分析画布内容...",
-      "建议使用更清晰的图标。",
-      "也许可以添加一些箭头或说明文字。",
-    ];
-    let i = 0;
-    const interval = setInterval(() => {
-      if (i < chunks.length) {
-        setMessages((prev) => [...prev, chunks[i++]]);
-        if (!isOpen) setHasNew(true); // 收起时来新消息就提示
-      } else {
-        clearInterval(interval);
-        setIsLoading(false);
-      }
-    }, 1000);
+    const eventSource = new EventSource(API.ai.advice);
 
-    return () => clearInterval(interval);
+    eventSource.onmessage = (event) => {
+      const newMessage = event.data;
+      setMessages((prev) => {
+        const updated = [...prev, newMessage];
+        return updated.slice(-20); // 只保留最后 20 条
+      });
+
+      if (!isOpen) {
+        setHasNew(true); // 收起状态提示新消息
+      }
+    };
+
+    eventSource.onerror = (err) => {
+      console.error("SSE 连接出错:", err);
+      eventSource.close();
+      setIsLoading(false);
+    };
+
+    return () => {
+      eventSource.close(); // 组件卸载时清理
+    };
   }, [isOpen]);
 
   const toggleOpen = () => {
@@ -93,6 +99,14 @@ function AISuggestionBoxContent({
   messages: string[];
   isLoading: boolean;
 }) {
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
   return (
     <Card className="border-muted max-h-[400px] w-80 rounded-2xl bg-white shadow-lg dark:bg-zinc-900">
       <CardHeader>
@@ -113,6 +127,8 @@ function AISuggestionBoxContent({
                 <Skeleton className="h-4 w-2/3" />
               </div>
             )}
+            <div ref={bottomRef} />
+            {/* 自动滚动锚点 */}
           </div>
         </ScrollArea>
       </CardContent>

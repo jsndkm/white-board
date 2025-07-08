@@ -35,4 +35,7 @@ export const API = {
     updateScene: (projectId: number) =>
       `${BASE_URL}/api/project-board/${projectId}`,
   },
+  ai: {
+    advice: `${BASE_URL}/api/ai-advice`,
+  },
 };
