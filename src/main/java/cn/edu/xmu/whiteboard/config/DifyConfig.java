@@ -10,7 +10,6 @@ public class DifyConfig {
     private String baseUrl;
     private String endpoint;
 
-    // Getters and Setters
     public String getKey() { return key; }
     public void setKey(String key) { this.key = key; }
     public String getBaseUrl() { return baseUrl; }
