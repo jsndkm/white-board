@@ -269,7 +269,9 @@ export default function ExcalidrawWrapper({
         onChange={debounceHandleChange}
         onPointerUpdate={debounceHandlePointerUpdate}
         isCollaborating={true}
-        renderTopRightUI={() => <AISuggestionBox />}
+        renderTopRightUI={() => (
+          <AISuggestionBox excalidrawAPI={excalidrawAPIRef.current} />
+        )}
       >
         <ExcalidrawMenu api={excalidrawAPIRef.current} projectId={projectId} />
         <ProjectDialog />
