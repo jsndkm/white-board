@@ -232,4 +232,16 @@ public class RedisService {
             returnToPool(jedis);
         }
     }
+
+    public void appendMessage(KeyPrefix key, String id,String message) {
+        // 获取现有列表或创建新列表
+        List<String> messages = get(key, id, List.class);
+        if (messages == null) {
+            messages = new ArrayList<>();
+        }
+        messages.add(message);
+
+        // 存回Redis，设置24小时过期
+        set(key, id, messages);
+    }
 }
