@@ -16,7 +16,8 @@ public class CorsConfig implements WebMvcConfigurer {
                         "http://192.168.43.1:3000",
                         "http://192.168.222.1:3000",
                         "http://192.168.137.154:3000",
-                        "http://192.168.137.233:3000"
+                        "http://192.168.137.233:3000",
+                        "http://192.168.137.111:3000"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")

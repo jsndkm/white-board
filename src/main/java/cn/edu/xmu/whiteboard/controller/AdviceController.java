@@ -3,10 +3,13 @@ package cn.edu.xmu.whiteboard.controller;
 import cn.edu.xmu.whiteboard.controller.dto.DifyDto;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ElementDto;
 import cn.edu.xmu.whiteboard.controller.dto.pb.ProjectBoardDto;
+import cn.edu.xmu.whiteboard.controller.dto.pb.Prompt;
+import cn.edu.xmu.whiteboard.controller.dto.pb.PromptDeserializer;
 import cn.edu.xmu.whiteboard.service.DifyChatService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -19,21 +22,55 @@ import java.util.concurrent.atomic.AtomicReference;
 public class AdviceController {
 
     private final DifyChatService chatService;
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     public AdviceController(DifyChatService chatService) {
         this.chatService = chatService;
+        this.objectMapper = createCustomObjectMapper();
     }
 
+    private ObjectMapper createCustomObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        // 注册自定义反序列化器
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(Prompt.class, new PromptDeserializer());
+        mapper.registerModule(module);
+
+        return mapper;
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(value = "/ai-advice", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> streamChatResponse(@RequestBody ProjectBoardDto projectBoardDto) {
-        // 提取所有文本元素的内容
+    public Flux<String> streamChatResponse(@RequestBody ProjectBoardDto json) {
+        // 打印接收到的原始JSON用于调试
+        System.out.println("Received raw JSON: " + json);
+
+//        Prompt prompt;
+//        try {
+//            prompt = objectMapper.readValue(json, Prompt.class);
+//        } catch (JsonProcessingException e) {
+//            System.err.println("JSON parsing error: " + e.getMessage());
+//            throw new RuntimeException("Invalid request format", e);
+//        }
+
         StringBuilder query = new StringBuilder();
-        for (ElementDto element : projectBoardDto.getElements()) {
-            if ("text".equals(element.getType()) && element.getText() != null) {
-                query.append(element.getText());
+
+        if (json.getElements() != null) {
+            for (ElementDto element : json.getElements()) {
+                if (element.getText() != null) {
+                    System.out.println(element.getText());
+                    query.append(element.getText());
+                    query.append(";");
+                }
             }
         }
+
+        if(query.isEmpty()) {
+            query.append("随便给点提议");
+        }
+
+        System.out.println("Constructed query: " + query);
 
         // 构建Dify请求DTO
         DifyDto difyDto = new DifyDto();
@@ -106,6 +143,7 @@ public class AdviceController {
             if (c == '。' || c == '\n') {
                 // 提取完整句子（从上一个结束点到当前结束点）
                 String sentence = text.substring(lastIndex, i + 1);
+                System.out.println(sentence);
                 outputSink.tryEmitNext(sentence);
 
                 // 更新最后结束位置
