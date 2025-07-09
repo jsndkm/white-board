@@ -3,23 +3,94 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API } from "@/lib/endpoint";
+import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { Bot } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-export function AISuggestionBox() {
+export function AISuggestionBox({
+  excalidrawAPI,
+}: {
+  excalidrawAPI: ExcalidrawImperativeAPI | null;
+}) {
   const [messages, setMessages] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [hasNew, setHasNew] = useState(false);
   const [showTip, setShowTip] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
+  const controllerRef = useRef<AbortController | null>(null);
+
+  const sendRequest = async () => {
+    if (!excalidrawAPI) return;
+
+    const elements = excalidrawAPI.getSceneElementsIncludingDeleted();
+    const payload = JSON.stringify({ elements });
+
+    setIsLoading(true);
+    const controller = new AbortController();
+    controllerRef.current = controller;
+
+    try {
+      const res = await fetch(API.ai.advice, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+        },
+        body: payload,
+        signal: controller.signal,
+      });
+
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let buffer = "";
+
+      while (reader) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+
+        for (const line of lines) {
+          if (line.startsWith("data:")) {
+            const text = line.replace(/^data:\s*/, "");
+            setMessages((prev) => [...prev, text].slice(-20));
+            if (!isOpen) setHasNew(true);
+          }
+        }
+
+        // 留下未完整解析的一行
+        buffer = lines[lines.length - 1] ?? "";
+      }
+    } catch (err) {
+      console.error("AI stream error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 每 30 秒请求一次
+  useEffect(() => {
+    if (!excalidrawAPI) return;
+
+    const interval = setInterval(sendRequest, 30000);
+    return () => clearInterval(interval);
+  }, [excalidrawAPI]);
+
+  // 打开时触发一次
+  useEffect(() => {
+    if (isOpen) {
+      sendRequest();
+    }
+  }, [isOpen]);
+
+  // 气泡提示逻辑
   useEffect(() => {
     let tipTimeout: ReturnType<typeof setTimeout> | null = null;
 
     if (hasNew && !isOpen) {
-      tipTimeout = setTimeout(() => {
-        setShowTip(true);
-      }, 3000); // 3秒后显示气泡提示
+      tipTimeout = setTimeout(() => setShowTip(true), 3000);
     } else {
       setShowTip(false);
     }
@@ -29,47 +100,22 @@ export function AISuggestionBox() {
     };
   }, [hasNew, isOpen]);
 
-  useEffect(() => {
-    const eventSource = new EventSource(API.ai.advice);
-
-    eventSource.onmessage = (event) => {
-      const newMessage = event.data;
-      setMessages((prev) => {
-        const updated = [...prev, newMessage];
-        return updated.slice(-20); // 只保留最后 20 条
-      });
-
-      if (!isOpen) {
-        setHasNew(true); // 收起状态提示新消息
-      }
-    };
-
-    eventSource.onerror = (err) => {
-      console.error("SSE 连接出错:", err);
-      eventSource.close();
-      setIsLoading(false);
-    };
-
-    return () => {
-      eventSource.close(); // 组件卸载时清理
-    };
-  }, [isOpen]);
-
   const toggleOpen = () => {
-    setIsOpen((prev) => !prev);
-    if (!isOpen) setHasNew(false);
+    setIsOpen((prev) => {
+      const next = !prev;
+      if (next) setHasNew(false);
+      return next;
+    });
   };
 
   return (
     <div className="relative">
-      {/* 控制按钮 */}
       <Button
         variant="outline"
         size="icon"
         onClick={toggleOpen}
         className="relative"
       >
-        {/* 气泡提示 */}
         {showTip && (
           <div className="bg-primary text-primary-foreground absolute right-0 bottom-[-40px] z-50 w-max rounded-lg px-3 py-1 text-sm shadow-md">
             有新的 AI 建议
@@ -82,7 +128,6 @@ export function AISuggestionBox() {
         )}
       </Button>
 
-      {/* 建议框内容 */}
       {isOpen && (
         <div className="absolute right-0 z-50 mt-2">
           <AISuggestionBoxContent messages={messages} isLoading={isLoading} />
@@ -102,9 +147,7 @@ function AISuggestionBoxContent({
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
@@ -128,7 +171,6 @@ function AISuggestionBoxContent({
               </div>
             )}
             <div ref={bottomRef} />
-            {/* 自动滚动锚点 */}
           </div>
         </ScrollArea>
       </CardContent>
