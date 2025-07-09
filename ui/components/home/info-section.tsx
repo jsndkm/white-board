@@ -21,10 +21,14 @@ export function InfoSection() {
             </a>
           </p>
           <p className="text-muted-foreground text-base">
-            联系方式：123@123.com
+            联系方式：llmons@foxmail.com
+          </p>
+          <p className="text-muted-foreground text-base">技术栈：</p>
+          <p className="text-muted-foreground text-base">
+            前端：Next.js + Tailwind CSS + ShadCN + Excalidraw
           </p>
           <p className="text-muted-foreground text-base">
-            技术栈：Next.js + Tailwind CSS + ShadCN + Excalidraw
+            后端：Java Spring + MySQL + Redis + WebSocket + Dify
           </p>
         </div>
       </div>

@@ -74,7 +74,7 @@ export default function HomePage() {
         description={["支持实时共享", "多人同步编辑", "权限管理"]}
         image={
           <Image
-            src="/images/operation.gif"
+            src="/images/collaboration.gif"
             alt="操作演示"
             width={1000}
             height={800}
@@ -88,7 +88,7 @@ export default function HomePage() {
         description={["分析逻辑链条", "提出策略建议", "提升决策质量"]}
         image={
           <Image
-            src="/images/operation.gif"
+            src="/images/ai.gif"
             alt="操作演示"
             width={1000}
             height={800}
